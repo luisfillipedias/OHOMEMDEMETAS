@@ -25,7 +25,7 @@
 [ext_resource type="PackedScene" uid="uid://dhiqkgm72e8e" path="res://assets/models/campus1/galpao.glb" id="16_d4qwm"]
 [ext_resource type="PackedScene" uid="uid://lepbujd1iahv" path="res://assets/URBAN/Cones & Barriers/Bollards/retro_bollard_detailed.fbx" id="17_vlj7a"]
 [ext_resource type="PackedScene" uid="uid://cumbe7v1vjnrj" path="res://assets/models/campus1/chao.glb" id="17_yjb2w"]
-[ext_resource type="PackedScene" uid="uid://vcb8bhkw53yt" path="res://assets/models/campus1/Hi3D_Modelo 3D Prédio Administrativo Universitário Moderno_allparts_20260822_150921.glb" id="18_d4qwm"]
+[ext_resource type="PackedScene" uid="uid://vcb8bhkw53yt" path="res://assets/models/campus1/predio_adm.glb" id="18_d4qwm"]
 [ext_resource type="PackedScene" uid="uid://ddqk43ydbu2u3" path="res://assets/URBAN/Cones & Barriers/Bollards/security_bollard.fbx" id="18_ocq0d"]
 [ext_resource type="Texture2D" uid="uid://dcgbiws6ng3yi" path="res://assets/textures/psx_stormy_sky.jpg" id="18_sky_tex"]
 [ext_resource type="PackedScene" uid="uid://ccn36i1t7p80f" path="res://assets/URBAN/Litter/Metal trashcan/metaltrashcan_beaten.glb" id="19_hw3tc"]
