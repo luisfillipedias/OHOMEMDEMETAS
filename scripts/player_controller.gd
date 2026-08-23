@@ -30,11 +30,7 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
 		if not is_frozen and Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED:
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
-		var ch = get_tree().get_first_node_in_group("chapter")
-		if ch and ch.has_method("toggle_pause_menu"):
-			ch.toggle_pause_menu()
-			return
+	# ESC é tratado pelo chapter_01.gd (PROCESS_MODE_ALWAYS) — não duplicar aqui
 	if is_frozen:
 		return
 	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:

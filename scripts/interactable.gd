@@ -17,7 +17,7 @@ func interact() -> void:
 		return
 	used = true
 	if flag_to_set != "":
-		GameManager.set_flag(flag_to_set)
+		GameManager.set_flag(flag_to_set, true)
 	on_interact()
 
 # Sobrescreva nas cenas específicas

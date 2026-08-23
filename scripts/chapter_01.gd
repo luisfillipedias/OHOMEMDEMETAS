@@ -40,13 +40,17 @@ var quarto_trancado: bool = false
 var is_paused: bool = false
 
 var pause_menu_control: Control = null
-var settings_subpanel: Control = null
 var audio_wind_extra: AudioStreamPlayer = null
+
+var font_retro: Font = null
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	add_to_group("chapter")
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	
+	if ResourceLoader.exists("res://assets/fonts/text_font.ttf"):
+		font_retro = load("res://assets/fonts/text_font.ttf") as Font
 	
 	_setup_pause_menu()
 	
@@ -61,20 +65,18 @@ func _ready() -> void:
 	clima_manager = ClimaManager.new()
 	add_child(clima_manager)
 	
-	# Camada extra de áudio de vento e uivos PSX
+	# Áudio de vento extra e folhas voando
 	_setup_extra_wind_audio()
-	
-	# Partículas de folhas voando
 	_setup_wind_particles()
 	
-	# Aplica shader de vento nas árvores com cache (60 FPS estáveis)
+	# Aplica shader de vento nas árvores
 	_aplicar_vento_automatico_em_todas_arvores()
 	
-	# Sequência cinematográfica de Boot VHS / Tubo CRT ligando
+	# Boot VHS
 	_play_vhs_intro_sequence()
 
 # ============================================================
-# SISTEMA DE PAUSA E CONFIGURAÇÕES [ESC]
+# SISTEMA DE PAUSA RETRO VHS / TV AZUL [ESC]
 # ============================================================
 
 func _setup_pause_menu() -> void:
@@ -89,44 +91,76 @@ func _setup_pause_menu() -> void:
 		pause_menu_control.set_anchors_preset(Control.PRESET_FULL_RECT)
 		pause_menu_control.z_index = 100
 		
-		# Fundo escuro
-		var bg = ColorRect.new()
-		bg.color = Color(0.02, 0.02, 0.04, 0.88)
-		bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-		pause_menu_control.add_child(bg)
+		# Fundo semitransparente escurecido
+		var dark_dim = ColorRect.new()
+		dark_dim.color = Color(0.0, 0.0, 0.0, 0.65)
+		dark_dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+		pause_menu_control.add_child(dark_dim)
 		
+		# Caixa Azul Retrô VCR (FUNCTION)
+		var vcr_box = ColorRect.new()
+		vcr_box.name = "VCRBox"
+		vcr_box.color = Color(0.10, 0.16, 0.58, 0.98)
+		vcr_box.set_anchors_preset(Control.PRESET_CENTER)
+		vcr_box.custom_minimum_size = Vector2(530, 430)
+		vcr_box.offset_left = -265
+		vcr_box.offset_top = -215
+		vcr_box.offset_right = 265
+		vcr_box.offset_bottom = 215
+		pause_menu_control.add_child(vcr_box)
+		
+		# Borda branca VCR
+		var border = ReferenceRect.new()
+		border.border_color = Color(0.92, 0.92, 0.92, 1.0)
+		border.border_width = 3.0
+		border.editor_only = false
+		border.set_anchors_preset(Control.PRESET_FULL_RECT)
+		vcr_box.add_child(border)
+		
+		# Container de Conteúdo
 		var vbox = VBoxContainer.new()
-		vbox.set_anchors_preset(Control.PRESET_CENTER)
-		vbox.custom_minimum_size = Vector2(380, 320)
-		vbox.add_theme_constant_override("separation", 14)
-		pause_menu_control.add_child(vbox)
+		vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+		vbox.offset_left = 32
+		vbox.offset_top = 22
+		vbox.offset_right = -32
+		vbox.offset_bottom = -80
+		vbox.add_theme_constant_override("separation", 10)
+		vcr_box.add_child(vbox)
 		
+		# Título: FUNCTION
 		var title = Label.new()
-		title.text = "PAUSA  //  [ESC]"
+		title.text = "FUNCTION"
 		title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		title.add_theme_font_size_override("font_size", 22)
-		title.add_theme_color_override("font_color", Color(1, 0.9, 0.4, 1))
+		if font_retro:
+			title.add_theme_font_override("font", font_retro)
+		title.add_theme_font_size_override("font_size", 24)
+		title.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 1.0))
 		vbox.add_child(title)
 		
+		var spacer = Control.new()
+		spacer.custom_minimum_size = Vector2(0, 6)
+		vbox.add_child(spacer)
+		
+		# Botão Retomar Jogo
 		var btn_resume = Button.new()
-		btn_resume.text = "RETOMAR JOGO"
-		btn_resume.custom_minimum_size = Vector2(0, 38)
+		btn_resume.text = "→ RETOMAR JOGO"
+		btn_resume.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		if font_retro:
+			btn_resume.add_theme_font_override("font", font_retro)
+		btn_resume.add_theme_font_size_override("font_size", 18)
+		btn_resume.add_theme_color_override("font_color", Color(1, 1, 1, 1))
+		btn_resume.add_theme_color_override("font_hover_color", Color(1, 0.3, 0.3, 1))
+		btn_resume.flat = true
 		btn_resume.pressed.connect(func(): toggle_pause_menu())
 		vbox.add_child(btn_resume)
 		
-		var btn_settings = Button.new()
-		btn_settings.text = "CONFIGURAÇÕES"
-		btn_settings.custom_minimum_size = Vector2(0, 38)
-		btn_settings.pressed.connect(func(): _toggle_settings_panel())
-		vbox.add_child(btn_settings)
-		
-		settings_subpanel = VBoxContainer.new()
-		settings_subpanel.add_theme_constant_override("separation", 8)
-		settings_subpanel.hide()
-		
+		# Sliders de Volume
 		var lbl_vol = Label.new()
-		lbl_vol.text = "Volume Geral:"
-		settings_subpanel.add_child(lbl_vol)
+		lbl_vol.text = "MASTER VOLUME:"
+		if font_retro:
+			lbl_vol.add_theme_font_override("font", font_retro)
+		lbl_vol.add_theme_font_size_override("font_size", 16)
+		vbox.add_child(lbl_vol)
 		
 		var slider_vol = HSlider.new()
 		slider_vol.min_value = 0.0
@@ -134,10 +168,28 @@ func _setup_pause_menu() -> void:
 		slider_vol.step = 0.05
 		slider_vol.value = db_to_linear(AudioServer.get_bus_volume_db(0))
 		slider_vol.value_changed.connect(func(v): AudioServer.set_bus_volume_db(0, linear_to_db(v)))
-		settings_subpanel.add_child(slider_vol)
+		vbox.add_child(slider_vol)
 		
+		var lbl_sfx = Label.new()
+		lbl_sfx.text = "SFX VOLUME:"
+		if font_retro:
+			lbl_sfx.add_theme_font_override("font", font_retro)
+		lbl_sfx.add_theme_font_size_override("font_size", 16)
+		vbox.add_child(lbl_sfx)
+		
+		var slider_sfx = HSlider.new()
+		slider_sfx.min_value = 0.0
+		slider_sfx.max_value = 1.0
+		slider_sfx.step = 0.05
+		slider_sfx.value = 0.85
+		vbox.add_child(slider_sfx)
+		
+		# Checkbox Tela Cheia
 		var check_fs = CheckBox.new()
-		check_fs.text = "Tela Cheia"
+		check_fs.text = "  TELA CHEIA"
+		if font_retro:
+			check_fs.add_theme_font_override("font", font_retro)
+		check_fs.add_theme_font_size_override("font_size", 16)
 		check_fs.button_pressed = (DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN)
 		check_fs.toggled.connect(func(toggled):
 			if toggled:
@@ -145,25 +197,49 @@ func _setup_pause_menu() -> void:
 			else:
 				DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 		)
-		settings_subpanel.add_child(check_fs)
-		vbox.add_child(settings_subpanel)
+		vbox.add_child(check_fs)
 		
-		var btn_main_menu = Button.new()
-		btn_main_menu.text = "MENU PRINCIPAL"
-		btn_main_menu.custom_minimum_size = Vector2(0, 38)
-		btn_main_menu.pressed.connect(_on_main_menu_pressed)
-		vbox.add_child(btn_main_menu)
+		# Botão Menu Principal
+		var btn_main = Button.new()
+		btn_main.text = "→ MENU PRINCIPAL"
+		btn_main.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		if font_retro:
+			btn_main.add_theme_font_override("font", font_retro)
+		btn_main.add_theme_font_size_override("font_size", 18)
+		btn_main.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85, 1))
+		btn_main.add_theme_color_override("font_hover_color", Color(1, 0.3, 0.3, 1))
+		btn_main.flat = true
+		btn_main.pressed.connect(_on_main_menu_pressed)
+		vbox.add_child(btn_main)
+		
+		# Barra Inferior VCR OSD (Cinza Claro)
+		var footer_bg = ColorRect.new()
+		footer_bg.color = Color(0.88, 0.88, 0.90, 1.0)
+		footer_bg.custom_minimum_size = Vector2(0, 52)
+		footer_bg.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+		footer_bg.offset_left = 6
+		footer_bg.offset_right = -6
+		footer_bg.offset_bottom = -6
+		footer_bg.offset_top = -58
+		vcr_box.add_child(footer_bg)
+		
+		var footer_lbl = Label.new()
+		footer_lbl.text = "SELECT WITH (▲, ▼) AND (OK)\nPRESS (ESC) TO END"
+		footer_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		footer_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		footer_lbl.set_anchors_preset(Control.PRESET_FULL_RECT)
+		if font_retro:
+			footer_lbl.add_theme_font_override("font", font_retro)
+		footer_lbl.add_theme_font_size_override("font_size", 14)
+		footer_lbl.add_theme_color_override("font_color", Color(0.08, 0.08, 0.12, 1.0))
+		footer_bg.add_child(footer_lbl)
 		
 		hud.add_child(pause_menu_control)
 	
 	pause_menu_control.hide()
 
-func _toggle_settings_panel() -> void:
-	if settings_subpanel:
-		settings_subpanel.visible = not settings_subpanel.visible
-
-func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE):
+func _process(_delta: float) -> void:
+	if Input.is_action_just_pressed("ui_cancel"):
 		toggle_pause_menu()
 
 func toggle_pause_menu() -> void:
@@ -181,9 +257,6 @@ func _toggle_pause() -> void:
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	else:
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-
-func _on_resume_pressed() -> void:
-	toggle_pause_menu()
 
 func _on_main_menu_pressed() -> void:
 	get_tree().paused = false
@@ -328,7 +401,7 @@ func _setup_wind_particles() -> void:
 		particles.position = Vector3(0.0, 5.0, 0.0)
 
 # ============================================================
-# TRANSIÇÃO CINEMATOGRÁFICA DE BOOT VHS / TUBO CRT
+# BOOT VHS
 # ============================================================
 
 func _play_vhs_intro_sequence() -> void:
@@ -356,6 +429,8 @@ func _play_vhs_intro_sequence() -> void:
 	var vcr_label := Label.new()
 	vcr_label.text = "▶ PLAY   SP   17:50:00"
 	vcr_label.position = Vector2(36, 28)
+	if font_retro:
+		vcr_label.add_theme_font_override("font", font_retro)
 	vcr_label.add_theme_color_override("font_color", Color(0.25, 1.0, 0.45, 1.0))
 	vcr_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.95))
 	vcr_label.add_theme_constant_override("shadow_offset_x", 2)
