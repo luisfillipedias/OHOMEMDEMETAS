@@ -1,0 +1,12 @@
+# Blender 4.0.0 MTL File: 'low_poly_nature.blend'
+# www.blender.org
+
+newmtl med_tree
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd textures/med_tree.png
+map_d textures/med_tree.png
