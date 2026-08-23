@@ -137,11 +137,16 @@ func _aplicar_vento_automatico_em_todas_arvores() -> void:
 	if not wind_shader:
 		return
 	
+	# Cache de materiais por textura para evitar centenas de draw calls individuais (60 FPS no bosque)
+	var mat_cache := {}
+	
 	var mesh_instances = find_children("*", "MeshInstance3D", true, false)
 	for m in mesh_instances:
 		var mi := m as MeshInstance3D
 		var full_name = (mi.name + " " + mi.get_parent().name).to_lower()
-		if "tree" in full_name or "arvore" in full_name or "palm" in full_name or "palmeira" in full_name or "bosquinho" in full_name or "folha" in full_name or "branch" in full_name or "commontree" in full_name or "bush" in full_name or "arbusto" in full_name or "vegetat" in full_name:
+		
+		# Identifica árvores, folhagens, gramas e vegetações
+		if "tree" in full_name or "arvore" in full_name or "palm" in full_name or "palmeira" in full_name or "bosquinho" in full_name or "folha" in full_name or "branch" in full_name or "commontree" in full_name or "grass_p" in full_name or "bush" in full_name or "arbusto" in full_name or "vegetat" in full_name:
 			var mat_count = mi.get_surface_override_material_count()
 			if mat_count == 0 and mi.mesh:
 				mat_count = mi.mesh.get_surface_count()
@@ -152,14 +157,19 @@ func _aplicar_vento_automatico_em_todas_arvores() -> void:
 				if active_mat is BaseMaterial3D and active_mat.albedo_texture:
 					albedo_tex = active_mat.albedo_texture
 				
-				var sm := ShaderMaterial.new()
-				sm.shader = wind_shader
-				if albedo_tex:
-					sm.set_shader_parameter("texture_albedo", albedo_tex)
-				sm.set_shader_parameter("velocidade_vento", 3.2)
-				sm.set_shader_parameter("forca_vento", 0.38)
-				sm.set_shader_parameter("turbulencia", 0.5)
+				var cache_key = albedo_tex.resource_path if albedo_tex else "default_tree_mat"
+				var sm: ShaderMaterial
+				if mat_cache.has(cache_key):
+					sm = mat_cache[cache_key]
+				else:
+					sm = ShaderMaterial.new()
+					sm.shader = wind_shader
+					if albedo_tex:
+						sm.set_shader_parameter("texture_albedo", albedo_tex)
+					sm.set_shader_parameter("velocidade_vento", 3.2)
+					sm.set_shader_parameter("forca_vento", 0.38)
+					mat_cache[cache_key] = sm
+					if clima_manager:
+						clima_manager.tree_materials.append(sm)
 				
 				mi.set_surface_override_material(s, sm)
-				if clima_manager:
-					clima_manager.tree_materials.append(sm)

@@ -2342,6 +2342,1212 @@ material_override = SubResource("StandardMaterial3D_frvqy")
 mesh = SubResource("QuadMesh_1iice")
 metadata/_edit_group_ = true
 
+[node name="MeshInstance3D71" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1014050555]
+transform = Transform3D(2.19449, 0, -3.8449857e-09, 0, 2.0582564, 0, 8.175112e-09, 0, 1.0321305, 49.91959, 1.0012449, 15.894416)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D72" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1055246006]
+transform = Transform3D(2.19449, 0, -3.8449857e-09, 0, 2.0582564, 0, 8.175112e-09, 0, 1.0321305, 49.91959, -1.1621484, 15.894416)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D73" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=425925637]
+transform = Transform3D(2.19449, 0, -3.8449857e-09, 0, 2.0582564, 0, 8.175112e-09, 0, 1.0321305, 47.910034, -1.3516303, 15.894416)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D74" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=847902971]
+transform = Transform3D(2.19449, 0, -3.8449857e-09, 0, 2.0582564, 0, 8.175112e-09, 0, 1.0321305, 53.40291, -1.3516303, 16.132477)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D75" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1003660938]
+transform = Transform3D(2.19449, 0, -3.8449857e-09, 0, 2.0582564, 0, 8.175112e-09, 0, 1.0321305, 55.728176, -1.3516303, 16.132477)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D76" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1551083267]
+transform = Transform3D(2.19449, 0, -3.8449857e-09, 0, 2.0582564, 0, 8.175112e-09, 0, 1.0321305, 55.728176, 2.7379375, 16.132477)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D77" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1659694807]
+transform = Transform3D(2.19449, 0, -3.8449857e-09, 0, 2.0582564, 0, 8.175112e-09, 0, 1.0321305, 58.664787, 2.7379375, 16.132477)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D78" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=459592387]
+transform = Transform3D(2.19449, 0, -3.8449857e-09, 0, 2.0582564, 0, 8.175112e-09, 0, 1.0321305, 58.664787, 2.7379375, 16.271696)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D79" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1317171659]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 63.636524, 2.7379375, 16.395056)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D80" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=141793573]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 63.636524, -0.9461498, 16.395056)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D81" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1097966740]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 63.636524, -2.8779645, 16.395056)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D82" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1163165382]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 44.78639, -2.8779645, 15.737734)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D261" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=899244426]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 44.78639, -7.0829926, 15.737734)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D262" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=880086212]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 54.03319, -7.0829926, 16.290604)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D263" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1326972895]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 60.37631, -7.0829926, 16.287218)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D264" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1487009954]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 60.37631, -10.451972, 16.287218)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D265" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=663616234]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 48.65726, -12.055336, 16.293472)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D266" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=959953876]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 39.90287, -14.422357, 16.298143)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D267" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=15942752]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 49.19292, -18.802261, 16.293186)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D268" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=209778980]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 51.244633, -18.802261, 16.292091)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D269" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=827259767]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 63.187252, -22.436218, 16.779514)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D270" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1583668632]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 63.187252, -19.651394, 16.779514)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D271" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1477772715]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 54.625343, -18.227745, 16.784082)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D83" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1507357811]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 41.629475, -6.5013475, 15.587411)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D84" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1060279727]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 37.940296, 0.90203595, 15.589379)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D85" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=350268793]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 39.82606, 2.9374847, 15.588373)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D86" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1527569257]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 39.82606, 14.184204, 15.588373)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D87" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1711775050]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 43.234825, 14.5498, 15.817042)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D88" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1859360289]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 46.41813, 14.5498, 15.815344)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D89" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1278620816]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 56.9467, 14.979058, 16.242832)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D90" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1902897508]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 53.378036, 12.567108, 16.244736)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D91" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1173646671]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 48.454132, 6.740754, 16.247364)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D92" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=983711217]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 60.42604, 9.352577, 16.68927)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D93" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1466251072]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 60.42604, 11.561482, 16.68927)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D105" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=302739395]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 56.961918, 6.4620028, 44.783005)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D180" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=427391350]
+transform = Transform3D(0.6476471, 0, 0.9549085, 0, 2.0582564, 0, -1.5787976, 0, 0.39171818, 60.356216, 6.4620028, 42.484585)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D181" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1622201014]
+transform = Transform3D(0.6476471, 0, 0.9549085, 0, 2.0582564, 0, -1.5787976, 0, 0.39171818, 61.000484, 6.4620028, 40.91403)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D182" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=869094646]
+transform = Transform3D(0.6476471, 0, 0.9549085, 0, 2.0582564, 0, -1.5787976, 0, 0.39171818, 61.000484, 4.216277, 40.91403)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D183" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=21140623]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 60.263702, 4.216277, 38.132637)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D184" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=2109339585]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 60.263702, 6.4545193, 38.132637)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D185" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=583980527]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 60.796246, 6.4545193, 35.49549)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D186" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=513774274]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 61.278522, 6.4545193, 33.107273)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D187" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=2068025202]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 61.278522, 3.9646623, 33.107273)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D188" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1517079139]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 61.278522, 0.91602325, 33.107273)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D189" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=586360422]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 60.808502, 0.91602325, 35.43481)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D190" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=685868140]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.308754, 0.91602325, 37.909554)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D191" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1212702391]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 59.960506, 0.91602325, 43.05386)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D192" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1302526471]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 59.960506, -3.4662905, 43.05386)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D193" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=519662754]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.49583, -3.4662905, 40.285805)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D194" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=2122958256]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.493187, -3.4662905, 38.641624)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D195" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=397853317]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.493187, -5.8743296, 38.641624)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D196" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=154669634]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.488132, -5.8743296, 35.496952)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D197" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1989764059]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.482677, -5.8743296, 32.104286)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D199" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1320222046]
+transform = Transform3D(0.6476471, 0, 0.9549085, 0, 2.0582564, 0, -1.5787976, 0, 0.39171818, 60.356216, -9.182542, 42.484585)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D200" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=544753609]
+transform = Transform3D(0.6476471, 0, 0.9549085, 0, 2.0582564, 0, -1.5787976, 0, 0.39171818, 61.000484, -9.182542, 40.91403)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D201" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=293432845]
+transform = Transform3D(0.6476471, 0, 0.9549085, 0, 2.0582564, 0, -1.5787976, 0, 0.39171818, 61.000484, -11.4282675, 40.91403)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D202" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1901987307]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 60.263702, -11.4282675, 38.132637)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D203" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=11258017]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 60.263702, -9.190025, 38.132637)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D204" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1403664597]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 60.796246, -9.190025, 35.49549)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D205" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=646891186]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 61.278522, -9.190025, 33.107273)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D206" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1532276970]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 61.278522, -11.679882, 33.107273)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D207" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=341795101]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 61.278522, -14.728521, 33.107273)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D208" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1166580549]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 60.808502, -14.728521, 35.43481)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D209" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1804516833]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.308754, -14.728521, 37.909554)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D210" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1205977756]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 59.960506, -14.728521, 43.05386)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D211" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1349171888]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 59.960506, -19.110836, 43.05386)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D212" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=742155529]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.49583, -19.110836, 40.285805)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D213" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=655440050]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.493187, -19.110836, 38.641624)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D214" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=905723577]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.493187, -21.518875, 38.641624)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D215" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=2021656477]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.488132, -21.518875, 35.496952)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D216" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=711631902]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.482677, -21.518875, 32.104286)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D217" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=210392054]
+transform = Transform3D(0.6476471, 0, 0.9549085, 0, 2.0582564, 0, -1.5787976, 0, 0.39171818, 60.356216, -26.595783, 42.484585)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D218" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1879074256]
+transform = Transform3D(0.6476471, 0, 0.9549085, 0, 2.0582564, 0, -1.5787976, 0, 0.39171818, 61.000484, -26.595783, 40.91403)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D219" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=264624357]
+transform = Transform3D(0.6476471, 0, 0.9549085, 0, 2.0582564, 0, -1.5787976, 0, 0.39171818, 61.000484, -28.841507, 40.91403)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D220" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=301933353]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 60.263702, -28.841507, 38.132637)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D221" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=201187839]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 60.263702, -26.603266, 38.132637)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D222" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1832765458]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 60.796246, -26.603266, 35.49549)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D223" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=2139552774]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 61.278522, -26.603266, 33.107273)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D224" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1617870214]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 61.278522, -29.093122, 33.107273)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D225" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1200482673]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 61.278522, -32.14176, 33.107273)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D226" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1407444662]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 60.808502, -32.14176, 35.43481)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D227" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=631880050]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.308754, -32.14176, 37.909554)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D228" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1226152814]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 59.960506, -32.14176, 43.05386)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D229" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1038425540]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 59.960506, -36.52408, 43.05386)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D230" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=2102211859]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.49583, -36.52408, 40.285805)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D231" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1512553762]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.493187, -36.52408, 38.641624)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D232" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=590632096]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.493187, -38.932114, 38.641624)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D233" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=178338479]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.488132, -38.932114, 35.496952)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D234" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=493092611]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.482677, -38.932114, 32.104286)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D235" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=110706276]
+transform = Transform3D(0.6476471, 0, 0.9549085, 0, 2.0582564, 0, -1.5787976, 0, 0.39171818, 60.356216, -44.581203, 42.484585)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D236" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=623535517]
+transform = Transform3D(0.6476471, 0, 0.9549085, 0, 2.0582564, 0, -1.5787976, 0, 0.39171818, 61.000484, -44.581203, 40.91403)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D237" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1779134691]
+transform = Transform3D(0.6476471, 0, 0.9549085, 0, 2.0582564, 0, -1.5787976, 0, 0.39171818, 61.000484, -46.826927, 40.91403)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D238" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1653779116]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 60.263702, -46.826927, 38.132637)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D239" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=124720526]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 60.263702, -44.588684, 38.132637)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D240" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1001719794]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 60.796246, -44.588684, 35.49549)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D241" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1872277510]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 61.278522, -44.588684, 33.107273)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D242" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1026251216]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 61.278522, -47.078545, 33.107273)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D243" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=720119094]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 61.278522, -50.127182, 33.107273)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D244" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1240324745]
+transform = Transform3D(0.33778557, 0, 1.0117081, 0, 2.0582564, 0, -1.6727072, 0, 0.20430382, 60.808502, -50.127182, 35.43481)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D245" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1136293241]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.308754, -50.127182, 37.909554)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D246" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=2100059902]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 59.960506, -50.127182, 43.05386)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D247" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=791085887]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 59.960506, -54.5095, 43.05386)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D248" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1112797566]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.49583, -54.5095, 40.285805)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D249" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1187260451]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.493187, -54.5095, 38.641624)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D250" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1304557694]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.493187, -56.917534, 38.641624)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D251" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1173916440]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.488132, -56.917534, 35.496952)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D252" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=2093984764]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.482677, -56.917534, 32.104286)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D198" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1415150172]
+transform = Transform3D(-0.0027438402, 0, 1.0321293, 0, 2.0582564, 0, -1.7064704, 0, -0.0016595423, 60.482677, -2.9150074, 32.104286)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D106" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1975986775]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 52.534775, 6.4620028, 44.785366)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D107" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=122717813]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 42.92621, 6.4620028, 44.35201)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D108" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=138872820]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 35.177273, 6.4620028, 44.356144)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D109" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1998915775]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 35.177273, 4.201205, 44.356144)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D110" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=441509465]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 39.06507, 4.201205, 44.35407)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D111" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=454913869]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 39.06507, -0.41969442, 44.35407)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D112" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1617704931]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 44.550373, -0.41969442, 44.351143)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D113" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=224611568]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 44.424145, -2.8421729, 44.35121)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D114" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=934973101]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 50.701286, -2.8421729, 44.347862)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D115" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1169481914]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 53.06893, -2.8421729, 44.3466)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D116" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1276254941]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 53.06893, -0.97176385, 44.3466)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D117" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=674576377]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 58.01618, -0.97176385, 44.824013)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D118" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1409079158]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 58.01618, -3.5986717, 44.824013)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D119" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=511769929]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 58.01618, -3.5986717, 44.824013)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D120" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1802859193]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 56.961918, -8.151409, 44.783005)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D121" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=916355812]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 52.534775, -8.151409, 44.785366)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D122" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=2035508684]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 42.92621, -8.151409, 44.35201)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D123" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1091377701]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 35.177273, -8.151409, 44.356144)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D124" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=383947074]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 35.177273, -10.412207, 44.356144)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D125" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1211618072]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 39.06507, -10.412207, 44.35407)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D126" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1426229225]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 39.06507, -15.033106, 44.35407)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D127" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=566038962]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 44.550373, -15.033106, 44.351143)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D128" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=241329017]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 44.424145, -17.455585, 44.35121)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D129" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1946798627]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 50.701286, -17.455585, 44.347862)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D130" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1886031816]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 53.06893, -17.455585, 44.3466)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D131" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=185512639]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 53.06893, -15.5851755, 44.3466)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D132" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=117952470]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 58.01618, -15.5851755, 44.824013)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D133" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=376685470]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 58.01618, -18.212084, 44.824013)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D134" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=165586726]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 58.01618, -18.212084, 44.824013)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D135" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=118350087]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 56.961918, -21.357513, 44.783005)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D136" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1117996629]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 52.534775, -21.357513, 44.785366)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D137" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=316032930]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 42.92621, -21.357513, 44.35201)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D138" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=583036131]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 35.177273, -21.357513, 44.356144)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D139" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1821626652]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 35.177273, -23.618309, 44.356144)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D140" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=13371053]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 39.06507, -23.618309, 44.35407)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D141" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1171071849]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 39.06507, -28.239208, 44.35407)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D142" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=820302200]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 44.550373, -28.239208, 44.351143)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D143" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=567726570]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 44.424145, -30.66169, 44.35121)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D144" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1014652717]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 50.701286, -30.66169, 44.347862)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D145" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1940009872]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 53.06893, -30.66169, 44.3466)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D146" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=735798358]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 53.06893, -28.791279, 44.3466)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D147" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1289783780]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 58.01618, -28.791279, 44.824013)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D148" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1310604918]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 58.01618, -31.418186, 44.824013)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D149" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1921869298]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 58.01618, -31.418186, 44.824013)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D150" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1740382118]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 56.961918, -35.6787, 44.783005)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D151" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1885959126]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 52.534775, -35.6787, 44.785366)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D152" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1589595757]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 42.92621, -35.6787, 44.35201)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D153" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=375162273]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 35.177273, -35.6787, 44.356144)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D154" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=388962043]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 35.177273, -37.939495, 44.356144)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D155" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=2040047006]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 39.06507, -37.939495, 44.35407)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D156" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1979706707]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 39.06507, -42.560394, 44.35407)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D157" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=262210328]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 44.550373, -42.560394, 44.351143)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D158" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=681022518]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 44.424145, -44.982876, 44.35121)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D159" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=420866807]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 50.701286, -44.982876, 44.347862)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D160" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1031950490]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 53.06893, -44.982876, 44.3466)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D161" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=509034967]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 53.06893, -43.112465, 44.3466)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D162" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1682763227]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 58.01618, -43.112465, 44.824013)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D253" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=391057646]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 62.035255, -46.09008, 35.95624)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D254" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1931323894]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 79.539696, -45.477562, 36.520046)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D257" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1491780676]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 79.52957, -45.477562, 17.544733)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D258" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1514541433]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 79.52957, -43.11891, 17.544733)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D259" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=104200489]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 72.31354, -43.11891, 17.548584)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D260" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=497037437]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 91.71431, -43.11891, 17.53823)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D255" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1421877975]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 79.539696, -48.214962, 36.520046)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D256" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=2031375062]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 94.72492, -48.214962, 37.157482)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D163" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=233486929]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 58.01618, -45.739372, 44.824013)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D164" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=674119419]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 58.01618, -45.739372, 44.824013)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D165" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=21087594]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 56.961918, -49.951565, 44.783005)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D166" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1640733170]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 52.534775, -49.951565, 44.785366)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D167" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1677564017]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 42.92621, -49.951565, 44.35201)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D168" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1184862646]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 35.177273, -49.951565, 44.356144)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D169" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=172552368]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 35.177273, -52.21236, 44.356144)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D170" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=688680556]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 39.06507, -52.21236, 44.35407)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D171" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1898057055]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 39.06507, -56.83326, 44.35407)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D172" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=496399216]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 44.550373, -56.83326, 44.351143)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D173" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=963204340]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 44.424145, -59.25574, 44.35121)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D174" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=355474279]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 50.701286, -59.25574, 44.347862)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D175" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1660790674]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 53.06893, -59.25574, 44.3466)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D176" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=2038438314]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 53.06893, -57.38533, 44.3466)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D177" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1382886623]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 58.01618, -57.38533, 44.824013)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D178" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=386304952]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 58.01618, -60.012238, 44.824013)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D179" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1754454815]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 58.01618, -60.012238, 44.824013)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D94" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1283711966]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 63.817505, 18.093653, 16.68746)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D95" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1785044901]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 55.174683, 18.093653, 16.688627)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D96" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1381054296]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 52.95764, 18.093653, 16.68981)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D97" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1682757955]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 49.0011, 18.093653, 16.691921)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D98" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1879479932]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 45.386776, 18.093653, 16.69385)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D99" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=554986690]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 41.766094, 20.326279, 16.695782)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D100" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=151918333]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 41.766094, 25.417812, 16.695782)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D101" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=292183420]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 48.151894, 25.417812, 16.692373)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D102" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1646136824]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 55.14176, 22.064219, 16.688643)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D103" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=853368993]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 58.864788, 22.064219, 16.686655)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D104" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1531366307]
+transform = Transform3D(2.1944897, 0, 0.000550762, 0, 2.0582564, 0, -0.0011710164, 0, 1.0321304, 60.144943, 27.810383, 16.685972)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
 [node name="MeshInstance3D6" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=32928328]
 transform = Transform3D(1, 0, -3.7252903e-09, 0, 1, 0, 3.7252903e-09, 0, 1, -5.566803, 0, -7.6293945e-06)
 material_override = SubResource("StandardMaterial3D_frvqy")
@@ -2440,6 +3646,186 @@ metadata/_edit_group_ = true
 
 [node name="MeshInstance3D31" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=985012303]
 transform = Transform3D(0.06997199, -1.4878306e-05, 0.99156886, -0.0009224576, 0.9999998, 0.00010480904, -1.003565, -0.0003415962, 0.06997197, -88.00113, -34.175125, 82.16769)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D41" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1484758562]
+transform = Transform3D(0.03947831, -2.1918313e-05, 0.99156886, -0.00052045204, 1.4731724, 0.00010480904, -0.56621295, -0.0005032302, 0.06997197, 5.358449, -46.749973, 107.6079)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D42" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=77297492]
+transform = Transform3D(0.03947831, -2.1918313e-05, 0.99156886, -0.00052045204, 1.4731724, 0.00010480904, -0.56621295, -0.0005032302, 0.06997197, 5.566095, -46.752712, 104.62977)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D43" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=676373565]
+transform = Transform3D(0.03947831, -2.1918313e-05, 0.99156886, -0.00052045204, 1.4731724, 0.00010480904, -0.56621295, -0.0005032302, 0.06997197, 5.5661426, -49.9511, 104.63086)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D57" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1533474061]
+transform = Transform3D(0.03947831, -2.1918313e-05, 0.99156886, -0.00052045204, 1.4731724, 0.00010480904, -0.56621295, -0.0005032302, 0.06997197, 8.840692, -48.153187, 116.91568)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D58" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=619257506]
+transform = Transform3D(0.03947831, -2.1918313e-05, 0.99156886, -0.00052045204, 1.4731724, 0.00010480904, -0.56621295, -0.0005032302, 0.06997197, 9.052201, -48.155975, 113.88212)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D59" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1104586842]
+transform = Transform3D(0.03947831, -2.1918313e-05, 0.99156886, -0.00052045204, 1.4731724, 0.00010480904, -0.56621295, -0.0005032302, 0.06997197, 3.3724928, -47.007385, 129.92656)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D60" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1628009974]
+transform = Transform3D(0.03947831, -2.1918313e-05, 0.99156886, -0.00052045204, 1.4731724, 0.00010480904, -0.56621295, -0.0005032302, 0.06997197, 3.372399, -40.704998, 129.92441)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D61" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1865055461]
+transform = Transform3D(0.03947831, -2.1918313e-05, 0.99156886, -0.00052045204, 1.4731724, 0.00010480904, -0.56621295, -0.0005032302, 0.06997197, 3.1658823, -40.702274, 132.88635)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D62" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1347383102]
+transform = Transform3D(0.03947831, -2.1918313e-05, 0.99156886, -0.00052045204, 1.4731724, 0.00010480904, -0.56621295, -0.0005032302, 0.06997197, 3.1658306, -37.240055, 132.88516)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D63" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1323850309]
+transform = Transform3D(0.03947831, -2.1918313e-05, 0.99156886, -0.00052045204, 1.4731724, 0.00010480904, -0.56621295, -0.0005032302, 0.06997197, 3.1659744, -46.900032, 132.88846)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D64" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1161298199]
+transform = Transform3D(0.03947831, -2.1918313e-05, 0.99156886, -0.00052045204, 1.4731724, 0.00010480904, -0.56621295, -0.0005032302, 0.06997197, 3.166069, -53.261066, 132.89063)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D65" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=415617975]
+transform = Transform3D(0.03947831, -2.1918313e-05, 0.99156886, -0.00052045204, 1.4731724, 0.00010480904, -0.56621295, -0.0005032302, 0.06997197, 3.36991, -53.263752, 129.96706)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D66" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1762275677]
+transform = Transform3D(0.03947831, -2.1918313e-05, 0.99156886, -0.00052045204, 1.4731724, 0.00010480904, -0.56621295, -0.0005032302, 0.06997197, 3.369861, -49.963932, 129.96593)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D67" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=862569394]
+transform = Transform3D(0.03947831, -2.1918313e-05, 0.99156886, -0.00052045204, 1.4731724, 0.00010480904, -0.56621295, -0.0005032302, 0.06997197, 3.175515, -49.96137, 132.75331)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D68" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=328162177]
+transform = Transform3D(0.03947831, -2.1918313e-05, 0.99156886, -0.00052045204, 1.4731724, 0.00010480904, -0.56621295, -0.0005032302, 0.06997197, 6.362812, -48.300385, 142.93346)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D69" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1120607865]
+transform = Transform3D(0.03947831, -2.1918313e-05, 0.99156886, -0.00052045204, 1.4731724, 0.00010480904, -0.56621295, -0.0005032302, 0.06997197, 6.584718, -48.30331, 139.7508)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D70" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=630222684]
+transform = Transform3D(0.03947831, -2.1918313e-05, 0.99156886, -0.00052045204, 1.4731724, 0.00010480904, -0.56621295, -0.0005032302, 0.06997197, 6.584665, -44.711834, 139.74957)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D44" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=31153058]
+transform = Transform3D(0.03947831, -2.1918313e-05, 0.99156886, -0.00052045204, 1.4731724, 0.00010480904, -0.56621295, -0.0005032302, 0.06997197, -0.0097210035, -48.154575, 112.02377)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D45" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1366150209]
+transform = Transform3D(-0.56291497, -2.1918328e-05, 0.12811583, -0.00036082588, 1.4731724, -0.00026866628, -0.07268075, -0.0005032302, -0.98574394, 1.6468734, -48.154675, 112.66314)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D46" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=238832899]
+transform = Transform3D(-0.56291497, -2.1918328e-05, 0.12811583, -0.00036082588, 1.4731724, -0.00026866628, -0.07268075, -0.0005032302, -0.98574394, 1.6469188, -51.210804, 112.664185)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D47" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1925966693]
+transform = Transform3D(-0.56291497, -2.1918328e-05, 0.12811583, -0.00036082588, 1.4731724, -0.00026866628, -0.07268075, -0.0005032302, -0.98574394, 7.332268, -51.207317, 112.936356)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D48" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=882418295]
+transform = Transform3D(-0.56291497, -2.1918328e-05, 0.12811583, -0.00036082588, 1.4731724, -0.00026866628, -0.07268075, -0.0005032302, -0.98574394, 7.3250537, -51.207302, 112.99187)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D49" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=510428993]
+transform = Transform3D(-0.56291497, -2.1918328e-05, 0.12811583, -0.00036082588, 1.4731724, -0.00026866628, -0.07268075, -0.0005032302, -0.98574394, 1.4760498, -50.384674, 128.81157)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D50" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=463079530]
+transform = Transform3D(-0.56291497, -2.1918328e-05, 0.12811583, -0.00036082588, 1.4731724, -0.00026866628, -0.07268075, -0.0005032302, -0.98574394, 1.4760014, -47.129528, 128.81046)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D51" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=287163906]
+transform = Transform3D(-0.56291497, -2.1918328e-05, 0.12811583, -0.00036082588, 1.4731724, -0.00026866628, -0.07268075, -0.0005032302, -0.98574394, 1.475955, -44.007664, 128.80939)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D52" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1921005744]
+transform = Transform3D(-0.56291497, -2.1918328e-05, 0.12811583, -0.00036082588, 1.4731724, -0.00026866628, -0.07268075, -0.0005032302, -0.98574394, 1.4758594, -37.582634, 128.80719)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D53" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=1831473988]
+transform = Transform3D(-0.56291497, -2.1918328e-05, 0.12811583, -0.00036082588, 1.4731724, -0.00026866628, -0.07268075, -0.0005032302, -0.98574394, -3.9951804, -37.586006, 128.49153)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D54" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=46936649]
+transform = Transform3D(-0.56291497, -2.1918328e-05, 0.12811583, -0.00036082588, 1.4731724, -0.00026866628, -0.07268075, -0.0005032302, -0.98574394, -3.9951348, -40.64131, 128.49257)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D55" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=2069721348]
+transform = Transform3D(-0.56291497, -2.1918328e-05, 0.12811583, -0.00036082588, 1.4731724, -0.00026866628, -0.07268075, -0.0005032302, -0.98574394, -3.99504, -47.013153, 128.49475)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D56" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D" unique_id=955970922]
+transform = Transform3D(-0.56291497, -2.1918328e-05, 0.12811583, -0.00036082588, 1.4731724, -0.00026866628, -0.07268075, -0.0005032302, -0.98574394, -3.9949412, -53.644844, 128.49701)
 material_override = SubResource("StandardMaterial3D_frvqy")
 mesh = SubResource("QuadMesh_1iice")
 metadata/_edit_group_ = true
@@ -2795,6 +4181,354 @@ material_override = SubResource("StandardMaterial3D_frvqy")
 mesh = SubResource("QuadMesh_1iice")
 metadata/_edit_group_ = true
 
+[node name="MeshInstance3D72" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1679643909]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 29.046719, -19.386917, 152.53275)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D73" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1523863772]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 32.49015, -19.386917, 152.67287)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D74" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1985492258]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 32.49015, -22.545723, 152.67287)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D75" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1261255736]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 38.06729, -22.545723, 152.89981)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D76" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=232308560]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 45.35586, -22.545723, 153.04022)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D77" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1736771171]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 50.693176, -22.545723, 153.25742)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D78" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=380691734]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 50.693176, -17.726936, 153.25742)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D79" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=2031881922]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 55.38543, -17.726936, 153.44836)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D80" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1569518359]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 41.707115, -17.726936, 152.89175)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D81" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=45238116]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 41.707115, -28.200333, 152.89175)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D82" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=882148129]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 31.521557, -28.200333, 152.47728)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D83" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1651777]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 52.111736, -28.200333, 153.31516)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D84" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1192271859]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 47.123116, -28.200333, 153.11215)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D85" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1396298327]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 47.123116, -33.433586, 153.11215)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D86" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1557068925]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 55.779125, -33.433586, 153.46439)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D87" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1012738298]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 38.312798, -33.433586, 152.75363)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D88" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=427928648]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 30.755836, -33.433586, 152.44612)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D90" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1346285954]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 55.38543, -38.57373, 153.44836)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D91" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=65201179]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 41.707115, -38.57373, 152.89175)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D92" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1359260119]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 41.707115, -49.047127, 152.89175)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D93" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1980522817]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 31.521557, -49.047127, 152.47728)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D94" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1549161240]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 52.111736, -49.047127, 153.31516)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D95" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=171339778]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 47.123116, -49.047127, 153.11215)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D96" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=10221233]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 47.123116, -54.28038, 153.11215)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D97" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=575729865]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 55.779125, -54.28038, 153.46439)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D98" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=981795280]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 38.312798, -54.28038, 152.75363)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D99" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=2096200263]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 30.755836, -54.28038, 152.44612)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D100" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1795235648]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 55.38543, -67.22728, 153.44836)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D101" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=640751594]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 41.707115, -67.22728, 152.89175)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D102" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1703568848]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 41.707115, -77.70068, 152.89175)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D103" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=341882905]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 31.521557, -77.70068, 152.47728)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D104" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1337871873]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 52.111736, -77.70068, 153.31516)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D105" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=292475817]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 47.123116, -77.70068, 153.11215)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D106" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=2087064553]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 47.123116, -82.93393, 153.11215)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D107" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1541512167]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 55.779125, -82.93393, 153.46439)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D108" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=737971251]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 38.312798, -82.93393, 152.75363)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D109" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1120975071]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 30.755836, -82.93393, 152.44612)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D110" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=218575057]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 83.20668, -28.614338, 155.03215)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D111" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=645882234]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 69.528366, -28.614338, 154.47554)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D112" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1263686744]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 69.528366, -39.08774, 154.47554)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D113" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1240204502]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 59.342827, -39.08774, 154.06107)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D114" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=593513452]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 79.933, -39.08774, 154.89894)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D115" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1139820856]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 74.94437, -39.08774, 154.69594)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D116" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1128730440]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 74.94437, -44.320988, 154.69594)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D117" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1975507135]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 83.60039, -44.320988, 155.04817)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D118" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1646181472]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 66.13405, -44.320988, 154.33742)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D119" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=2035881571]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 58.577103, -44.320988, 154.0299)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D120" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=406015570]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 83.20668, -50.718212, 155.03215)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D121" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=120492295]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 69.528366, -50.718212, 154.47554)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D122" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1627539917]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 69.528366, -61.191616, 154.47554)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D123" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=227829847]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 59.342827, -61.191616, 154.06107)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D124" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=2035759214]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 79.933, -61.191616, 154.89894)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D125" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1667857773]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 74.94437, -61.191616, 154.69594)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D126" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=203136714]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 74.94437, -66.424866, 154.69594)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D127" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1835658767]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 83.60039, -66.424866, 155.04817)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D128" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1549223065]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 66.13405, -66.424866, 154.33742)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D129" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=1312943610]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 58.577103, -66.424866, 154.0299)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D89" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=524222159]
+transform = Transform3D(-3.4316964, 0, 0.041251257, 0, 2.9035637, 0, -0.13964559, 0, -0.9931785, 30.755836, -33.433586, 152.44612)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+metadata/_edit_group_ = true
+
 [node name="MeshInstance3D65" type="MeshInstance3D" parent="Node3D/MeshInstance3D5/Node3D2" unique_id=563751378]
 transform = Transform3D(0.07004655, 0, 0.9915637, 0, 1, 0, -1.0035598, 0, 0.07004656, -88.29423, 13.162748, 89.76388)
 material_override = SubResource("StandardMaterial3D_frvqy")
@@ -3028,7 +4762,27 @@ material_override = SubResource("StandardMaterial3D_frvqy")
 mesh = SubResource("QuadMesh_1iice")
 
 [node name="MeshInstance3D15" type="MeshInstance3D" parent="Node3D" unique_id=310651625]
-transform = Transform3D(-1.0789673, 0.009983457, -0.43413037, 0.00033286022, 8.428, 0.0044093695, 0.3371508, 0.023628684, -1.3893311, 50.614857, 18.88873, 154.43387)
+transform = Transform3D(-1.0789673, 0.009983457, -0.43413037, 0.00033286022, 8.428, 0.0044093695, 0.3371508, 0.023628684, -1.3893311, 53.2743, 18.887909, 153.60286)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+
+[node name="MeshInstance3D38" type="MeshInstance3D" parent="Node3D" unique_id=1465632418]
+transform = Transform3D(-1.0789673, 0.009983457, -0.43413037, 0.00033286022, 8.428, 0.0044093695, 0.3371508, 0.023628684, -1.3893311, 50.82715, 18.888664, 154.36754)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+
+[node name="MeshInstance3D39" type="MeshInstance3D" parent="Node3D" unique_id=1772155507]
+transform = Transform3D(-1.0789673, 0.009983457, -0.43413037, 0.00033286022, 8.428, 0.0044093695, 0.3371508, 0.023628684, -1.3893311, 56.199272, 18.887007, 152.68889)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+
+[node name="MeshInstance3D40" type="MeshInstance3D" parent="Node3D" unique_id=1958419549]
+transform = Transform3D(-1.0789673, 0.009983457, -0.43413037, 0.00033286022, 8.428, 0.0044093695, 0.3371508, 0.023628684, -1.3893311, 61.162766, 18.885475, 151.13792)
+material_override = SubResource("StandardMaterial3D_frvqy")
+mesh = SubResource("QuadMesh_1iice")
+
+[node name="MeshInstance3D41" type="MeshInstance3D" parent="Node3D" unique_id=161260818]
+transform = Transform3D(-1.0789673, 0.009983457, -0.43413037, 0.00033286022, 8.428, 0.0044093695, 0.3371508, 0.023628684, -1.3893311, 61.162766, 18.885475, 151.13792)
 material_override = SubResource("StandardMaterial3D_frvqy")
 mesh = SubResource("QuadMesh_1iice")
 
