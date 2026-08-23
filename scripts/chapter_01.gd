@@ -41,7 +41,6 @@ var is_paused: bool = false
 
 var pause_menu_control: Control = null
 var audio_wind_extra: AudioStreamPlayer = null
-
 var font_retro: Font = null
 
 func _ready() -> void:
@@ -76,7 +75,7 @@ func _ready() -> void:
 	_play_vhs_intro_sequence()
 
 # ============================================================
-# SISTEMA DE PAUSA RETRO VHS / TV AZUL [ESC]
+# SISTEMA DE PAUSA RETRO VHS / TV AZUL [ESC] EM PORTUGUÊS
 # ============================================================
 
 func _setup_pause_menu() -> void:
@@ -97,7 +96,7 @@ func _setup_pause_menu() -> void:
 		dark_dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 		pause_menu_control.add_child(dark_dim)
 		
-		# Caixa Azul Retrô VCR (FUNCTION)
+		# Caixa Azul Retrô VCR (CONFIGURAÇÕES)
 		var vcr_box = ColorRect.new()
 		vcr_box.name = "VCRBox"
 		vcr_box.color = Color(0.10, 0.16, 0.58, 0.98)
@@ -127,13 +126,13 @@ func _setup_pause_menu() -> void:
 		vbox.add_theme_constant_override("separation", 10)
 		vcr_box.add_child(vbox)
 		
-		# Título: FUNCTION
+		# Título: CONFIGURAÇÕES
 		var title = Label.new()
-		title.text = "FUNCTION"
+		title.text = "CONFIGURAÇÕES"
 		title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		if font_retro:
 			title.add_theme_font_override("font", font_retro)
-		title.add_theme_font_size_override("font_size", 24)
+		title.add_theme_font_size_override("font_size", 22)
 		title.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 1.0))
 		vbox.add_child(title)
 		
@@ -156,7 +155,7 @@ func _setup_pause_menu() -> void:
 		
 		# Sliders de Volume
 		var lbl_vol = Label.new()
-		lbl_vol.text = "MASTER VOLUME:"
+		lbl_vol.text = "VOLUME GERAL:"
 		if font_retro:
 			lbl_vol.add_theme_font_override("font", font_retro)
 		lbl_vol.add_theme_font_size_override("font_size", 16)
@@ -171,7 +170,7 @@ func _setup_pause_menu() -> void:
 		vbox.add_child(slider_vol)
 		
 		var lbl_sfx = Label.new()
-		lbl_sfx.text = "SFX VOLUME:"
+		lbl_sfx.text = "VOLUME DOS EFEITOS:"
 		if font_retro:
 			lbl_sfx.add_theme_font_override("font", font_retro)
 		lbl_sfx.add_theme_font_size_override("font_size", 16)
@@ -212,7 +211,7 @@ func _setup_pause_menu() -> void:
 		btn_main.pressed.connect(_on_main_menu_pressed)
 		vbox.add_child(btn_main)
 		
-		# Barra Inferior VCR OSD (Cinza Claro)
+		# Barra Inferior VCR OSD em Português
 		var footer_bg = ColorRect.new()
 		footer_bg.color = Color(0.88, 0.88, 0.90, 1.0)
 		footer_bg.custom_minimum_size = Vector2(0, 52)
@@ -224,7 +223,7 @@ func _setup_pause_menu() -> void:
 		vcr_box.add_child(footer_bg)
 		
 		var footer_lbl = Label.new()
-		footer_lbl.text = "SELECT WITH (▲, ▼) AND (OK)\nPRESS (ESC) TO END"
+		footer_lbl.text = "SELECIONE COM (▲, ▼) E (OK)\nAPERTE (ESC) PARA SAIR"
 		footer_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		footer_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		footer_lbl.set_anchors_preset(Control.PRESET_FULL_RECT)

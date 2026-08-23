@@ -4,8 +4,9 @@ extends Path3D
 # CONTROLADOR DE ROTA DE PEDESTRE - HOMEM DE METAS
 # ============================================================
 
-@export var tempo_min_espera: float = 15.0
-@export var tempo_max_espera: float = 40.0
+# Pedestres raros e espaçados no tempo para clima de terror e solidão
+@export var tempo_min_espera: float = 60.0 # Mínimo 1 minuto entre pedestres
+@export var tempo_max_espera: float = 160.0 # Máximo 2.6 minutos
 @export var velocidade_base: float = 2.4
 @export var offset_orientacao_graus: float = 0.0
 @export var altura_offset: float = 0.0
@@ -13,11 +14,14 @@ extends Path3D
 var timer: Timer = null
 
 func _ready() -> void:
+	randomize()
 	timer = Timer.new()
 	timer.one_shot = true
 	timer.timeout.connect(_spawn_pedestre)
 	add_child(timer)
-	timer.start(randf_range(3.0, 10.0))
+	
+	# Primeiro pedestre demora entre 35s e 80s para aparecer pela primeira vez
+	timer.start(randf_range(35.0, 80.0))
 
 func _agendar_proximo() -> void:
 	timer.start(randf_range(tempo_min_espera, tempo_max_espera))
@@ -43,11 +47,13 @@ func _spawn_pedestre() -> void:
 	follow.loop = false
 	follow.rotation_mode = PathFollow3D.ROTATION_Y
 	follow.use_model_front = false
+	follow.progress_ratio = 0.001
 	
 	var holder := Node3D.new()
 	holder.name = "ModelHolder"
 	holder.position.y = altura_offset
-	holder.rotation_degrees.y = offset_orientacao_graus
+	# 180 graus de rotação base alinha o modelo Mixamo olhando na direção exata do trajeto
+	holder.rotation_degrees.y = 180.0 + offset_orientacao_graus
 	
 	holder.add_child(modelo_inst)
 	follow.add_child(holder)
@@ -65,14 +71,14 @@ func _spawn_pedestre() -> void:
 			anim_player.play(anim_name)
 			anim_player.speed_scale = randf_range(1.1, 1.3)
 	
-	# Deslocamento 100% suave pelo caminho via Tween
+	# Deslocamento 100% suave pelo caminho via Tween (termina em 0.998 para evitar vetor zero)
 	var path_len = curve.get_baked_length() if curve else 50.0
 	if path_len <= 1.0:
 		path_len = 50.0
 	var duracao = path_len / velocidade_base
 	
 	var tw = create_tween()
-	tw.tween_property(follow, "progress_ratio", 1.0, duracao)
+	tw.tween_property(follow, "progress_ratio", 0.998, duracao)
 	tw.finished.connect(func():
 		if is_instance_valid(PedestreManager):
 			PedestreManager.liberar_pedestre(index)

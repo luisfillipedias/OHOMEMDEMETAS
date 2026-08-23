@@ -3,20 +3,18 @@ extends Node
 # ============================================================
 # GERENCIADOR GLOBAL DE PEDESTRES - O HOMEM DE METAS
 # ============================================================
-# Carrega automaticamente todas as cenas (.tscn, .fbx, .glb)
-# de pedestres e sorteia para as 3 rotas sem repetições simultâneas.
 
 var modelos_pedestres: Array[PackedScene] = []
 var em_uso: Dictionary = {}
 var ultimo_usado_global: int = -1
 
 func _ready() -> void:
+	randomize()
 	carregar_modelos()
 
 func carregar_modelos() -> void:
 	modelos_pedestres.clear()
 	
-	# Pastas onde o usuário pode guardar os personagens
 	var pastas_busca = [
 		"res://scenes/characters/pedestres",
 		"res://scenes/characters",
@@ -25,6 +23,8 @@ func carregar_modelos() -> void:
 	
 	for pasta in pastas_busca:
 		_varrer_pasta(pasta)
+	
+	modelos_pedestres.shuffle()
 
 func _varrer_pasta(dir_path: String) -> void:
 	var dir = DirAccess.open(dir_path)
@@ -55,15 +55,16 @@ func pick_pedestre() -> Dictionary:
 		if not em_uso.get(i, false) and i != ultimo_usado_global:
 			candidatos.append(i)
 	
-	# Se todos estiverem ocupados ou só restar o último usado
+	# Se todos os outros estiverem ocupados ou só restar o último usado
 	if candidatos.is_empty():
 		for i in range(modelos_pedestres.size()):
 			if not em_uso.get(i, false):
 				candidatos.append(i)
 	
 	if candidatos.is_empty():
-		return {} # Todos estão andando na rua neste momento
+		return {}
 	
+	candidatos.shuffle()
 	var escolhido = candidatos.pick_random()
 	em_uso[escolhido] = true
 	ultimo_usado_global = escolhido
