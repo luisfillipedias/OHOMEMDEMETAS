@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://b8i6sw2r1m7nq"
+path="res://.godot/imported/Car_Parking_Brake.ogg-2129f0bbf709e77f4888785a07b70577.oggvorbisstr"
+
+[deps]
+
+source_file="res://assets/models/car/psx/Sound effects/Car_Parking_Brake.ogg"
+dest_files=["res://.godot/imported/Car_Parking_Brake.ogg-2129f0bbf709e77f4888785a07b70577.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

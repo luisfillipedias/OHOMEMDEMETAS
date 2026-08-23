@@ -4,21 +4,36 @@ render_mode blend_mix, depth_draw_opaque, cull_disabled, diffuse_lambert, specul
 uniform sampler2D texture_albedo : source_color, filter_nearest_mipmap;
 uniform float alpha_scissor_threshold : hint_range(0.0, 1.0) = 0.5;
 
-uniform float velocidade_vento : hint_range(0.5, 10.0) = 3.2;
-uniform float forca_vento : hint_range(0.0, 1.5) = 0.38;
+// Direção ÚNICA do vento pra cena inteira (todas as árvores se inclinam na mesma direção)
 uniform vec2 direcao_vento = vec2(1.0, 0.35);
 
+// Rajada lenta e imponente (inclinação geral da árvore, a "onda" do vento)
+uniform float velocidade_rajada : hint_range(0.1, 4.0) = 0.85;
+uniform float forca_rajada : hint_range(0.0, 1.5) = 0.28;
+
+// Tremor rápido e pequeno (folhas e galhos finos vibrando)
+uniform float velocidade_flutter : hint_range(1.0, 20.0) = 7.5;
+uniform float forca_flutter : hint_range(0.0, 0.5) = 0.04;
+
 void vertex() {
-	// Altura com escala suave (raízes imóveis, topo balançando forte no vendaval)
-	float altura = clamp(VERTEX.y * 0.4, 0.0, 2.5);
 	vec2 dir = normalize(direcao_vento);
-	
-	// Cálculo trigonométrico unificado super otimizado (60 FPS estável)
-	float phase = TIME * velocidade_vento + NODE_POSITION_WORLD.x * 0.3 + NODE_POSITION_WORLD.z * 0.3 + VERTEX.y * 0.5;
-	float sway = (sin(phase) + sin(phase * 1.6) * 0.4) * forca_vento * altura;
-	
-	VERTEX.x += dir.x * sway;
-	VERTEX.z += dir.y * sway;
+	float altura = clamp(VERTEX.y * 0.45, 0.0, 3.0);
+
+	// A fase viaja no espaço mundial ao longo da direção do vento:
+	// A rajada de vento varre a fileira de árvores como uma onda real
+	float fase = dot(NODE_POSITION_WORLD.xz, dir) * 0.12;
+
+	// Rajada de corpo: inclina o topo da árvore na direção do vento
+	float rajada = sin(TIME * velocidade_rajada + fase) * 0.5 + 0.5;
+	vec2 inclinacao = dir * (rajada * forca_rajada * altura);
+
+	// Flutter rápido nas pontas das folhas
+	float flutter = sin(TIME * velocidade_flutter + NODE_POSITION_WORLD.x * 2.5 + VERTEX.y * 1.5) * forca_flutter * altura;
+	vec2 tremor = dir * flutter;
+
+	VERTEX.x += inclinacao.x + tremor.x;
+	VERTEX.z += inclinacao.y + tremor.y;
+	VERTEX.y -= (rajada * forca_rajada * altura) * 0.12; // Leve curvatura natural para baixo com o peso do vento
 }
 
 void fragment() {
