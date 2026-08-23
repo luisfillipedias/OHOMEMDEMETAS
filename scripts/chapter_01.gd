@@ -12,6 +12,7 @@ extends Node3D
 @onready var audio_sfx: AudioStreamPlayer = get_node_or_null("AudioSFX")
 @onready var world_env: WorldEnvironment = get_node_or_null("WorldEnvironment")
 @onready var sun_light: DirectionalLight3D = get_node_or_null("SunLight")
+var clima_manager: ClimaManager = null
 
 # HUD Elements
 @onready var hud: CanvasLayer = get_node_or_null("HUD")
@@ -41,6 +42,20 @@ var is_paused: bool = false
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	_setup_pause_menu()
+	
+	# Garante que o som de vento e tempestade rode em loop infinito contínuo
+	if audio_amb:
+		if not audio_amb.playing:
+			audio_amb.play()
+		if not audio_amb.finished.is_connected(audio_amb.play):
+			audio_amb.finished.connect(audio_amb.play)
+	
+	# Instancia o Gerenciador de Clima (Vento e Névoa)
+	clima_manager = ClimaManager.new()
+	add_child(clima_manager)
+	
+	# Aplica o shader de vento automaticamente em todas as 30+ árvores da cena
+	_aplicar_vento_automatico_em_todas_arvores()
 	
 	# Transição inicial suave estilo fita VHS / Fears to Fathom
 	if fade_rect:
@@ -116,3 +131,35 @@ func show_interact_hint(text: String) -> void:
 func hide_interact_hint() -> void:
 	if not interact_hint: return
 	interact_hint.hide()
+
+func _aplicar_vento_automatico_em_todas_arvores() -> void:
+	var wind_shader = load("res://shaders/vento_arvore.gdshader") as Shader
+	if not wind_shader:
+		return
+	
+	var mesh_instances = find_children("*", "MeshInstance3D", true, false)
+	for m in mesh_instances:
+		var mi := m as MeshInstance3D
+		var full_name = (mi.name + " " + mi.get_parent().name).to_lower()
+		if "tree" in full_name or "arvore" in full_name or "palm" in full_name or "palmeira" in full_name or "bosquinho" in full_name or "folha" in full_name or "branch" in full_name or "commontree" in full_name or "bush" in full_name or "arbusto" in full_name or "vegetat" in full_name:
+			var mat_count = mi.get_surface_override_material_count()
+			if mat_count == 0 and mi.mesh:
+				mat_count = mi.mesh.get_surface_count()
+			
+			for s in range(max(1, mat_count)):
+				var active_mat = mi.get_active_material(s)
+				var albedo_tex: Texture2D = null
+				if active_mat is BaseMaterial3D and active_mat.albedo_texture:
+					albedo_tex = active_mat.albedo_texture
+				
+				var sm := ShaderMaterial.new()
+				sm.shader = wind_shader
+				if albedo_tex:
+					sm.set_shader_parameter("texture_albedo", albedo_tex)
+				sm.set_shader_parameter("velocidade_vento", 3.2)
+				sm.set_shader_parameter("forca_vento", 0.38)
+				sm.set_shader_parameter("turbulencia", 0.5)
+				
+				mi.set_surface_override_material(s, sm)
+				if clima_manager:
+					clima_manager.tree_materials.append(sm)
