@@ -1,0 +1,11 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://c0h0hhbxx3dr3"]
+
+[ext_resource type="Texture2D" path="res://assets/textures/psx_cefet_facade.jpg" id="1_tex"]
+
+[resource]
+resource_name = "Mat_CefetFacade"
+cull_mode = 0
+albedo_texture = ExtResource("1_tex")
+roughness = 0.8
+uv1_scale = Vector3(4, 2, 1)
+texture_filter = 0

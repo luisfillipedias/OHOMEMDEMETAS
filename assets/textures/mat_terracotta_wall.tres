@@ -1,0 +1,6 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://d2pagiduxqddo"]
+
+[resource]
+resource_name = "Mat_TerracottaWall"
+albedo_color = Color(0.5882353, 0.5176471, 0.4862745, 1)
+roughness = 0.8

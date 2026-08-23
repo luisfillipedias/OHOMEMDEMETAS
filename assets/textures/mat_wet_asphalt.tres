@@ -1,0 +1,12 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://ombmni10uncj"]
+
+[ext_resource type="Texture2D" path="res://assets/textures/psx_wet_asphalt.jpg" id="1_tex"]
+
+[resource]
+resource_name = "Mat_WetAsphalt"
+cull_mode = 0
+albedo_texture = ExtResource("1_tex")
+roughness = 0.3
+metallic = 0.2
+uv1_scale = Vector3(6, 6, 1)
+texture_filter = 0

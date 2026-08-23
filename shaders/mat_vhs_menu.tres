@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://vhsmenumat01"]
+
+[ext_resource type="Shader" path="res://shaders/vhs_menu.gdshader" id="1_vhs"]
+
+[resource]
+shader = ExtResource("1_vhs")
+shader_parameter/scanline_strength = 0.04
+shader_parameter/grain_strength = 0.018
+shader_parameter/vignette_strength = 0.30
+shader_parameter/curvature = 0.012
+shader_parameter/corner_radius = 0.03

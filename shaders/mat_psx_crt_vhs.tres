@@ -1,0 +1,14 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://matpsxcrtvhs01"]
+
+[ext_resource type="Shader" path="res://shaders/psx_crt_vhs.gdshader" id="1_shader"]
+
+[resource]
+shader = ExtResource("1_shader")
+shader_parameter/pixel_size = 1.6
+shader_parameter/scanline_strength = 0.08
+shader_parameter/aberration = 0.0012
+shader_parameter/vignette_strength = 0.42
+shader_parameter/grain_strength = 0.035
+shader_parameter/curvature = 0.018
+shader_parameter/corner_radius = 0.035
+shader_parameter/dither_depth = 32.0

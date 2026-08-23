@@ -1,0 +1,13 @@
+[remap]
+
+importer="theora"
+type="VideoStream"
+uid="uid://vhsbootvideo01"
+path.s3tc="res://.godot/imported/vhs_boot.mp4-abc123video.oggvideo"
+
+[deps]
+
+source_file="res://assets/video/vhs_boot.mp4"
+dest_files=[]
+
+[params]

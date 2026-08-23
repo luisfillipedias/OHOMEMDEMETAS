@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://matpsxfilter01"]
+
+[ext_resource type="Shader" path="res://shaders/psx_filter.gdshader" id="1_psx"]
+
+[resource]
+shader = ExtResource("1_psx")
+shader_parameter/pixel_size = 2.0
+shader_parameter/scanline_strength = 0.06
+shader_parameter/aberration = 0.002
+shader_parameter/vignette_strength = 0.35
+shader_parameter/grain_strength = 0.03

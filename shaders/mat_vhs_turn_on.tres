@@ -1,0 +1,8 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://drw7sobpwr887"]
+
+[ext_resource type="Shader" uid="uid://cxpkk4forbn10" path="res://shaders/vhs_turn_on.gdshader" id="1_turnon"]
+
+[resource]
+shader = ExtResource("1_turnon")
+shader_parameter/turn_on_progress = 0.0
+shader_parameter/static_noise_intensity = 1.0

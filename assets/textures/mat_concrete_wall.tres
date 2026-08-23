@@ -1,0 +1,11 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://olpwhk0o7rqq"]
+
+[ext_resource type="Texture2D" uid="uid://d0b1q23bw32nf" path="res://assets/textures/psx_concrete_wall.png" id="1_tex"]
+
+[resource]
+resource_name = "Mat_ConcreteWall"
+albedo_color = Color(0.78352344, 0.78352344, 0.78352326, 1)
+albedo_texture = ExtResource("1_tex")
+roughness = 0.88
+uv1_scale = Vector3(30.003, 30.003, 10)
+texture_filter = 0

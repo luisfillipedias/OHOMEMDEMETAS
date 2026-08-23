@@ -1,0 +1,7 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://matrain01"]
+
+[resource]
+transparency = 1
+cull_mode = 0
+shading_mode = 0
+albedo_color = Color(0.75, 0.82, 0.95, 0.6)

@@ -1,0 +1,193 @@
+[gd_scene load_steps=5 format=3 uid="uid://phoneappscene0"]
+
+[ext_resource type="Script" path="res://scripts/phone_app.gd" id="1_phone"]
+[ext_resource type="FontFile" path="res://assets/fonts/Oswald.ttf" id="2_font"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_PhoneBody"]
+bg_color = Color(0.08, 0.08, 0.1, 0.98)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.3, 0.3, 0.35, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Notif"]
+bg_color = Color(0.12, 0.1, 0.15, 0.95)
+border_width_left = 3
+border_color = Color(1, 0.3, 0.2, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="PhoneUI" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1_phone")
+
+[node name="PhoneContainer" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -380.0
+offset_top = -280.0
+offset_right = -40.0
+offset_bottom = 300.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="PhoneBody" type="Panel" parent="PhoneContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_PhoneBody")
+
+[node name="TopBar" type="HBoxContainer" parent="PhoneContainer/PhoneBody"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 16.0
+offset_top = 12.0
+offset_right = -16.0
+offset_bottom = 38.0
+grow_horizontal = 2
+
+[node name="TimeLabel" type="Label" parent="PhoneContainer/PhoneBody/TopBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = "21:42 • WhatsApp"
+
+[node name="Spacer" type="Control" parent="PhoneContainer/PhoneBody/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ClosePhoneBtn" type="Button" parent="PhoneContainer/PhoneBody/TopBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = "✕ FECHAR"
+flat = true
+
+[node name="ContactsList" type="Control" parent="PhoneContainer/PhoneBody"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_top = 48.0
+offset_right = -14.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Scroll" type="ScrollContainer" parent="PhoneContainer/PhoneBody/ContactsList"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="PhoneContainer/PhoneBody/ContactsList/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ChatView" type="Control" parent="PhoneContainer/PhoneBody"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_top = 44.0
+offset_right = -14.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Header" type="HBoxContainer" parent="PhoneContainer/PhoneBody/ChatView"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 32.0
+grow_horizontal = 2
+
+[node name="BackBtn" type="Button" parent="PhoneContainer/PhoneBody/ChatView/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = "◀ Voltar"
+flat = true
+
+[node name="ChatContactName" type="Label" parent="PhoneContainer/PhoneBody/ChatView/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.7, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "Contato"
+
+[node name="Scroll" type="ScrollContainer" parent="PhoneContainer/PhoneBody/ChatView"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 36.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MessagesVBox" type="VBoxContainer" parent="PhoneContainer/PhoneBody/ChatView/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="NotificationBanner" type="Panel" parent="."]
+visible = false
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -260.0
+offset_top = -80.0
+offset_right = 260.0
+offset_bottom = -10.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_Notif")
+
+[node name="NotifText" type="Label" parent="NotificationBanner"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 8.0
+offset_right = -16.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.85, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = "💬 Nova Mensagem Recebida"
+autowrap_mode = 3
+
+[node name="NotifBtn" type="Button" parent="NotificationBanner"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+flat = true

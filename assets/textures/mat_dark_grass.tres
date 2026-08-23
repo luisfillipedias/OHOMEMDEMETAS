@@ -1,0 +1,11 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://matdarkgrass"]
+
+[ext_resource type="Texture2D" path="res://assets/textures/psx_dark_grass.jpg" id="1_tex"]
+
+[resource]
+resource_name = "Mat_DarkGrass"
+cull_mode = 0
+albedo_texture = ExtResource("1_tex")
+roughness = 0.9
+uv1_scale = Vector3(4, 4, 1)
+texture_filter = 0

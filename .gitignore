@@ -1,0 +1,12 @@
+# Godot 4
+.godot/
+*.tmp
+*.bak
+BACKUP/
+*.blend1
+*.blend@
+cenario_preview_*.png
+test_capture.*
+chapter_01_cand_*.tscn
+chapter_01_TEST_*.tscn
+chapter_01_quebrado_backup.tscn

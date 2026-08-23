@@ -1,0 +1,344 @@
+[gd_scene format=3 uid="uid://dhc3qnw4mxblm"]
+
+[ext_resource type="Script" uid="uid://djsk0bxdt06el" path="res://scripts/title_screen.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://c8f3fali608w5" path="res://assets/textures/cefet_portico_ref.jpg" id="2_1oiph"]
+[ext_resource type="FontFile" uid="uid://bbb0a4bwdtbnc" path="res://assets/fonts/title_font.otf" id="3_title_font"]
+[ext_resource type="FontFile" uid="uid://b34hl0r4aa0hr" path="res://assets/fonts/text_font.ttf" id="4_text_font"]
+[ext_resource type="Material" uid="uid://dh10rriiq3irw" path="res://shaders/mat_title_glitch.tres" id="5_glitch"]
+[ext_resource type="Material" uid="uid://vhsmenumat01" path="res://shaders/mat_vhs_menu.tres" id="6_vhs"]
+[ext_resource type="Material" uid="uid://drw7sobpwr887" path="res://shaders/mat_vhs_turn_on.tres" id="7_turnon"]
+[ext_resource type="AudioStream" uid="uid://c1eqajwlfj178" path="res://assets/audio/menu/music/GAMESTARTSOUND.mp3" id="8_gamestart"]
+[ext_resource type="AudioStream" uid="uid://bvhs01menusnd" path="res://assets/audio/menu/music/menuVHSSOUND.wav" id="9_vhshum"]
+[ext_resource type="AudioStream" uid="uid://6gryddqmlwfc" path="res://assets/audio/menu/music/playloadingsound.mp3" id="10_playload"]
+[ext_resource type="AudioStream" uid="uid://coixkuuk2m2jy" path="res://assets/audio/menu/music/textglich.mp3" id="11_textglitch"]
+[ext_resource type="AudioStream" uid="uid://h35dt3b5q3uk" path="res://assets/audio/menu/music/SOMETIMEGLITH.mp3" id="12_rareglitch"]
+[ext_resource type="AudioStream" uid="uid://b0gtiu2eiv8kf" path="res://assets/audio/menu/music/titlescreenmusic1.mp3" id="13_music1"]
+
+[sub_resource type="Gradient" id="Gradient_1oiph"]
+offsets = PackedFloat32Array(0, 0.6666667)
+colors = PackedColorArray(1, 1, 1, 0, 0, 0, 0, 0.4509804)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_1iice"]
+gradient = SubResource("Gradient_1oiph")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 1)
+
+[node name="TitleScreen" type="Control" unique_id=1132857226]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="TextureRect" parent="." unique_id=55883085]
+modulate = Color(0.65834004, 0.6583399, 0.6583399, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -25.0
+offset_right = 40.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_1oiph")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="TextureRect" type="TextureRect" parent="Background" unique_id=422707173]
+layout_mode = 0
+offset_right = 1362.0
+offset_bottom = 769.0
+texture = SubResource("GradientTexture2D_1iice")
+
+[node name="MenuContainer" type="Control" parent="." unique_id=1659238628]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 65.0
+offset_top = 45.0
+offset_right = 560.0
+offset_bottom = 690.0
+
+[node name="Title" type="Label" parent="MenuContainer" unique_id=1955952469]
+material = ExtResource("5_glitch")
+layout_mode = 0
+offset_left = 2.0
+offset_top = -30.0
+offset_right = 462.0
+offset_bottom = 166.0
+theme_override_colors/font_color = Color(0.85, 0.12, 0.12, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.95)
+theme_override_constants/line_spacing = -14
+theme_override_fonts/font = ExtResource("3_title_font")
+theme_override_font_sizes/font_size = 90
+text = "O HOMEM
+"
+
+[node name="Title2" type="Label" parent="MenuContainer" unique_id=1158482433]
+material = ExtResource("5_glitch")
+layout_mode = 0
+offset_left = -3.0
+offset_top = 29.0
+offset_right = 457.0
+offset_bottom = 225.0
+theme_override_colors/font_color = Color(0.85, 0.12, 0.12, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.95)
+theme_override_constants/line_spacing = -14
+theme_override_fonts/font = ExtResource("3_title_font")
+theme_override_font_sizes/font_size = 114
+text = "DE METAS"
+
+[node name="Subtitle" type="Label" parent="MenuContainer" unique_id=983425428]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 139.0
+offset_right = 428.0
+offset_bottom = 164.0
+theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.95)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_fonts/font = ExtResource("4_text_font")
+theme_override_font_sizes/font_size = 16
+text = "BASEADO EM FATOS REAIS"
+
+[node name="Options" type="VBoxContainer" parent="MenuContainer" unique_id=492197995]
+layout_mode = 0
+offset_top = 229.0
+offset_right = 320.0
+offset_bottom = 416.0
+theme_override_constants/separation = 6
+
+[node name="BtnJogar" type="Button" parent="MenuContainer/Options" unique_id=979645099]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_fonts/font = ExtResource("4_text_font")
+theme_override_font_sizes/font_size = 23
+text = "►  JOGAR"
+flat = true
+alignment = 0
+
+[node name="BtnContinuar" type="Button" parent="MenuContainer/Options" unique_id=1994257409]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.45, 0.45, 1)
+theme_override_fonts/font = ExtResource("4_text_font")
+theme_override_font_sizes/font_size = 22
+text = "    CONTINUAR"
+flat = true
+alignment = 0
+
+[node name="BtnConfig" type="Button" parent="MenuContainer/Options" unique_id=1564987152]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_fonts/font = ExtResource("4_text_font")
+theme_override_font_sizes/font_size = 22
+text = "    CONFIGURAÇÕES"
+flat = true
+alignment = 0
+
+[node name="BtnSair" type="Button" parent="MenuContainer/Options" unique_id=1382590582]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_fonts/font = ExtResource("4_text_font")
+theme_override_font_sizes/font_size = 22
+text = "    SAIR"
+flat = true
+alignment = 0
+
+[node name="ControlsGuide" type="RichTextLabel" parent="MenuContainer" unique_id=428264161]
+layout_mode = 0
+offset_top = 507.0
+offset_right = 440.0
+offset_bottom = 667.0
+theme_override_constants/line_separation = 1
+theme_override_fonts/normal_font = ExtResource("4_text_font")
+theme_override_font_sizes/normal_font_size = 15
+bbcode_enabled = true
+text = "[color=#c81818]W A S D[/color]  -  ANDAR
+[color=#c81818]E[/color]  -  INTERAGIR
+[color=#c81818]G[/color]  -  USAR ITEM
+[color=#c81818]ESC[/color]  -  CONFIGURAÇÕES
+CLIQUE OU [color=#c81818]ESPAÇO[/color]  -  PULAR DIÁLOGOS"
+fit_content = true
+
+[node name="SettingsPanel" type="ColorRect" parent="." unique_id=916804697]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -210.0
+offset_right = 260.0
+offset_bottom = 210.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.16, 0.55, 0.96)
+
+[node name="VCRBorder" type="ReferenceRect" parent="SettingsPanel" unique_id=271028746]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.9, 0.9, 0.9, 1)
+border_width = 3.0
+editor_only = false
+
+[node name="VBox" type="VBoxContainer" parent="SettingsPanel" unique_id=502128899]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 28.0
+offset_top = 20.0
+offset_right = -28.0
+offset_bottom = -75.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="SettingsTitle" type="Label" parent="SettingsPanel/VBox" unique_id=1935571147]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("4_text_font")
+theme_override_font_sizes/font_size = 22
+text = "FUNCTION"
+horizontal_alignment = 1
+
+[node name="MasterLabel" type="Label" parent="SettingsPanel/VBox" unique_id=849548202]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_fonts/font = ExtResource("4_text_font")
+theme_override_font_sizes/font_size = 15
+text = "  MASTER VOLUME:"
+
+[node name="MasterSlider" type="HSlider" parent="SettingsPanel/VBox" unique_id=2109852226]
+layout_mode = 2
+max_value = 1.0
+step = 0.05
+value = 0.8
+
+[node name="SFXLabel" type="Label" parent="SettingsPanel/VBox" unique_id=1982664849]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_fonts/font = ExtResource("4_text_font")
+theme_override_font_sizes/font_size = 15
+text = "  SFX VOLUME:"
+
+[node name="SFXSlider" type="HSlider" parent="SettingsPanel/VBox" unique_id=1205673704]
+layout_mode = 2
+max_value = 1.0
+step = 0.05
+value = 0.9
+
+[node name="CheckFullscreen" type="CheckBox" parent="SettingsPanel/VBox" unique_id=977964476]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_fonts/font = ExtResource("4_text_font")
+theme_override_font_sizes/font_size = 16
+text = "  TELA CHEIA"
+
+[node name="BtnCloseSettings" type="Button" parent="SettingsPanel/VBox" unique_id=1503102532]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("4_text_font")
+theme_override_font_sizes/font_size = 17
+text = "→ VOLTAR"
+flat = true
+alignment = 0
+
+[node name="VCRFooter" type="ColorRect" parent="SettingsPanel" unique_id=715865413]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = -60.0
+offset_right = -6.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 0
+color = Color(0.92, 0.92, 0.92, 1)
+
+[node name="FooterText" type="Label" parent="SettingsPanel/VCRFooter" unique_id=1074859957]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.08, 0.08, 0.12, 1)
+theme_override_constants/line_spacing = 1
+theme_override_fonts/font = ExtResource("4_text_font")
+theme_override_font_sizes/font_size = 14
+text = "SELECT WITH (▲, ▼) AND (OK)
+PRESS (ESC) TO END"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VHSOverlay" type="ColorRect" parent="." unique_id=1903792607]
+material = ExtResource("6_vhs")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="VHSTurnOnOverlay" type="ColorRect" parent="." unique_id=782599884]
+material = ExtResource("7_turnon")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="FadeOverlay" type="ColorRect" parent="." unique_id=698661469]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0)
+
+[node name="AudioGameStart" type="AudioStreamPlayer" parent="." unique_id=1286075310]
+stream = ExtResource("8_gamestart")
+volume_db = -4.0
+
+[node name="AudioVHSHum" type="AudioStreamPlayer" parent="." unique_id=972134479]
+stream = ExtResource("9_vhshum")
+volume_db = -8.0
+
+[node name="AudioPlayLoad" type="AudioStreamPlayer" parent="." unique_id=1043341962]
+stream = ExtResource("10_playload")
+volume_db = -2.0
+
+[node name="AudioTextGlitch" type="AudioStreamPlayer" parent="." unique_id=171754809]
+stream = ExtResource("11_textglitch")
+volume_db = -6.0
+
+[node name="AudioRareGlitch" type="AudioStreamPlayer" parent="." unique_id=247461195]
+stream = ExtResource("12_rareglitch")
+volume_db = -5.0
+
+[node name="AudioMenuMusic" type="AudioStreamPlayer" parent="." unique_id=1414782099]
+stream = ExtResource("13_music1")
+volume_db = -10.0

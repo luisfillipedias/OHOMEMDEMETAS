@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://c0h0hhcaejwpb"]
+
+[ext_resource type="Texture2D" path="res://assets/textures/psx_cefet_portal_sign.jpg" id="1_tex"]
+
+[resource]
+resource_name = "Mat_CefetPortal"
+cull_mode = 0
+albedo_texture = ExtResource("1_tex")
+roughness = 0.6
+texture_filter = 0

@@ -1,0 +1,15 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://dh10rriiq3irw"]
+
+[ext_resource type="Shader" uid="uid://4ksc4iueoq04" path="res://shaders/title_glitch.gdshader" id="1_glitch"]
+
+[resource]
+shader = ExtResource("1_glitch")
+shader_parameter/text_color = Color(0.5815336, 0.073226385, 0.07696297, 1)
+shader_parameter/chroma_split = 0.004
+shader_parameter/grain_amount = 0.35
+shader_parameter/glitch_amount = 0.006
+shader_parameter/scanline_density = 400.0
+shader_parameter/glitch_speed = 10.0
+shader_parameter/block_glitch_chance = 0.06
+shader_parameter/block_glitch_strength = 0.035
+shader_parameter/flicker_amount = 0.15
