@@ -39,69 +39,160 @@ var stalker_sms_visto: bool = false
 var quarto_trancado: bool = false
 var is_paused: bool = false
 
+var pause_menu_control: Control = null
+var settings_subpanel: Control = null
+var audio_wind_extra: AudioStreamPlayer = null
+
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	add_to_group("chapter")
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	
 	_setup_pause_menu()
 	
-	# Garante que o som de vento e tempestade rode em loop infinito contínuo
+	# Som de vento e tempestade contínuo em loop
 	if audio_amb:
 		if not audio_amb.playing:
 			audio_amb.play()
 		if not audio_amb.finished.is_connected(audio_amb.play):
 			audio_amb.finished.connect(audio_amb.play)
 	
-	# Instancia o Gerenciador de Clima (Vento e Névoa)
+	# Gerenciador de Clima
 	clima_manager = ClimaManager.new()
 	add_child(clima_manager)
 	
-	# Aplica o shader de vento automaticamente em todas as 30+ árvores da cena
+	# Camada extra de áudio de vento e uivos PSX
+	_setup_extra_wind_audio()
+	
+	# Partículas de folhas voando
+	_setup_wind_particles()
+	
+	# Aplica shader de vento nas árvores com cache (60 FPS estáveis)
 	_aplicar_vento_automatico_em_todas_arvores()
 	
-	# Transição inicial suave estilo fita VHS / Fears to Fathom
-	if fade_rect:
-		fade_rect.color = Color(0, 0, 0, 1)
-		fade_rect.show()
-		var tw := create_tween()
-		tw.tween_property(fade_rect, "color:a", 0.0, 1.8).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-		tw.tween_callback(fade_rect.hide)
-	
-	# Início da Cena 1: CEFET Campus 1, Crepúsculo Ventoso (17:50)
-	_show_timecard("CEFET-MG  -  CAMPUS 1", "17:50")
-	_set_objective("Vá até o prédio administrativo\ne faça sua matrícula.")
+	# Sequência cinematográfica de Boot VHS / Tubo CRT ligando
+	_play_vhs_intro_sequence()
+
+# ============================================================
+# SISTEMA DE PAUSA E CONFIGURAÇÕES [ESC]
+# ============================================================
 
 func _setup_pause_menu() -> void:
-	var pause_menu = get_node_or_null("HUD/PauseMenu")
-	if not pause_menu:
+	if not hud:
 		return
-	pause_menu.hide()
-	var btn_resume = get_node_or_null("HUD/PauseMenu/VCRBox/VBox/BtnResume")
-	if btn_resume and not btn_resume.pressed.is_connected(_on_resume_pressed):
-		btn_resume.pressed.connect(_on_resume_pressed)
-	var btn_main_menu = get_node_or_null("HUD/PauseMenu/VCRBox/VBox/BtnMainMenu")
-	if btn_main_menu and not btn_main_menu.pressed.is_connected(_on_main_menu_pressed):
+	
+	pause_menu_control = hud.get_node_or_null("PauseMenu") as Control
+	if not pause_menu_control:
+		pause_menu_control = Control.new()
+		pause_menu_control.name = "PauseMenu"
+		pause_menu_control.process_mode = Node.PROCESS_MODE_ALWAYS
+		pause_menu_control.set_anchors_preset(Control.PRESET_FULL_RECT)
+		pause_menu_control.z_index = 100
+		
+		# Fundo escuro
+		var bg = ColorRect.new()
+		bg.color = Color(0.02, 0.02, 0.04, 0.88)
+		bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+		pause_menu_control.add_child(bg)
+		
+		var vbox = VBoxContainer.new()
+		vbox.set_anchors_preset(Control.PRESET_CENTER)
+		vbox.custom_minimum_size = Vector2(380, 320)
+		vbox.add_theme_constant_override("separation", 14)
+		pause_menu_control.add_child(vbox)
+		
+		var title = Label.new()
+		title.text = "PAUSA  //  [ESC]"
+		title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		title.add_theme_font_size_override("font_size", 22)
+		title.add_theme_color_override("font_color", Color(1, 0.9, 0.4, 1))
+		vbox.add_child(title)
+		
+		var btn_resume = Button.new()
+		btn_resume.text = "RETOMAR JOGO"
+		btn_resume.custom_minimum_size = Vector2(0, 38)
+		btn_resume.pressed.connect(func(): toggle_pause_menu())
+		vbox.add_child(btn_resume)
+		
+		var btn_settings = Button.new()
+		btn_settings.text = "CONFIGURAÇÕES"
+		btn_settings.custom_minimum_size = Vector2(0, 38)
+		btn_settings.pressed.connect(func(): _toggle_settings_panel())
+		vbox.add_child(btn_settings)
+		
+		settings_subpanel = VBoxContainer.new()
+		settings_subpanel.add_theme_constant_override("separation", 8)
+		settings_subpanel.hide()
+		
+		var lbl_vol = Label.new()
+		lbl_vol.text = "Volume Geral:"
+		settings_subpanel.add_child(lbl_vol)
+		
+		var slider_vol = HSlider.new()
+		slider_vol.min_value = 0.0
+		slider_vol.max_value = 1.0
+		slider_vol.step = 0.05
+		slider_vol.value = db_to_linear(AudioServer.get_bus_volume_db(0))
+		slider_vol.value_changed.connect(func(v): AudioServer.set_bus_volume_db(0, linear_to_db(v)))
+		settings_subpanel.add_child(slider_vol)
+		
+		var check_fs = CheckBox.new()
+		check_fs.text = "Tela Cheia"
+		check_fs.button_pressed = (DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN)
+		check_fs.toggled.connect(func(toggled):
+			if toggled:
+				DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+			else:
+				DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+		)
+		settings_subpanel.add_child(check_fs)
+		vbox.add_child(settings_subpanel)
+		
+		var btn_main_menu = Button.new()
+		btn_main_menu.text = "MENU PRINCIPAL"
+		btn_main_menu.custom_minimum_size = Vector2(0, 38)
 		btn_main_menu.pressed.connect(_on_main_menu_pressed)
+		vbox.add_child(btn_main_menu)
+		
+		hud.add_child(pause_menu_control)
+	
+	pause_menu_control.hide()
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel"):
-		_toggle_pause()
+func _toggle_settings_panel() -> void:
+	if settings_subpanel:
+		settings_subpanel.visible = not settings_subpanel.visible
+
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE):
+		toggle_pause_menu()
+
+func toggle_pause_menu() -> void:
+	_toggle_pause()
 
 func _toggle_pause() -> void:
-	var pause_menu = get_node_or_null("HUD/PauseMenu")
-	if not pause_menu:
+	if not pause_menu_control:
+		_setup_pause_menu()
+	if not pause_menu_control:
 		return
 	is_paused = not is_paused
-	pause_menu.visible = is_paused
+	pause_menu_control.visible = is_paused
+	get_tree().paused = is_paused
 	if is_paused:
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	else:
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func _on_resume_pressed() -> void:
-	_toggle_pause()
+	toggle_pause_menu()
 
 func _on_main_menu_pressed() -> void:
+	get_tree().paused = false
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	get_tree().change_scene_to_file("res://scenes/ui/title_screen.tscn")
+
+# ============================================================
+# HUD / TIMECARD / OBJETIVOS
+# ============================================================
 
 func _show_timecard(local_text: String, hora_text: String) -> void:
 	if not timecard_panel: return
@@ -118,7 +209,6 @@ func _set_objective(text: String) -> void:
 	if not objective_panel: return
 	if objective_label:
 		objective_label.text = "OBJETIVO:\n" + text
-	objective_panel.modulate.a = 0.0
 	objective_panel.show()
 	var tween = create_tween()
 	tween.tween_property(objective_panel, "modulate:a", 1.0, 1.0)
@@ -132,20 +222,21 @@ func hide_interact_hint() -> void:
 	if not interact_hint: return
 	interact_hint.hide()
 
+# ============================================================
+# SISTEMA DE VEGETAÇÃO E VENTO
+# ============================================================
+
 func _aplicar_vento_automatico_em_todas_arvores() -> void:
 	var wind_shader = load("res://shaders/vento_arvore.gdshader") as Shader
 	if not wind_shader:
 		return
 	
-	# Cache de materiais por textura para evitar centenas de draw calls individuais (60 FPS no bosque)
 	var mat_cache := {}
-	
 	var mesh_instances = find_children("*", "MeshInstance3D", true, false)
 	for m in mesh_instances:
 		var mi := m as MeshInstance3D
 		var full_name = (mi.name + " " + mi.get_parent().name).to_lower()
 		
-		# Identifica árvores, folhagens, gramas e vegetações
 		if "tree" in full_name or "arvore" in full_name or "palm" in full_name or "palmeira" in full_name or "bosquinho" in full_name or "folha" in full_name or "branch" in full_name or "commontree" in full_name or "grass_p" in full_name or "bush" in full_name or "arbusto" in full_name or "vegetat" in full_name:
 			var mat_count = mi.get_surface_override_material_count()
 			if mat_count == 0 and mi.mesh:
@@ -176,8 +267,6 @@ func _aplicar_vento_automatico_em_todas_arvores() -> void:
 						clima_manager.tree_materials.append(sm)
 				
 				mi.set_surface_override_material(s, sm)
-
-var audio_wind_extra: AudioStreamPlayer = null
 
 func _setup_extra_wind_audio() -> void:
 	audio_wind_extra = AudioStreamPlayer.new()
@@ -238,11 +327,14 @@ func _setup_wind_particles() -> void:
 		add_child(particles)
 		particles.position = Vector3(0.0, 5.0, 0.0)
 
+# ============================================================
+# TRANSIÇÃO CINEMATOGRÁFICA DE BOOT VHS / TUBO CRT
+# ============================================================
+
 func _play_vhs_intro_sequence() -> void:
 	if not hud:
 		return
 	
-	# Garante que a cena comece completamente preta
 	if fade_rect:
 		fade_rect.color = Color(0, 0, 0, 1)
 		fade_rect.show()
@@ -261,7 +353,6 @@ func _play_vhs_intro_sequence() -> void:
 	vhs_overlay.material = sm
 	hud.add_child(vhs_overlay)
 	
-	# Texto verde VCR OSD no canto superior esquerdo
 	var vcr_label := Label.new()
 	vcr_label.text = "▶ PLAY   SP   17:50:00"
 	vcr_label.position = Vector2(36, 28)
@@ -273,7 +364,6 @@ func _play_vhs_intro_sequence() -> void:
 	vcr_label.modulate.a = 0.0
 	hud.add_child(vcr_label)
 	
-	# Som de TV ligando / cabeçote VHS
 	var sfx_boot := AudioStreamPlayer.new()
 	var boot_audio = load("res://assets/audio/menu/music/GAMESTARTSOUND.mp3") as AudioStream
 	if boot_audio:
@@ -282,19 +372,15 @@ func _play_vhs_intro_sequence() -> void:
 		add_child(sfx_boot)
 		sfx_boot.play()
 	
-	# Aguarda 2 frames para a GPU compilar e preparar a cena sem travamentos
 	await get_tree().process_frame
 	await get_tree().process_frame
 	
-	# Esconde o fade preto sólido para a animação do tubo CRT brilhar
 	if fade_rect:
 		fade_rect.hide()
 	
-	# Anima o tubo CRT abrindo com feixe horizontal e estática (0.0 -> 1.0)
 	var tw := create_tween()
 	tw.tween_method(func(val: float): sm.set_shader_parameter("turn_on_progress", val), 0.0, 1.0, 1.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	
-	# Faz o texto verde VCR PLAY aparecer e sumir
 	var tw_txt := create_tween()
 	tw_txt.tween_property(vcr_label, "modulate:a", 1.0, 0.2)
 	tw_txt.tween_interval(1.8)
@@ -302,13 +388,11 @@ func _play_vhs_intro_sequence() -> void:
 	
 	await tw.finished
 	
-	# Fade out suave da estática VHS restante revelando o campus
 	var tw_fade := create_tween()
 	tw_fade.tween_property(vhs_overlay, "modulate:a", 0.0, 0.5)
 	await tw_fade.finished
 	vhs_overlay.queue_free()
 	vcr_label.queue_free()
 	
-	# Início da Cena 1: Mostra Timecard e Objetivo
 	_show_timecard("CEFET-MG  -  CAMPUS 1", "17:50")
 	_set_objective("Vá até o prédio administrativo\ne faça sua matrícula.")

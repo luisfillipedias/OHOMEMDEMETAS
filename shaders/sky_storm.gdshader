@@ -85,7 +85,7 @@ void sky() {
 	// 4. Realce Crepuscular sutil apenas no horizonte
 	float horizon_factor = pow(clamp(1.0 - y * 1.6, 0.0, 1.0), 1.8);
 	float rim = smoothstep(coverage, coverage + 0.15, cloud_shape) * (1.0 - smoothstep(coverage + 0.15, coverage + 0.35, cloud_shape));
-	cloud_col = mix(cloud_col, sunset_glow, clamp(rim * 1.2 * horizon_factor + horizon_factor * 0.25, 0.0, 1.0));
+	cloud_col = mix(cloud_col, sunset_glow, clamp(rim * 0.6 * horizon_factor, 0.0, 0.45));  // Sem inject forçado de sunset
 
 	// 5. Composição Final
 	vec3 final_color = mix(sky_bg, cloud_col, cloud_alpha);
