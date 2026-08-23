@@ -42,6 +42,14 @@ func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	_setup_pause_menu()
 	
+	# Transição inicial suave estilo fita VHS / Fears to Fathom
+	if fade_rect:
+		fade_rect.color = Color(0, 0, 0, 1)
+		fade_rect.show()
+		var tw := create_tween()
+		tw.tween_property(fade_rect, "color:a", 0.0, 1.8).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tw.tween_callback(fade_rect.hide)
+	
 	# Início da Cena 1: CEFET Campus 1, Crepúsculo Ventoso (17:50)
 	_show_timecard("CEFET-MG  -  CAMPUS 1", "17:50")
 	_set_objective("Vá até o prédio administrativo\ne faça sua matrícula.")
