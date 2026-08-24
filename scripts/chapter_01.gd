@@ -103,13 +103,13 @@ func _setup_hud_styling() -> void:
 	if timecard_panel:
 		timecard_panel.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 		timecard_panel.offset_left = 36.0
-		timecard_panel.offset_top = -140.0
+		timecard_panel.offset_top = -110.0
 		timecard_panel.offset_right = 550.0
 		timecard_panel.offset_bottom = -28.0
 		timecard_panel.modulate.a = 0.0
 		timecard_panel.hide()
 	if timecard_label:
-		timecard_label.text = "CEFET-MG  -  CAMPUS 1\n17:52:31\nDIA - 10/01/2024"
+		timecard_label.text = "CEFET-MG  -  CAMPUS 1\n17:52 - 10/01/2024"
 		if font_retro:
 			timecard_label.add_theme_font_override("font", font_retro)
 		timecard_label.add_theme_font_size_override("font_size", 22)
@@ -562,49 +562,74 @@ func _setup_wind_particles() -> void:
 	quad.material = quad_mat
 	leaves_particles.draw_pass_1 = quad
 	
-	# 2. Partículas de Poeira Rasteira (PURAMENTE OCASIONAL - One-Shot / Disparado apenas na rajada de vento)
+	# 2. Partículas de Poeira Rasteira (Orgânica, Coesa e Focada - Disparada nas Rajadas)
 	_ground_dust_particles = GPUParticles3D.new()
 	_ground_dust_particles.name = "GroundDustParticles"
-	_ground_dust_particles.amount = 16
-	_ground_dust_particles.lifetime = 2.2
+	_ground_dust_particles.amount = 18
+	_ground_dust_particles.lifetime = 2.8
 	_ground_dust_particles.one_shot = true
 	_ground_dust_particles.emitting = false
-	_ground_dust_particles.explosiveness = 0.75
+	_ground_dust_particles.explosiveness = 0.08 # Nasce escalonada ao longo do tempo
 	_ground_dust_particles.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	_ground_dust_particles.visibility_aabb = AABB(Vector3(-30, -2, -30), Vector3(60, 10, 60))
+	_ground_dust_particles.visibility_aabb = AABB(Vector3(-15, -2, -15), Vector3(30, 8, 30))
+	
+	# Curva de Fade In / Fade Out Suave over Lifetime
+	var color_grad := Gradient.new()
+	color_grad.add_point(0.0, Color(0.60, 0.56, 0.50, 0.0))
+	color_grad.add_point(0.22, Color(0.60, 0.56, 0.50, 0.11))
+	color_grad.add_point(0.68, Color(0.60, 0.56, 0.50, 0.06))
+	color_grad.add_point(1.0, Color(0.60, 0.56, 0.50, 0.0))
+	var color_ramp_tex := GradientTexture1D.new()
+	color_ramp_tex.gradient = color_grad
+	
+	# Curva de Escala: Expande suavemente conforme sobe
+	var scale_curve := Curve.new()
+	scale_curve.add_point(Vector2(0.0, 0.35))
+	scale_curve.add_point(Vector2(0.35, 1.0))
+	scale_curve.add_point(Vector2(1.0, 1.45))
+	var scale_tex := CurveTexture.new()
+	scale_tex.curve = scale_curve
 	
 	var dmat := ParticleProcessMaterial.new()
 	dmat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
-	dmat.emission_box_extents = Vector3(16.0, 0.2, 16.0)
-	dmat.direction = Vector3(1.0, 0.06, 0.35).normalized()
-	dmat.spread = 15.0
-	dmat.initial_velocity_min = 7.0
-	dmat.initial_velocity_max = 14.0
-	dmat.gravity = Vector3(0.0, 0.08, 0.0)
-	dmat.scale_min = 0.4
-	dmat.scale_max = 0.85
-	dmat.color = Color(0.60, 0.56, 0.50, 0.08) # Alpha sutil 8% para zero ruído visual
-	dmat.damping_min = 1.5
-	dmat.damping_max = 3.0
+	dmat.emission_box_extents = Vector3(1.2, 0.04, 1.2) # Área pequena e coesa perto dos pés
+	dmat.direction = Vector3(1.0, 0.45, 0.35).normalized() # Deriva com o vento subindo suavemente
+	dmat.spread = 22.0
+	dmat.initial_velocity_min = 0.5
+	dmat.initial_velocity_max = 1.3 # Velocidade lenta de fumaça/poeira
+	dmat.gravity = Vector3(0.08, 0.16, 0.03) # Flutua no ar
+	dmat.damping_min = 2.5
+	dmat.damping_max = 4.0 # Desacelera no ar
+	dmat.scale_min = 0.35
+	dmat.scale_max = 0.70
+	dmat.color_ramp = color_ramp_tex
+	dmat.scale_curve = scale_tex
+	
+	# Turbulência orgânica para ondulação natural de poeira
+	dmat.turbulence_enabled = true
+	dmat.turbulence_noise_strength = 0.40
+	dmat.turbulence_noise_scale = 2.0
+	dmat.turbulence_noise_speed = Vector3(0.4, 0.2, 0.4)
+	
 	_ground_dust_particles.process_material = dmat
 	_ground_dust_mat = dmat
 	
-	# Textura suave de gradiente radial (alpha zero absoluto a 60% do raio)
+	# Textura suave de gradiente radial sem bordas
 	var grad := Gradient.new()
-	grad.add_point(0.0, Color(1, 1, 1, 0.28))
-	grad.add_point(0.35, Color(1, 1, 1, 0.08))
-	grad.add_point(0.65, Color(1, 1, 1, 0.0))
+	grad.add_point(0.0, Color(1, 1, 1, 0.35))
+	grad.add_point(0.35, Color(1, 1, 1, 0.10))
+	grad.add_point(0.60, Color(1, 1, 1, 0.0))
 	grad.add_point(1.0, Color(1, 1, 1, 0.0))
 	var grad_tex := GradientTexture2D.new()
 	grad_tex.gradient = grad
 	grad_tex.fill = GradientTexture2D.FILL_RADIAL
 	grad_tex.fill_from = Vector2(0.5, 0.5)
-	grad_tex.fill_to = Vector2(0.65, 0.5)
+	grad_tex.fill_to = Vector2(0.60, 0.5)
 	grad_tex.width = 64
 	grad_tex.height = 64
 	
 	var dust_quad := QuadMesh.new()
-	dust_quad.size = Vector2(0.35, 0.25)
+	dust_quad.size = Vector2(0.32, 0.24)
 	var dust_qmat := StandardMaterial3D.new()
 	dust_qmat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	dust_qmat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
@@ -618,12 +643,12 @@ func _setup_wind_particles() -> void:
 		player.add_child(leaves_particles)
 		leaves_particles.position = Vector3(-10.0, 4.0, -10.0)
 		player.add_child(_ground_dust_particles)
-		_ground_dust_particles.position = Vector3(-6.0, 0.1, -6.0)
+		_ground_dust_particles.position = Vector3(0.0, 0.04, 0.0) # Rente ao chão nos pés
 	else:
 		add_child(leaves_particles)
 		leaves_particles.position = Vector3(0.0, 5.0, 0.0)
 		add_child(_ground_dust_particles)
-		_ground_dust_particles.position = Vector3(0.0, 0.1, 0.0)
+		_ground_dust_particles.position = Vector3(0.0, 0.04, 0.0)
 
 # ============================================================
 # CONTROLADOR DE RAJADAS DINÂMICAS DE VENTO (Espaçadas e Raras)

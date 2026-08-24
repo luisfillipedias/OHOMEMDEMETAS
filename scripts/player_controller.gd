@@ -143,41 +143,61 @@ func _setup_footstep_dust() -> void:
 	_step_dust_particles = GPUParticles3D.new()
 	_step_dust_particles.name = "FootstepDust"
 	_step_dust_particles.amount = 4
-	_step_dust_particles.lifetime = 0.45
+	_step_dust_particles.lifetime = 0.55
 	_step_dust_particles.one_shot = true
 	_step_dust_particles.emitting = false
-	_step_dust_particles.explosiveness = 0.95
+	_step_dust_particles.explosiveness = 0.20
 	_step_dust_particles.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	
+	# Curva de Fade In / Fade Out Suave
+	var color_grad := Gradient.new()
+	color_grad.add_point(0.0, Color(0.60, 0.56, 0.50, 0.0))
+	color_grad.add_point(0.25, Color(0.60, 0.56, 0.50, 0.09))
+	color_grad.add_point(0.70, Color(0.60, 0.56, 0.50, 0.04))
+	color_grad.add_point(1.0, Color(0.60, 0.56, 0.50, 0.0))
+	var color_ramp_tex := GradientTexture1D.new()
+	color_ramp_tex.gradient = color_grad
+	
+	# Curva de Escala Suave
+	var scale_curve := Curve.new()
+	scale_curve.add_point(Vector2(0.0, 0.3))
+	scale_curve.add_point(Vector2(0.4, 0.8))
+	scale_curve.add_point(Vector2(1.0, 1.2))
+	var scale_tex := CurveTexture.new()
+	scale_tex.curve = scale_curve
 	
 	var pmat := ParticleProcessMaterial.new()
 	pmat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
-	pmat.emission_sphere_radius = 0.18
-	pmat.direction = Vector3(0.0, 0.4, 0.0)
-	pmat.spread = 45.0
-	pmat.initial_velocity_min = 0.3
-	pmat.initial_velocity_max = 0.7
-	pmat.gravity = Vector3(0.0, 0.1, 0.0)
-	pmat.scale_min = 0.25
-	pmat.scale_max = 0.45
-	pmat.color = Color(0.60, 0.56, 0.50, 0.07) # Muito sutil e transparente
+	pmat.emission_sphere_radius = 0.12
+	pmat.direction = Vector3(0.0, 0.6, 0.0)
+	pmat.spread = 35.0
+	pmat.initial_velocity_min = 0.2
+	pmat.initial_velocity_max = 0.5
+	pmat.gravity = Vector3(0.0, 0.08, 0.0)
+	pmat.damping_min = 2.0
+	pmat.damping_max = 3.5
+	pmat.scale_min = 0.2
+	pmat.scale_max = 0.4
+	pmat.color_ramp = color_ramp_tex
+	pmat.scale_curve = scale_tex
 	_step_dust_particles.process_material = pmat
 	
-	# Textura suave de gradiente radial
+	# Textura suave de gradiente radial sem bordas
 	var grad := Gradient.new()
-	grad.add_point(0.0, Color(1, 1, 1, 0.25))
-	grad.add_point(0.35, Color(1, 1, 1, 0.06))
-	grad.add_point(0.65, Color(1, 1, 1, 0.0))
+	grad.add_point(0.0, Color(1, 1, 1, 0.3))
+	grad.add_point(0.35, Color(1, 1, 1, 0.08))
+	grad.add_point(0.60, Color(1, 1, 1, 0.0))
 	grad.add_point(1.0, Color(1, 1, 1, 0.0))
 	var grad_tex := GradientTexture2D.new()
 	grad_tex.gradient = grad
 	grad_tex.fill = GradientTexture2D.FILL_RADIAL
 	grad_tex.fill_from = Vector2(0.5, 0.5)
-	grad_tex.fill_to = Vector2(0.65, 0.5)
+	grad_tex.fill_to = Vector2(0.60, 0.5)
 	grad_tex.width = 32
 	grad_tex.height = 32
 	
 	var quad := QuadMesh.new()
-	quad.size = Vector2(0.28, 0.20)
+	quad.size = Vector2(0.24, 0.18)
 	var qmat := StandardMaterial3D.new()
 	qmat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	qmat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
@@ -188,4 +208,4 @@ func _setup_footstep_dust() -> void:
 	_step_dust_particles.draw_pass_1 = quad
 	
 	add_child(_step_dust_particles)
-	_step_dust_particles.position = Vector3(0.0, 0.05, 0.0)
+	_step_dust_particles.position = Vector3(0.0, 0.02, 0.0)
