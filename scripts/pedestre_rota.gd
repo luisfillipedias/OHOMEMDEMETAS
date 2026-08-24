@@ -225,7 +225,13 @@ func _orientar_para_frente(follow: PathFollow3D, holder: Node3D) -> void:
 		return
 
 	var alvo: Vector3 = holder.global_position + direcao.normalized()
-	holder.look_at(alvo, Vector3.UP)
+	# Garante que o alvo é diferente da posição atual (evita "target vector can't be zero")
+	if alvo.distance_to(holder.global_position) < 0.0001:
+		return
+	# look_at pode falhar se o vetor UP for paralelo à direção de olhar (ex: subindo escada)
+	var look_dir := (alvo - holder.global_position).normalized()
+	var up_ref := Vector3.UP if abs(look_dir.dot(Vector3.UP)) < 0.999 else Vector3.FORWARD
+	holder.look_at(alvo, up_ref)
 
 func _atualizar_olhar_cabeca(p: Dictionary, jogador: Node3D, delta: float) -> void:
 	var skeleton: Skeleton3D = p["skeleton"]
@@ -239,13 +245,20 @@ func _atualizar_olhar_cabeca(p: Dictionary, jogador: Node3D, delta: float) -> vo
 
 	var fwd: Vector3 = -holder.global_transform.basis.z
 	fwd.y = 0.0
+	if fwd.length() < 0.0001:
+		return
 	fwd = fwd.normalized()
 	
 	var right: Vector3 = holder.global_transform.basis.x
 	right.y = 0.0
+	if right.length() < 0.0001:
+		return
 	right = right.normalized()
 
-	var dir_horiz: Vector3 = Vector3(para_jogador.x, 0.0, para_jogador.z).normalized()
+	var dir_horiz_raw := Vector3(para_jogador.x, 0.0, para_jogador.z)
+	if dir_horiz_raw.length() < 0.0001:
+		return
+	var dir_horiz: Vector3 = dir_horiz_raw.normalized()
 	var dot_fwd: float = fwd.dot(dir_horiz)
 	var dot_right: float = right.dot(dir_horiz)
 	var yaw_rad: float = atan2(dot_right, dot_fwd)

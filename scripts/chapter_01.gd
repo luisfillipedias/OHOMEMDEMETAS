@@ -786,11 +786,12 @@ func _aplicar_vento_automatico_em_todas_arvores() -> void:
 	var mat_cache := {}
 	var mesh_instances = find_children("*", "MeshInstance3D", true, false)
 	
+	var tree_idx: int = 0
 	for m in mesh_instances:
 		var mi := m as MeshInstance3D
 		var full_name = (mi.name + " " + mi.get_parent().name).to_lower()
 		
-		# IGNORA POSTES, LUZES DE RUA (street_light), SEMÁFOROS E LÂMPADAS (evita poste dançando com o vento!)
+		# IGNORA POSTES, LUZES DE RUA (street_light), SEMÁFOROS E LÂMPADAS
 		if "street" in full_name or "post" in full_name or "light" in full_name or "lamp" in full_name or "semaforo" in full_name or "traffic" in full_name:
 			continue
 		
@@ -798,9 +799,24 @@ func _aplicar_vento_automatico_em_todas_arvores() -> void:
 		   "palmeira" in full_name or "bosquinho" in full_name or "folha" in full_name or \
 		   "branch" in full_name or "commontree" in full_name or "grass_p" in full_name or \
 		   "bush" in full_name or "arbusto" in full_name or "vegetat" in full_name:
+			
+			# CLASSIFICAÇÃO POR PERFIL DE ESPÉCIE
+			# 0 = Conífera/Pinheiro (rígido, uniforme)
+			# 1 = Árvore Larga/Copada (tronco firme, copa viva)
+			# 2 = Árvore Fina/Palmeira/Arbusto (haste flexível)
+			var tipo: int = 1
+			if "tree_rt" in full_name or "pinheiro" in full_name or "pine" in full_name:
+				tipo = 0
+			elif "small" in full_name or "palm" in full_name or "palmeira" in full_name or "bush" in full_name or "arbusto" in full_name or "grass" in full_name:
+				tipo = 2
+			
 			var mat_count = mi.get_surface_override_material_count()
 			if mat_count == 0 and mi.mesh:
 				mat_count = mi.mesh.get_surface_count()
+			
+			tree_idx += 1
+			# Distribui seeds e variações para evitar sincronização mecânica ("puxar corda")
+			var seed_bucket = (tree_idx % 5)
 			
 			for s in range(max(1, mat_count)):
 				var active_mat = mi.get_active_material(s)
@@ -808,7 +824,8 @@ func _aplicar_vento_automatico_em_todas_arvores() -> void:
 				if active_mat is BaseMaterial3D and active_mat.albedo_texture:
 					albedo_tex = active_mat.albedo_texture
 				
-				var cache_key = albedo_tex.resource_path if albedo_tex else ("mat_" + str(mi.name) + "_" + str(s))
+				var tex_key = albedo_tex.resource_path if albedo_tex else ("mat_" + str(mi.name) + "_" + str(s))
+				var cache_key = tex_key + "_t" + str(tipo) + "_s" + str(seed_bucket)
 				var sm: ShaderMaterial
 				if mat_cache.has(cache_key):
 					sm = mat_cache[cache_key]
@@ -818,9 +835,11 @@ func _aplicar_vento_automatico_em_todas_arvores() -> void:
 					if albedo_tex:
 						sm.set_shader_parameter("texture_albedo", albedo_tex)
 					sm.set_shader_parameter("direcao_vento", _wind_direction)
-					sm.set_shader_parameter("velocidade_vento", 0.38)
-					sm.set_shader_parameter("forca_vento", 0.45)
-					sm.set_shader_parameter("forca_flutter", 0.015)
+					sm.set_shader_parameter("tipo_arvore", tipo)
+					sm.set_shader_parameter("seed_individual", float(seed_bucket) * 7.3)
+					sm.set_shader_parameter("velocidade_vento", 0.35)
+					sm.set_shader_parameter("forca_vento", 0.50)
+					sm.set_shader_parameter("forca_flutter", 0.02)
 					mat_cache[cache_key] = sm
 					_tree_materials.append(sm)
 					if clima_manager:
