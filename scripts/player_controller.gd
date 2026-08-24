@@ -18,6 +18,8 @@ const MAX_STEP_HEIGHT := 0.35
 var is_frozen: bool = false
 var bob_time: float = 0.0
 var camera_base_y: float = 0.65
+var _step_dust_timer: float = 0.0
+var _step_dust_particles: GPUParticles3D = null
 
 func _ready() -> void:
 	add_to_group("player")
@@ -25,12 +27,12 @@ func _ready() -> void:
 	camera_base_y = camera_mount.position.y
 	floor_snap_length = 0.4
 	floor_max_angle = deg_to_rad(50.0)
+	_setup_footstep_dust()
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
 		if not is_frozen and Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED:
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-	# ESC é tratado pelo chapter_01.gd (PROCESS_MODE_ALWAYS) — não duplicar aqui
 	if is_frozen:
 		return
 	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
@@ -70,9 +72,18 @@ func _physics_process(delta: float) -> void:
 
 		# Step assist para subir calçadas e meios-fios suavemente
 		_handle_step_assist(dir)
+		
+		# Gatilho Ocasional de Poeira nos Passos (a cada ~0.7s com 35% de chance)
+		if is_on_floor():
+			_step_dust_timer += delta
+			if _step_dust_timer >= 0.7:
+				_step_dust_timer = 0.0
+				if randf() < 0.35 and is_instance_valid(_step_dust_particles):
+					_step_dust_particles.restart()
 	else:
 		velocity.x = lerp(velocity.x, 0.0, delta * 9.0)
 		velocity.z = lerp(velocity.z, 0.0, delta * 9.0)
+		_step_dust_timer = 0.0
 
 	move_and_slide()
 
@@ -89,10 +100,12 @@ func _handle_step_assist(dir: Vector3) -> void:
 	if not is_on_floor():
 		return
 	if is_on_wall():
-		var test_pos = global_position + Vector3(0, MAX_STEP_HEIGHT, 0)
-		var test_transform = global_transform
-		test_transform.origin = test_pos + dir * 0.2
-		if not test_move(test_transform, Vector3.DOWN * MAX_STEP_HEIGHT):
+		var space_state = get_world_3d().direct_space_state
+		var step_origin = global_position + Vector3(0, MAX_STEP_HEIGHT, 0)
+		var query = PhysicsRayQueryParameters3D.create(step_origin, step_origin + dir * 0.5)
+		query.exclude = [self]
+		var result = space_state.intersect_ray(query)
+		if result.is_empty():
 			global_position.y += 0.12
 
 func _check_interaction() -> void:
@@ -118,8 +131,61 @@ func _check_interaction() -> void:
 
 func freeze() -> void:
 	is_frozen = true
-	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
 func unfreeze() -> void:
 	is_frozen = false
-	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
+# ============================================================
+# POEIRA SUTIL E OCASIONAL DE PASSOS (REATIVA / ONE-SHOT)
+# ============================================================
+
+func _setup_footstep_dust() -> void:
+	_step_dust_particles = GPUParticles3D.new()
+	_step_dust_particles.name = "FootstepDust"
+	_step_dust_particles.amount = 4
+	_step_dust_particles.lifetime = 0.45
+	_step_dust_particles.one_shot = true
+	_step_dust_particles.emitting = false
+	_step_dust_particles.explosiveness = 0.95
+	_step_dust_particles.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	
+	var pmat := ParticleProcessMaterial.new()
+	pmat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+	pmat.emission_sphere_radius = 0.18
+	pmat.direction = Vector3(0.0, 0.4, 0.0)
+	pmat.spread = 45.0
+	pmat.initial_velocity_min = 0.3
+	pmat.initial_velocity_max = 0.7
+	pmat.gravity = Vector3(0.0, 0.1, 0.0)
+	pmat.scale_min = 0.25
+	pmat.scale_max = 0.45
+	pmat.color = Color(0.60, 0.56, 0.50, 0.07) # Muito sutil e transparente
+	_step_dust_particles.process_material = pmat
+	
+	# Textura suave de gradiente radial
+	var grad := Gradient.new()
+	grad.add_point(0.0, Color(1, 1, 1, 0.25))
+	grad.add_point(0.35, Color(1, 1, 1, 0.06))
+	grad.add_point(0.65, Color(1, 1, 1, 0.0))
+	grad.add_point(1.0, Color(1, 1, 1, 0.0))
+	var grad_tex := GradientTexture2D.new()
+	grad_tex.gradient = grad
+	grad_tex.fill = GradientTexture2D.FILL_RADIAL
+	grad_tex.fill_from = Vector2(0.5, 0.5)
+	grad_tex.fill_to = Vector2(0.65, 0.5)
+	grad_tex.width = 32
+	grad_tex.height = 32
+	
+	var quad := QuadMesh.new()
+	quad.size = Vector2(0.28, 0.20)
+	var qmat := StandardMaterial3D.new()
+	qmat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	qmat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	qmat.vertex_color_use_as_albedo = true
+	qmat.albedo_texture = grad_tex
+	qmat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	quad.material = qmat
+	_step_dust_particles.draw_pass_1 = quad
+	
+	add_child(_step_dust_particles)
+	_step_dust_particles.position = Vector3(0.0, 0.05, 0.0)

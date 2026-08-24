@@ -525,8 +525,10 @@ func _setup_extra_wind_audio() -> void:
 			audio_wind_extra.play()
 		)
 
+var _ground_dust_particles: GPUParticles3D = null
+
 func _setup_wind_particles() -> void:
-	# 1. Partículas de Folhas Voando
+	# 1. Partículas de Folhas Voando no Vento (ambiente contínuo orgânico)
 	var leaves_particles := GPUParticles3D.new()
 	leaves_particles.name = "WindLeavesParticles"
 	leaves_particles.amount = 90
@@ -560,45 +562,49 @@ func _setup_wind_particles() -> void:
 	quad.material = quad_mat
 	leaves_particles.draw_pass_1 = quad
 	
-	# 2. Partículas de Poeira / Névoa Rasteira Levantando do Chão
-	var dust_particles := GPUParticles3D.new()
-	dust_particles.name = "GroundDustParticles"
-	dust_particles.amount = 40
-	dust_particles.lifetime = 4.0
-	dust_particles.preprocess = 2.0
-	dust_particles.visibility_aabb = AABB(Vector3(-45, -5, -45), Vector3(90, 15, 90))
+	# 2. Partículas de Poeira Rasteira (PURAMENTE OCASIONAL - One-Shot / Disparado apenas na rajada de vento)
+	_ground_dust_particles = GPUParticles3D.new()
+	_ground_dust_particles.name = "GroundDustParticles"
+	_ground_dust_particles.amount = 16
+	_ground_dust_particles.lifetime = 2.2
+	_ground_dust_particles.one_shot = true
+	_ground_dust_particles.emitting = false
+	_ground_dust_particles.explosiveness = 0.75
+	_ground_dust_particles.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_ground_dust_particles.visibility_aabb = AABB(Vector3(-30, -2, -30), Vector3(60, 10, 60))
 	
 	var dmat := ParticleProcessMaterial.new()
 	dmat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
-	dmat.emission_box_extents = Vector3(28.0, 0.5, 28.0)
-	dmat.direction = Vector3(1.0, 0.08, 0.35).normalized()
-	dmat.spread = 18.0
-	dmat.initial_velocity_min = 6.0
-	dmat.initial_velocity_max = 13.0
-	dmat.gravity = Vector3(0.0, 0.15, 0.0) # Flutua levemente
-	dmat.scale_min = 1.4
-	dmat.scale_max = 3.2
-	dmat.color = Color(0.60, 0.55, 0.50, 0.22)
-	dmat.damping_min = 1.0
-	dmat.damping_max = 2.0
-	dust_particles.process_material = dmat
+	dmat.emission_box_extents = Vector3(16.0, 0.2, 16.0)
+	dmat.direction = Vector3(1.0, 0.06, 0.35).normalized()
+	dmat.spread = 15.0
+	dmat.initial_velocity_min = 7.0
+	dmat.initial_velocity_max = 14.0
+	dmat.gravity = Vector3(0.0, 0.08, 0.0)
+	dmat.scale_min = 0.4
+	dmat.scale_max = 0.85
+	dmat.color = Color(0.60, 0.56, 0.50, 0.08) # Alpha sutil 8% para zero ruído visual
+	dmat.damping_min = 1.5
+	dmat.damping_max = 3.0
+	_ground_dust_particles.process_material = dmat
 	_ground_dust_mat = dmat
 	
-	# Textura suave radial gerada proceduralmente
+	# Textura suave de gradiente radial (alpha zero absoluto a 60% do raio)
 	var grad := Gradient.new()
-	grad.add_point(0.0, Color(1, 1, 1, 0.35))
-	grad.add_point(0.5, Color(1, 1, 1, 0.15))
+	grad.add_point(0.0, Color(1, 1, 1, 0.28))
+	grad.add_point(0.35, Color(1, 1, 1, 0.08))
+	grad.add_point(0.65, Color(1, 1, 1, 0.0))
 	grad.add_point(1.0, Color(1, 1, 1, 0.0))
 	var grad_tex := GradientTexture2D.new()
 	grad_tex.gradient = grad
 	grad_tex.fill = GradientTexture2D.FILL_RADIAL
 	grad_tex.fill_from = Vector2(0.5, 0.5)
-	grad_tex.fill_to = Vector2(1.0, 0.5)
-	grad_tex.width = 128
-	grad_tex.height = 128
+	grad_tex.fill_to = Vector2(0.65, 0.5)
+	grad_tex.width = 64
+	grad_tex.height = 64
 	
 	var dust_quad := QuadMesh.new()
-	dust_quad.size = Vector2(2.2, 1.8)
+	dust_quad.size = Vector2(0.35, 0.25)
 	var dust_qmat := StandardMaterial3D.new()
 	dust_qmat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	dust_qmat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
@@ -606,56 +612,57 @@ func _setup_wind_particles() -> void:
 	dust_qmat.albedo_texture = grad_tex
 	dust_qmat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
 	dust_quad.material = dust_qmat
-	dust_particles.draw_pass_1 = dust_quad
+	_ground_dust_particles.draw_pass_1 = dust_quad
 	
 	if player:
 		player.add_child(leaves_particles)
 		leaves_particles.position = Vector3(-10.0, 4.0, -10.0)
-		player.add_child(dust_particles)
-		dust_particles.position = Vector3(-8.0, 0.2, -8.0)
+		player.add_child(_ground_dust_particles)
+		_ground_dust_particles.position = Vector3(-6.0, 0.1, -6.0)
 	else:
 		add_child(leaves_particles)
 		leaves_particles.position = Vector3(0.0, 5.0, 0.0)
-		add_child(dust_particles)
-		dust_particles.position = Vector3(0.0, 0.2, 0.0)
+		add_child(_ground_dust_particles)
+		_ground_dust_particles.position = Vector3(0.0, 0.1, 0.0)
 
 # ============================================================
-# CONTROLADOR DE RAJADAS DINÂMICAS DE VENTO
+# CONTROLADOR DE RAJADAS DINÂMICAS DE VENTO (Espaçadas e Raras)
 # ============================================================
 
 func _start_dynamic_wind_system() -> void:
-	# Loop assíncrono de rajadas imprevisíveis de vento
+	# Loop de rajadas raras e atmosféricas (a cada 25-45 segundos)
 	while is_instance_valid(self) and not is_queued_for_deletion():
-		var wait_time = randf_range(8.0, 14.0)
+		var wait_time = randf_range(25.0, 45.0)
 		await get_tree().create_timer(wait_time).timeout
 		if not is_instance_valid(self) or is_queued_for_deletion():
 			break
 		_trigger_wind_gust()
 
 func _trigger_wind_gust() -> void:
-	var gust_duration = randf_range(3.5, 5.0)
-	var peak_wind_force = randf_range(0.48, 0.62)
-	var peak_flutter = randf_range(11.0, 15.0)
+	var gust_duration = randf_range(4.0, 5.5)
+	var peak_wind_force = randf_range(0.46, 0.58)
+	var peak_flutter = randf_range(11.0, 14.0)
 	
-	# 1. Aumenta balanço das árvores
+	# 1. Dispara o burst único e sutil de poeira na rajada
+	if is_instance_valid(_ground_dust_particles):
+		_ground_dust_particles.restart()
+	
+	# 2. Aumenta balanço das árvores
 	var tw = create_tween().set_parallel(true)
 	for sm in _tree_materials:
 		if is_instance_valid(sm):
 			tw.tween_property(sm, "shader_parameter/forca_rajada", peak_wind_force, gust_duration * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 			tw.tween_property(sm, "shader_parameter/velocidade_flutter", peak_flutter, gust_duration * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	
-	# 2. Som do vento ruge mais alto e com pitch variado (sensação física de rajada)
+	# 3. Som do vento ruge na rajada
 	if is_instance_valid(audio_wind_extra):
-		tw.tween_property(audio_wind_extra, "volume_db", -1.0, gust_duration * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-		tw.tween_property(audio_wind_extra, "pitch_scale", 1.12, gust_duration * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tw.tween_property(audio_wind_extra, "volume_db", -1.5, gust_duration * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tw.tween_property(audio_wind_extra, "pitch_scale", 1.10, gust_duration * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	
-	# 3. Partículas aceleram no pico da rajada
+	# 4. Folhas aceleram no pico da rajada
 	if _wind_leaves_mat:
-		tw.tween_property(_wind_leaves_mat, "initial_velocity_min", 15.0, gust_duration * 0.3)
-		tw.tween_property(_wind_leaves_mat, "initial_velocity_max", 24.0, gust_duration * 0.3)
-	if _ground_dust_mat:
-		tw.tween_property(_ground_dust_mat, "initial_velocity_min", 11.0, gust_duration * 0.3)
-		tw.tween_property(_ground_dust_mat, "initial_velocity_max", 20.0, gust_duration * 0.3)
+		tw.tween_property(_wind_leaves_mat, "initial_velocity_min", 14.0, gust_duration * 0.3)
+		tw.tween_property(_wind_leaves_mat, "initial_velocity_max", 22.0, gust_duration * 0.3)
 	
 	await get_tree().create_timer(gust_duration * 0.45).timeout
 	if not is_instance_valid(self) or is_queued_for_deletion():
@@ -675,9 +682,6 @@ func _trigger_wind_gust() -> void:
 	if _wind_leaves_mat:
 		tw_back.tween_property(_wind_leaves_mat, "initial_velocity_min", 9.0, gust_duration * 0.6)
 		tw_back.tween_property(_wind_leaves_mat, "initial_velocity_max", 16.0, gust_duration * 0.6)
-	if _ground_dust_mat:
-		tw_back.tween_property(_ground_dust_mat, "initial_velocity_min", 6.0, gust_duration * 0.6)
-		tw_back.tween_property(_ground_dust_mat, "initial_velocity_max", 13.0, gust_duration * 0.6)
 
 # ============================================================
 # BOOT VHS - ESTÉTICA AUTÊNTICA VHS / OSD
