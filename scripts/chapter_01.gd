@@ -42,6 +42,7 @@ var is_paused: bool = false
 var pause_menu_control: Control = null
 var audio_wind_extra: AudioStreamPlayer = null
 var font_retro: Font = null
+var _objective_typing_token: int = 0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -57,6 +58,7 @@ func _ready() -> void:
 	if ResourceLoader.exists("res://assets/fonts/text_font.ttf"):
 		font_retro = load("res://assets/fonts/text_font.ttf") as Font
 	
+	_setup_hud_styling()
 	_setup_pause_menu()
 	
 	# Som de vento e tempestade contínuo em loop
@@ -79,6 +81,84 @@ func _ready() -> void:
 	
 	# Boot VHS
 	_play_vhs_intro_sequence()
+
+# ============================================================
+# ESTILIZAÇÃO E CALIBRAÇÃO DINÂMICA DO HUD (VHS OSD)
+# ============================================================
+
+func _setup_hud_styling() -> void:
+	if not hud:
+		return
+	hud.layer = 15
+	
+	# 1. Configura Timecard (Canto inferior esquerdo, tamanho 22, cor limpa e sombra)
+	if timecard_panel:
+		timecard_panel.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+		timecard_panel.offset_left = 36.0
+		timecard_panel.offset_top = -110.0
+		timecard_panel.offset_right = 500.0
+		timecard_panel.offset_bottom = -28.0
+		timecard_panel.modulate.a = 0.0
+		timecard_panel.hide()
+	if timecard_label:
+		timecard_label.text = "CEFET-MG  -  CAMPUS 1\n08:17"
+		if font_retro:
+			timecard_label.add_theme_font_override("font", font_retro)
+		timecard_label.add_theme_font_size_override("font_size", 22)
+		timecard_label.add_theme_color_override("font_color", Color(0.88, 0.90, 0.94, 1.0))
+		timecard_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 1.0))
+		timecard_label.add_theme_constant_override("shadow_offset_x", 2)
+		timecard_label.add_theme_constant_override("shadow_offset_y", 2)
+
+	# 2. Configura Objective (Canto superior esquerdo, SEM fundo cinza!)
+	if objective_panel:
+		var empty_style := StyleBoxEmpty.new()
+		objective_panel.add_theme_stylebox_override("panel", empty_style)
+		objective_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
+		objective_panel.offset_left = 36.0
+		objective_panel.offset_top = 28.0
+		objective_panel.offset_right = 520.0
+		objective_panel.offset_bottom = 180.0
+		objective_panel.modulate.a = 0.0
+		objective_panel.hide()
+	if objective_label:
+		objective_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		objective_label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+		if font_retro:
+			objective_label.add_theme_font_override("font", font_retro)
+		objective_label.add_theme_font_size_override("font_size", 18)
+		objective_label.add_theme_color_override("font_color", Color(0.92, 0.92, 0.95, 1.0))
+		objective_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 1.0))
+		objective_label.add_theme_constant_override("shadow_offset_x", 2)
+		objective_label.add_theme_constant_override("shadow_offset_y", 2)
+		objective_label.add_theme_constant_override("line_spacing", 6)
+
+	# 3. Configura InteractHint (Centro inferior, Amarelo retrô VCR)
+	if interact_hint:
+		interact_hint.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+		interact_hint.anchor_left = 0.5
+		interact_hint.anchor_right = 0.5
+		interact_hint.anchor_top = 1.0
+		interact_hint.anchor_bottom = 1.0
+		interact_hint.offset_left = -250.0
+		interact_hint.offset_top = -65.0
+		interact_hint.offset_right = 250.0
+		interact_hint.offset_bottom = -25.0
+		interact_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		interact_hint.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		if font_retro:
+			interact_hint.add_theme_font_override("font", font_retro)
+		interact_hint.add_theme_font_size_override("font_size", 22)
+		interact_hint.add_theme_color_override("font_color", Color(0.96, 0.85, 0.22, 1.0))
+		interact_hint.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 1.0))
+		interact_hint.add_theme_constant_override("shadow_offset_x", 2)
+		interact_hint.add_theme_constant_override("shadow_offset_y", 2)
+		interact_hint.hide()
+
+	# 4. Configura CRTOverlay (Coloca z_index = -1 atrás do texto)
+	var crt = hud.get_node_or_null("CRTOverlay")
+	if crt:
+		crt.z_index = -1
 
 # ============================================================
 # SISTEMA DE PAUSA RETRO VHS / TV AZUL [ESC] EM PORTUGUÊS
@@ -118,35 +198,38 @@ func _setup_pause_menu() -> void:
 		var border = ReferenceRect.new()
 		border.border_color = Color(0.92, 0.92, 0.92, 1.0)
 		border.border_width = 3.0
-		border.editor_only = false
 		border.set_anchors_preset(Control.PRESET_FULL_RECT)
 		vcr_box.add_child(border)
 		
-		# Container de Conteúdo
+		var margin = MarginContainer.new()
+		margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+		margin.add_theme_constant_override("margin_left", 32)
+		margin.add_theme_constant_override("margin_top", 24)
+		margin.add_theme_constant_override("margin_right", 32)
+		margin.add_theme_constant_override("margin_bottom", 24)
+		vcr_box.add_child(margin)
+		
 		var vbox = VBoxContainer.new()
-		vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
-		vbox.offset_left = 32
-		vbox.offset_top = 22
-		vbox.offset_right = -32
-		vbox.offset_bottom = -80
-		vbox.add_theme_constant_override("separation", 10)
-		vcr_box.add_child(vbox)
+		vbox.add_theme_constant_override("separation", 16)
+		margin.add_child(vbox)
 		
-		# Título: CONFIGURAÇÕES
-		var title = Label.new()
-		title.text = "CONFIGURAÇÕES"
-		title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		# Título VCR
+		var lbl_title = Label.new()
+		lbl_title.text = "CONFIGURAÇÕES"
+		lbl_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		if font_retro:
-			title.add_theme_font_override("font", font_retro)
-		title.add_theme_font_size_override("font_size", 22)
-		title.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 1.0))
-		vbox.add_child(title)
+			lbl_title.add_theme_font_override("font", font_retro)
+		lbl_title.add_theme_font_size_override("font_size", 24)
+		lbl_title.add_theme_color_override("font_color", Color(1, 1, 1, 1))
+		lbl_title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 1))
+		lbl_title.add_theme_constant_override("shadow_offset_x", 2)
+		lbl_title.add_theme_constant_override("shadow_offset_y", 2)
+		vbox.add_child(lbl_title)
 		
-		var spacer = Control.new()
-		spacer.custom_minimum_size = Vector2(0, 6)
-		vbox.add_child(spacer)
+		var sep = HSeparator.new()
+		vbox.add_child(sep)
 		
-		# Botão Retomar Jogo
+		# Botão Retomar
 		var btn_resume = Button.new()
 		btn_resume.text = "→ RETOMAR JOGO"
 		btn_resume.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -160,12 +243,13 @@ func _setup_pause_menu() -> void:
 		btn_resume.pressed.connect(func(): toggle_pause_menu())
 		vbox.add_child(btn_resume)
 		
-		# Sliders de Volume
+		# Volume Master
 		var lbl_vol = Label.new()
-		lbl_vol.text = "VOLUME GERAL:"
+		lbl_vol.text = "VOLUME GERAL"
 		if font_retro:
 			lbl_vol.add_theme_font_override("font", font_retro)
-		lbl_vol.add_theme_font_size_override("font_size", 16)
+		lbl_vol.add_theme_font_size_override("font_size", 15)
+		lbl_vol.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85, 1))
 		vbox.add_child(lbl_vol)
 		
 		var slider_vol = HSlider.new()
@@ -173,15 +257,19 @@ func _setup_pause_menu() -> void:
 		slider_vol.min_value = 0.0
 		slider_vol.max_value = 1.0
 		slider_vol.step = 0.05
-		slider_vol.value = db_to_linear(AudioServer.get_bus_volume_db(0))
-		slider_vol.value_changed.connect(func(v): AudioServer.set_bus_volume_db(0, linear_to_db(v)))
+		slider_vol.value = db_to_linear(AudioServer.get_bus_volume_db(AudioServer.get_bus_index("Master")))
+		slider_vol.value_changed.connect(func(v: float):
+			AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Master"), linear_to_db(v))
+		)
 		vbox.add_child(slider_vol)
 		
+		# Volume SFX
 		var lbl_sfx = Label.new()
-		lbl_sfx.text = "VOLUME DOS EFEITOS:"
+		lbl_sfx.text = "VOLUME DE EFEITOS (SFX)"
 		if font_retro:
 			lbl_sfx.add_theme_font_override("font", font_retro)
-		lbl_sfx.add_theme_font_size_override("font_size", 16)
+		lbl_sfx.add_theme_font_size_override("font_size", 15)
+		lbl_sfx.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85, 1))
 		vbox.add_child(lbl_sfx)
 		
 		var slider_sfx = HSlider.new()
@@ -189,26 +277,27 @@ func _setup_pause_menu() -> void:
 		slider_sfx.min_value = 0.0
 		slider_sfx.max_value = 1.0
 		slider_sfx.step = 0.05
-		slider_sfx.value = 0.85
+		slider_sfx.value = 0.8
 		vbox.add_child(slider_sfx)
 		
-		# Checkbox Tela Cheia
+		# Tela Cheia
 		var check_fs = CheckBox.new()
 		check_fs.process_mode = Node.PROCESS_MODE_ALWAYS
-		check_fs.text = "  TELA CHEIA"
+		check_fs.text = " TELA CHEIA (FULLSCREEN)"
 		if font_retro:
 			check_fs.add_theme_font_override("font", font_retro)
-		check_fs.add_theme_font_size_override("font_size", 16)
+		check_fs.add_theme_font_size_override("font_size", 15)
+		check_fs.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9, 1))
 		check_fs.button_pressed = (DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN)
-		check_fs.toggled.connect(func(toggled):
-			if toggled:
+		check_fs.toggled.connect(func(b: bool):
+			if b:
 				DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 			else:
 				DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 		)
 		vbox.add_child(check_fs)
 		
-		# Botão Menu Principal
+		# Menu Principal
 		var btn_main = Button.new()
 		btn_main.text = "→ MENU PRINCIPAL"
 		btn_main.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -222,42 +311,17 @@ func _setup_pause_menu() -> void:
 		btn_main.pressed.connect(_on_main_menu_pressed)
 		vbox.add_child(btn_main)
 		
-		# Barra Inferior VCR OSD em Português
-		var footer_bg = ColorRect.new()
-		footer_bg.color = Color(0.88, 0.88, 0.90, 1.0)
-		footer_bg.custom_minimum_size = Vector2(0, 52)
-		footer_bg.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-		footer_bg.offset_left = 6
-		footer_bg.offset_right = -6
-		footer_bg.offset_bottom = -6
-		footer_bg.offset_top = -58
-		vcr_box.add_child(footer_bg)
-		
-		var footer_lbl = Label.new()
-		footer_lbl.text = "SELECIONE COM (▲, ▼) E (OK)\nAPERTE (ESC) PARA SAIR"
-		footer_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		footer_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		footer_lbl.set_anchors_preset(Control.PRESET_FULL_RECT)
-		if font_retro:
-			footer_lbl.add_theme_font_override("font", font_retro)
-		footer_lbl.add_theme_font_size_override("font_size", 14)
-		footer_lbl.add_theme_color_override("font_color", Color(0.08, 0.08, 0.12, 1.0))
-		footer_bg.add_child(footer_lbl)
-		
 		hud.add_child(pause_menu_control)
-	
-	pause_menu_control.hide()
+		pause_menu_control.hide()
 
 func _process(_delta: float) -> void:
-	if Input.is_action_just_pressed("ui_cancel"):
+	if Input.is_action_just_pressed("ui_cancel") or (Input.is_key_pressed(KEY_ESCAPE) and Input.is_action_just_pressed("ui_cancel")):
 		toggle_pause_menu()
 
 func toggle_pause_menu() -> void:
 	_toggle_pause()
 
 func _toggle_pause() -> void:
-	if not pause_menu_control:
-		_setup_pause_menu()
 	if not pause_menu_control:
 		return
 	is_paused = not is_paused
@@ -274,31 +338,89 @@ func _on_main_menu_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/ui/title_screen.tscn")
 
 # ============================================================
-# HUD / TIMECARD / OBJETIVOS
+# HUD / TIMECARD / OBJETIVOS - ESTÉTICA VHS RETRÔ PROFISSIONAL
 # ============================================================
 
 func _show_timecard(local_text: String, hora_text: String) -> void:
 	if not timecard_panel: return
 	if timecard_label:
-		timecard_label.text = local_text + "\n" + hora_text
-	timecard_panel.modulate.a = 1.0
+		timecard_label.text = local_text.to_upper() + "\n" + hora_text
+		if font_retro:
+			timecard_label.add_theme_font_override("font", font_retro)
+		timecard_label.add_theme_font_size_override("font_size", 22)
+		timecard_label.add_theme_color_override("font_color", Color(0.88, 0.90, 0.94, 1.0))
+		timecard_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 1.0))
+		timecard_label.add_theme_constant_override("shadow_offset_x", 2)
+		timecard_label.add_theme_constant_override("shadow_offset_y", 2)
+	timecard_panel.modulate.a = 0.0
 	timecard_panel.show()
 	var tween = create_tween()
-	tween.tween_interval(5.0)
-	tween.tween_property(timecard_panel, "modulate:a", 0.0, 1.5)
+	tween.tween_property(timecard_panel, "modulate:a", 1.0, 0.8)
+	tween.tween_interval(7.5)
+	tween.tween_property(timecard_panel, "modulate:a", 0.0, 1.2)
 	tween.tween_callback(timecard_panel.hide)
 
-func _set_objective(text: String) -> void:
-	if not objective_panel: return
-	if objective_label:
-		objective_label.text = "OBJETIVO:\n" + text
+func _set_objective(text: String, transition: bool = true) -> void:
+	if not objective_panel or not objective_label: return
+	_objective_typing_token += 1
+	var my_token = _objective_typing_token
+	
+	var clean_text = text.strip_edges()
+	if clean_text.to_upper().begins_with("OBJETIVO:"):
+		clean_text = clean_text.substr(9).strip_edges()
+	
+	if font_retro:
+		objective_label.add_theme_font_override("font", font_retro)
+	objective_label.add_theme_font_size_override("font_size", 18)
+	objective_label.add_theme_color_override("font_color", Color(0.92, 0.92, 0.95, 1.0))
+	objective_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 1.0))
+	objective_label.add_theme_constant_override("shadow_offset_x", 2)
+	objective_label.add_theme_constant_override("shadow_offset_y", 2)
+	objective_label.add_theme_constant_override("line_spacing", 6)
+	objective_panel.modulate.a = 1.0
 	objective_panel.show()
-	var tween = create_tween()
-	tween.tween_property(objective_panel, "modulate:a", 1.0, 1.0)
+	
+	if not transition:
+		objective_label.text = "OBJETIVO:\n" + clean_text.to_upper()
+		return
+	
+	# Efeito Profissional de Digitação VHS / Typewriter
+	var current_text = objective_label.text
+	if current_text != "" and current_text != "OBJETIVO:" and current_text != "OBJETIVO:\n":
+		var newline_pos = current_text.find("\n")
+		if newline_pos != -1:
+			var body_content = current_text.substr(newline_pos + 1)
+			while body_content.length() > 0 and my_token == _objective_typing_token:
+				body_content = body_content.substr(0, body_content.length() - 1)
+				objective_label.text = "OBJETIVO:\n" + body_content
+				await get_tree().create_timer(0.015).timeout
+	
+	if my_token != _objective_typing_token:
+		return
+	
+	objective_label.text = "OBJETIVO:\n"
+	await get_tree().create_timer(0.15).timeout
+	
+	# Digita novo conteúdo caractere por caractere
+	var target_body = clean_text.to_upper()
+	var typed = ""
+	for i in range(target_body.length()):
+		if my_token != _objective_typing_token:
+			return
+		typed += target_body[i]
+		objective_label.text = "OBJETIVO:\n" + typed
+		await get_tree().create_timer(0.03).timeout
 
 func show_interact_hint(text: String) -> void:
 	if not interact_hint: return
-	interact_hint.text = text
+	interact_hint.text = text.to_upper()
+	if font_retro:
+		interact_hint.add_theme_font_override("font", font_retro)
+	interact_hint.add_theme_font_size_override("font_size", 22)
+	interact_hint.add_theme_color_override("font_color", Color(0.96, 0.85, 0.22, 1.0))
+	interact_hint.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 1.0))
+	interact_hint.add_theme_constant_override("shadow_offset_x", 2)
+	interact_hint.add_theme_constant_override("shadow_offset_y", 2)
 	interact_hint.show()
 
 func hide_interact_hint() -> void:
@@ -320,7 +442,10 @@ func _aplicar_vento_automatico_em_todas_arvores() -> void:
 		var mi := m as MeshInstance3D
 		var full_name = (mi.name + " " + mi.get_parent().name).to_lower()
 		
-		if "tree" in full_name or "arvore" in full_name or "palm" in full_name or "palmeira" in full_name or "bosquinho" in full_name or "folha" in full_name or "branch" in full_name or "commontree" in full_name or "grass_p" in full_name or "bush" in full_name or "arbusto" in full_name or "vegetat" in full_name:
+		if "tree" in full_name or "arvore" in full_name or "palm" in full_name or \
+		   "palmeira" in full_name or "bosquinho" in full_name or "folha" in full_name or \
+		   "branch" in full_name or "commontree" in full_name or "grass_p" in full_name or \
+		   "bush" in full_name or "arbusto" in full_name or "vegetat" in full_name:
 			var mat_count = mi.get_surface_override_material_count()
 			if mat_count == 0 and mi.mesh:
 				mat_count = mi.mesh.get_surface_count()
@@ -411,7 +536,7 @@ func _setup_wind_particles() -> void:
 		particles.position = Vector3(0.0, 5.0, 0.0)
 
 # ============================================================
-# BOOT VHS
+# BOOT VHS - ESTÉTICA AUTÊNTICA VHS / OSD
 # ============================================================
 
 func _play_vhs_intro_sequence() -> void:
@@ -426,7 +551,7 @@ func _play_vhs_intro_sequence() -> void:
 	vhs_overlay.name = "VHSIntroOverlay"
 	vhs_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	vhs_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	vhs_overlay.z_index = 20
+	vhs_overlay.z_index = 10
 	
 	var vhs_shader := load("res://shaders/vhs_turn_on.gdshader") as Shader
 	var sm := ShaderMaterial.new()
@@ -436,16 +561,18 @@ func _play_vhs_intro_sequence() -> void:
 	vhs_overlay.material = sm
 	hud.add_child(vhs_overlay)
 	
+	# ▶ PLAY Amarelo Retrô VCR (z_index 50 para ficar puro acima de qualquer overlay)
 	var vcr_label := Label.new()
 	vcr_label.text = "▶ PLAY   SP   17:50:00"
 	vcr_label.position = Vector2(36, 28)
+	vcr_label.z_index = 50
 	if font_retro:
 		vcr_label.add_theme_font_override("font", font_retro)
-	vcr_label.add_theme_color_override("font_color", Color(0.25, 1.0, 0.45, 1.0))
-	vcr_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.95))
+	vcr_label.add_theme_color_override("font_color", Color(0.96, 0.85, 0.22, 1.0))
+	vcr_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 1.0))
 	vcr_label.add_theme_constant_override("shadow_offset_x", 2)
 	vcr_label.add_theme_constant_override("shadow_offset_y", 2)
-	vcr_label.add_theme_font_size_override("font_size", 18)
+	vcr_label.add_theme_font_size_override("font_size", 22)
 	vcr_label.modulate.a = 0.0
 	hud.add_child(vcr_label)
 	
@@ -463,21 +590,35 @@ func _play_vhs_intro_sequence() -> void:
 	if fade_rect:
 		fade_rect.hide()
 	
+	# 1. Abre tubo CRT
 	var tw := create_tween()
 	tw.tween_method(func(val: float): sm.set_shader_parameter("turn_on_progress", val), 0.0, 1.0, 1.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	
 	var tw_txt := create_tween()
-	tw_txt.tween_property(vcr_label, "modulate:a", 1.0, 0.2)
-	tw_txt.tween_interval(1.8)
-	tw_txt.tween_property(vcr_label, "modulate:a", 0.0, 0.5)
+	tw_txt.tween_property(vcr_label, "modulate:a", 1.0, 0.3)
 	
-	await tw.finished
+	# 2. Exibe o Timecard no canto inferior esquerdo com tamanho grande correto
+	_show_timecard("CEFET-MG  -  CAMPUS 1", "08:17")
 	
-	var tw_fade := create_tween()
-	tw_fade.tween_property(vhs_overlay, "modulate:a", 0.0, 0.5)
-	await tw_fade.finished
-	vhs_overlay.queue_free()
-	vcr_label.queue_free()
+	# 3. Contagem real de segundos correndo no PLAY (17:50:00 até 17:50:05)
+	for sec in range(6):
+		if is_instance_valid(vcr_label):
+			var sec_str = "%02d" % sec
+			vcr_label.text = "▶ PLAY   SP   17:50:" + sec_str
+		await get_tree().create_timer(1.0).timeout
 	
-	_show_timecard("CEFET-MG  -  CAMPUS 1", "17:50")
-	_set_objective("Vá até o prédio administrativo\ne faça sua matrícula.")
+	# 4. Fade out suave do PLAY
+	if is_instance_valid(vcr_label):
+		var tw_fade_play = create_tween()
+		tw_fade_play.tween_property(vcr_label, "modulate:a", 0.0, 0.8)
+		await tw_fade_play.finished
+		vcr_label.queue_free()
+	
+	if is_instance_valid(vhs_overlay):
+		var tw_fade = create_tween()
+		tw_fade.tween_property(vhs_overlay, "modulate:a", 0.0, 0.5)
+		await tw_fade.finished
+		vhs_overlay.queue_free()
+	
+	# 5. Após o PLAY sumir, inicia digitação do objetivo no canto superior esquerdo
+	_set_objective("VÁ ATÉ O PRÉDIO\nADMINISTRATIVO E FAÇA\nSUA MATRÍCULA.", true)

@@ -96,13 +96,25 @@ func _handle_step_assist(dir: Vector3) -> void:
 			global_position.y += 0.12
 
 func _check_interaction() -> void:
+	var chapter = get_tree().get_first_node_in_group("chapter")
 	if not interact_ray.is_colliding():
+		if chapter and chapter.has_method("hide_interact_hint"):
+			chapter.hide_interact_hint()
 		return
 	var col := interact_ray.get_collider()
 	if col and col.is_in_group("interactable"):
-		if Input.is_action_just_pressed("interact") or Input.is_key_pressed(KEY_E):
+		var hint_text = "INTERAGIR"
+		if "interaction_hint" in col and str(col.interaction_hint).strip_edges() != "":
+			hint_text = str(col.interaction_hint).to_upper()
+		if chapter and chapter.has_method("show_interact_hint"):
+			chapter.show_interact_hint("E - " + hint_text)
+		
+		if Input.is_action_just_pressed("interact") or (Input.is_key_pressed(KEY_E) and not is_frozen):
 			if col.has_method("interact"):
 				col.interact()
+	else:
+		if chapter and chapter.has_method("hide_interact_hint"):
+			chapter.hide_interact_hint()
 
 func freeze() -> void:
 	is_frozen = true

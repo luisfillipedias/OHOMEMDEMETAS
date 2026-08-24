@@ -45,16 +45,20 @@ func show_timecard(location_text: String, time_text: String) -> void:
 	timecard_container.hide()
 
 func set_objective(text: String) -> void:
-	objective_label.text = "OBJETIVO:\n" + text.to_upper()
+	var formatted: String = text.to_upper().strip_edges()
+	if not formatted.begins_with("OBJETIVO:"):
+		formatted = "OBJETIVO:\n" + formatted
+	objective_label.text = formatted
+	objective_panel.modulate.a = 0.0
 	objective_panel.show()
 	var tw = create_tween()
-	tw.tween_property(objective_panel, "modulate:a", 1.0, 0.4)
+	tw.tween_property(objective_panel, "modulate:a", 1.0, 0.8)
 
 func hide_objective() -> void:
 	objective_panel.hide()
 
 func show_interact_prompt(text: String = "INTERAGIR") -> void:
-	interact_hint.text = "E  -  " + text.to_upper()
+	interact_hint.text = "E - " + text.to_upper()
 	interact_hint.show()
 
 func hide_interact_prompt() -> void:
