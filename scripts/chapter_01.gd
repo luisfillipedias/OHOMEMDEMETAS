@@ -52,7 +52,8 @@ var audio_amb_a: AudioStreamPlayer = null
 var audio_amb_b: AudioStreamPlayer = null
 var _active_amb_is_a: bool = true
 var _ambience_playlist: Array[AudioStream] = []
-var _current_ambience_idx: int = 0
+var _ambience_queue: Array[AudioStream] = []
+var _last_ambience_stream: AudioStream = null
 
 # Sistema de Vento com Crossfade Suave (Dois Players)
 var audio_wind_a: AudioStreamPlayer = null
@@ -275,13 +276,29 @@ func _setup_ambience_system() -> void:
 				_ambience_playlist.append(stream)
 
 	if not _ambience_playlist.is_empty():
-		_ambience_playlist.shuffle()
 		_play_next_ambience_crossfade()
 
+func _get_next_ambience_stream() -> AudioStream:
+	if _ambience_playlist.is_empty():
+		return null
+	if _ambience_playlist.size() == 1:
+		return _ambience_playlist[0]
+	
+	# Quando a fila acaba, re-embaralha e garante que a 1a não seja igual a última que tocou
+	if _ambience_queue.is_empty():
+		_ambience_queue = _ambience_playlist.duplicate()
+		_ambience_queue.shuffle()
+		if _ambience_queue[0] == _last_ambience_stream and _ambience_queue.size() > 1:
+			var first_item = _ambience_queue.pop_front()
+			_ambience_queue.push_back(first_item)
+	
+	var next_stream = _ambience_queue.pop_front()
+	_last_ambience_stream = next_stream
+	return next_stream
+
 func _play_next_ambience_crossfade() -> void:
-	if _ambience_playlist.is_empty(): return
-	var stream = _ambience_playlist[_current_ambience_idx]
-	_current_ambience_idx = (_current_ambience_idx + 1) % _ambience_playlist.size()
+	var stream = _get_next_ambience_stream()
+	if not stream: return
 
 	var incoming: AudioStreamPlayer = audio_amb_b if _active_amb_is_a else audio_amb_a
 	var outgoing: AudioStreamPlayer = audio_amb_a if _active_amb_is_a else audio_amb_b
@@ -289,6 +306,7 @@ func _play_next_ambience_crossfade() -> void:
 
 	incoming.stream = stream
 	incoming.volume_db = -80.0
+	incoming.pitch_scale = randf_range(0.98, 1.02)
 	incoming.play()
 
 	# Crossfade suave de 4.5 segundos sem corte brusco
