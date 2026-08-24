@@ -1,8 +1,7 @@
 extends CharacterBody3D
 
 # ============================================================
-# PLAYER CONTROLLER -- 1a Pessoa com sistema físico de passos
-#                      baseado em distância percorrida real
+# PLAYER CONTROLLER -- 1a Pessoa com sistema de passos por timer
 # ============================================================
 
 const WALK_SPEED := 3.2
@@ -10,10 +9,17 @@ const GRAVITY := 12.0
 var MOUSE_SENS := 0.0018
 const MAX_STEP_HEIGHT := 0.35
 
-# Sistema de Head Bobbing e Passos por Distância (Passadas Físicas Reais)
-const STEP_CYCLE_LENGTH := 2.6 # Metros por ciclo completo (2 passos = 1.30m por passo)
-const BOB_VERTICAL_AMP := 0.026 # Altura do impacto da cabeça no passo
-const BOB_HORIZONTAL_AMP := 0.012 # Balanço sutil lateral do corpo
+# Head Bobbing
+const BOB_VERTICAL_AMP := 0.022
+const BOB_HORIZONTAL_AMP := 0.010
+var _bob_accumulator: float = 0.0
+
+# Sistema de Passos por Timer (simples e confiável)
+# Intervalo base em segundos entre dois passos a velocidade máxima
+const STEP_INTERVAL_BASE: float = 0.48
+const STEP_SPEED_MIN: float = 0.5  # velocidade mínima para tocar passo
+
+var _step_timer: float = STEP_INTERVAL_BASE * 0.5  # já meio carregado para primeiro passo
 
 @onready var camera_mount: Node3D = $CameraMount
 @onready var camera: Camera3D = $CameraMount/Camera3D
@@ -22,9 +28,6 @@ const BOB_HORIZONTAL_AMP := 0.012 # Balanço sutil lateral do corpo
 var is_frozen: bool = false
 var camera_base_y: float = 0.65
 
-# Distância percorrida e estado dos passos
-var _step_dist_accumulator: float = STEP_CYCLE_LENGTH * 0.35 # Pronto para o primeiro passo
-var _last_step_threshold: int = 0
 var _audio_footstep: AudioStreamPlayer = null
 
 # Banco de sons de passos de alta qualidade (.ogg)
@@ -42,7 +45,6 @@ func _ready() -> void:
 	floor_snap_length = 0.4
 	floor_max_angle = deg_to_rad(50.0)
 	
-	# Configura AudioListener3D ativo para Áudio Espacial 3D real
 	camera.current = true
 	var listener := AudioListener3D.new()
 	listener.name = "PlayerAudioListener3D"
@@ -57,11 +59,11 @@ func _setup_footstep_audio() -> void:
 	_audio_footstep.volume_db = -16.0
 	add_child(_audio_footstep)
 
-	_carregar_amostras_pasta("Floor", _snds_floor, 21)
-	_carregar_amostras_pasta("Tiles", _snds_tiles, 22)
-	_carregar_amostras_pasta("Dirt", _snds_dirt, 21)
+	_carregar_amostras_pasta("Floor",  _snds_floor,  21)
+	_carregar_amostras_pasta("Tiles",  _snds_tiles,  22)
+	_carregar_amostras_pasta("Dirt",   _snds_dirt,   21)
 	_carregar_amostras_pasta("Gravel", _snds_gravel, 21)
-	_carregar_amostras_pasta("Wood", _snds_wood, 21)
+	_carregar_amostras_pasta("Wood",   _snds_wood,   21)
 	_carregar_amostras_pasta("Carpet", _snds_carpet, 21)
 
 func _carregar_amostras_pasta(pasta: String, array_destino: Array[AudioStream], max_count: int) -> void:
@@ -76,8 +78,6 @@ func _carregar_amostras_pasta(pasta: String, array_destino: Array[AudioStream], 
 func _input(event: InputEvent) -> void:
 	if is_frozen:
 		return
-	
-	# Se o jogo estiver pausado ou menu de pausa aberto, NUNCA captura o mouse no clique!
 	var chapter = get_tree().get_first_node_in_group("chapter")
 	if (chapter and "is_paused" in chapter and chapter.is_paused) or get_tree().paused:
 		return
@@ -99,7 +99,6 @@ func _physics_process(delta: float) -> void:
 	if is_frozen:
 		return
 
-	# Gravidade
 	if not is_on_floor():
 		velocity.y -= GRAVITY * delta
 
@@ -122,47 +121,44 @@ func _physics_process(delta: float) -> void:
 		dir = dir.normalized()
 		velocity.x = dir.x * WALK_SPEED
 		velocity.z = dir.z * WALK_SPEED
-
-		# Step assist para subir calçadas e meios-fios suavemente
 		_handle_step_assist(dir)
 	else:
 		velocity.x = lerp(velocity.x, 0.0, delta * 12.0)
 		velocity.z = lerp(velocity.z, 0.0, delta * 12.0)
 
 	move_and_slide()
-
-	# Sistema Físico de Passos e Head Bobbing
 	_process_footsteps_and_headbob(delta, is_moving)
-
-	# Interação
 	_check_interaction()
 
 func _process_footsteps_and_headbob(delta: float, is_moving: bool) -> void:
-	var horiz_speed = Vector2(velocity.x, velocity.z).length()
-	
-	if is_moving and is_on_floor() and horiz_speed > 0.4:
-		# Acumula a distância física real percorrida no solo
-		var dist_moved = horiz_speed * delta
-		_step_dist_accumulator += dist_moved
-		
-		# Ciclo normalizado [0.0 .. 1.0] (1 ciclo = 2 passos: Esquerdo e Direito)
-		var cycle_prog = fmod(_step_dist_accumulator, STEP_CYCLE_LENGTH) / STEP_CYCLE_LENGTH
-		
-		# Limiares de impacto do pé: Passo 1 em 0.5 (50%), Passo 2 em 0.0 (100% / 0%)
-		var current_threshold = 1 if cycle_prog >= 0.5 else 0
-		if current_threshold != _last_step_threshold:
-			_last_step_threshold = current_threshold
+	var horiz_speed := Vector2(velocity.x, velocity.z).length()
+	var on_ground := is_on_floor()
+	var walking := is_moving and on_ground and horiz_speed > STEP_SPEED_MIN
+
+	if walking:
+		# Timer sobe com o delta; intervalo escala inversamente com a velocidade
+		# (mais rápido = passos mais frequentes)
+		var speed_ratio := clamp(horiz_speed / WALK_SPEED, 0.5, 1.2)
+		var step_interval := STEP_INTERVAL_BASE / speed_ratio
+
+		_step_timer += delta
+
+		if _step_timer >= step_interval:
+			# Subtrai o intervalo em vez de resetar para 0 → mantém cadência sem drift
+			_step_timer -= step_interval
 			_play_footstep_sound()
-		
-		# Head bobbing suave sincronizado com a passada
-		var step_phase = cycle_prog * TAU
-		var target_y = camera_base_y - abs(sin(step_phase)) * BOB_VERTICAL_AMP
-		var target_x = sin(step_phase * 0.5) * BOB_HORIZONTAL_AMP
-		
-		camera_mount.position.y = lerp(camera_mount.position.y, target_y, delta * 15.0)
-		camera_mount.position.x = lerp(camera_mount.position.x, target_x, delta * 15.0)
+
+		# Head bobbing sincronizado com a mesma cadência do timer
+		_bob_accumulator += delta * (TAU / step_interval)
+		var target_y := camera_base_y - abs(sin(_bob_accumulator)) * BOB_VERTICAL_AMP
+		var target_x := sin(_bob_accumulator * 0.5) * BOB_HORIZONTAL_AMP
+		camera_mount.position.y = lerp(camera_mount.position.y, target_y, delta * 14.0)
+		camera_mount.position.x = lerp(camera_mount.position.x, target_x, delta * 14.0)
 	else:
-		# Retorno suave ao centro quando parado
+		# Ao parar: carrega o timer parcialmente para que o PRIMEIRO passo ao recomeçar
+		# saia imediatamente (sem esperar um intervalo inteiro)
+		_step_timer = STEP_INTERVAL_BASE * 0.6
+		_bob_accumulator = 0.0
 		camera_mount.position.y = lerp(camera_mount.position.y, camera_base_y, delta * 8.0)
 		camera_mount.position.x = lerp(camera_mount.position.x, 0.0, delta * 8.0)
 
@@ -170,17 +166,19 @@ func _play_footstep_sound() -> void:
 	if not _audio_footstep or not is_on_floor():
 		return
 	
-	# Detecta tipo de superfície abaixo do jogador via Raycast
-	var space_state = get_world_3d().direct_space_state
-	var ray_query = PhysicsRayQueryParameters3D.create(global_position + Vector3(0, 0.5, 0), global_position + Vector3(0, -1.2, 0))
+	var space_state := get_world_3d().direct_space_state
+	var ray_query := PhysicsRayQueryParameters3D.create(
+		global_position + Vector3(0, 0.5, 0),
+		global_position + Vector3(0, -1.2, 0)
+	)
 	ray_query.exclude = [self]
-	var hit = space_state.intersect_ray(ray_query)
+	var hit := space_state.intersect_ray(ray_query)
 	
 	var pool: Array[AudioStream] = _snds_floor
 	
 	if not hit.is_empty() and hit.has("collider"):
-		var col = hit["collider"]
-		var col_name = col.name.to_lower()
+		var col := hit["collider"]
+		var col_name := col.name.to_lower()
 		if col.get_parent():
 			col_name += " " + col.get_parent().name.to_lower()
 		
@@ -196,9 +194,8 @@ func _play_footstep_sound() -> void:
 			pool = _snds_carpet if not _snds_carpet.is_empty() else _snds_floor
 	
 	if not pool.is_empty():
-		var stream_to_play: AudioStream = pool[randi() % pool.size()]
-		_audio_footstep.stream = stream_to_play
-		_audio_footstep.pitch_scale = randf_range(0.96, 1.04)
+		_audio_footstep.stream = pool[randi() % pool.size()]
+		_audio_footstep.pitch_scale = randf_range(0.95, 1.05)
 		_audio_footstep.volume_db = randf_range(-17.0, -15.0)
 		_audio_footstep.play()
 
@@ -206,28 +203,27 @@ func _handle_step_assist(dir: Vector3) -> void:
 	if not is_on_floor():
 		return
 	if is_on_wall():
-		var space_state = get_world_3d().direct_space_state
-		var step_origin = global_position + Vector3(0, MAX_STEP_HEIGHT, 0)
-		var query = PhysicsRayQueryParameters3D.create(step_origin, step_origin + dir * 0.5)
+		var space_state := get_world_3d().direct_space_state
+		var step_origin := global_position + Vector3(0, MAX_STEP_HEIGHT, 0)
+		var query := PhysicsRayQueryParameters3D.create(step_origin, step_origin + dir * 0.5)
 		query.exclude = [self]
-		var result = space_state.intersect_ray(query)
+		var result := space_state.intersect_ray(query)
 		if result.is_empty():
 			global_position.y += 0.12
 
 func _check_interaction() -> void:
-	var chapter = get_tree().get_first_node_in_group("chapter")
+	var chapter := get_tree().get_first_node_in_group("chapter")
 	if not interact_ray.is_colliding():
 		if chapter and chapter.has_method("hide_interact_hint"):
 			chapter.hide_interact_hint()
 		return
 	var col := interact_ray.get_collider()
 	if col and col.is_in_group("interactable"):
-		var hint_text = "INTERAGIR"
+		var hint_text := "INTERAGIR"
 		if "interaction_hint" in col and str(col.interaction_hint).strip_edges() != "":
 			hint_text = str(col.interaction_hint).to_upper()
 		if chapter and chapter.has_method("show_interact_hint"):
 			chapter.show_interact_hint("E - " + hint_text)
-		
 		if Input.is_action_just_pressed("interact") or (Input.is_key_pressed(KEY_E) and not is_frozen):
 			if col.has_method("interact"):
 				col.interact()
