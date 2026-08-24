@@ -823,15 +823,17 @@ func _play_vhs_intro_sequence() -> void:
 		fade_rect.color = Color(0, 0, 0, 1)
 		fade_rect.show()
 	
-	# Som da Alice abrindo a porta e saindo do carro na escuridão
+	# Som da Alice abrindo a porta e saindo do carro na escuridão total (toca inteiro antes do boot VHS)
 	if ResourceLoader.exists("res://assets/audio/things/CarDoorOpen.mp3"):
 		var sfx_door := AudioStreamPlayer.new()
+		sfx_door.name = "CarDoorAudio"
 		sfx_door.stream = load("res://assets/audio/things/CarDoorOpen.mp3")
-		sfx_door.volume_db = -1.0
+		sfx_door.volume_db = 0.0
 		add_child(sfx_door)
 		sfx_door.play()
-		sfx_door.finished.connect(sfx_door.queue_free)
-		await get_tree().create_timer(1.2).timeout
+		await sfx_door.finished
+		sfx_door.queue_free()
+		await get_tree().create_timer(0.4).timeout
 	
 	var vhs_overlay := ColorRect.new()
 	vhs_overlay.name = "VHSIntroOverlay"
