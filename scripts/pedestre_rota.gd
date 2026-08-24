@@ -93,6 +93,8 @@ func _spawn_pedestre() -> void:
 	var correcao_graus: float = CALIBRACAO_FRENTE_GRAUS.get(nome_arquivo, 180.0)
 	modelo_inst.rotation_degrees.y = correcao_graus
 
+	print("🚶 [SPAWN] '%s' iniciou caminhada na rota '%s'!" % [nome_arquivo, name])
+
 	# Alinha orientação inicial imediatamente
 	_orientar_para_frente(follow, holder)
 

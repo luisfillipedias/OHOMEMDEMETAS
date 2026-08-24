@@ -1,6 +1,6 @@
 [gd_scene format=4 uid="uid://drlpaf1qod0lg"]
 
-[ext_resource type="Texture2D" uid="uid://dbdri1aijelj7" path="res://assets/models/_caracters/corrigido/cursed-lo-fi-nightmare-fuel_corrigido/textures/Brian Winne Low Poly Nightmare Fuel Phase 4.png" id="1_c6xqe"]
+[ext_resource type="Texture2D" path="res://assets/models/_caracters/corrigido/cursed-lo-fi-nightmare-fuel_corrigido/textures/brian_winne_tex.png" id="1_c6xqe"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_v0uuu"]
 albedo_texture = ExtResource("1_c6xqe")
