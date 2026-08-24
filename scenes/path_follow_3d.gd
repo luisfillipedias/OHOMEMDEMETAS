@@ -69,14 +69,11 @@ func _atualizar_rotacao() -> void:
 	var distancia = global_position.distance_to(player.global_position)
 	var desvio_alvo: float = 0.0
 
-	if distancia < raio_visao_player and distancia > 0.1:
-		var pos_alvo = player.global_position
-		pos_alvo.y = global_position.y
-		var direcao = global_position.direction_to(pos_alvo)
-
-		# Protege contra vetor zero (jogador na mesma posição exata)
-		if direcao.length_squared() > 0.001:
-			var angulo_player = atan2(direcao.x, direcao.z)
+	if distancia < raio_visao_player and distancia > 0.2:
+		var diff = player.global_position - global_position
+		diff.y = 0.0
+		if diff.length_squared() > 0.01:
+			var angulo_player = atan2(diff.x, diff.z)
 			var diferenca = wrapf(angulo_player - offset_base, -PI, PI)
 			var limite = deg_to_rad(desvio_maximo_graus)
 			desvio_alvo = clamp(diferenca, -limite, limite)

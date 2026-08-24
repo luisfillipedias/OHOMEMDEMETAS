@@ -221,17 +221,10 @@ func _orientar_para_frente(follow: PathFollow3D, holder: Node3D) -> void:
 
 	var direcao: Vector3 = pos_frente_global - pos_tras_global
 	direcao.y = 0.0
-	if direcao.length() < 0.0001:
+	if direcao.length_squared() < 0.0001:
 		return
-
-	var alvo: Vector3 = holder.global_position + direcao.normalized()
-	# Garante que o alvo é diferente da posição atual (evita "target vector can't be zero")
-	if alvo.distance_to(holder.global_position) < 0.0001:
-		return
-	# look_at pode falhar se o vetor UP for paralelo à direção de olhar (ex: subindo escada)
-	var look_dir := (alvo - holder.global_position).normalized()
-	var up_ref := Vector3.UP if abs(look_dir.dot(Vector3.UP)) < 0.999 else Vector3.FORWARD
-	holder.look_at(alvo, up_ref)
+	# Rotação direta por yaw (atan2) — 100% à prova de falhas, sem look_at
+	holder.rotation.y = atan2(-direcao.x, -direcao.z)
 
 func _atualizar_olhar_cabeca(p: Dictionary, jogador: Node3D, delta: float) -> void:
 	var skeleton: Skeleton3D = p["skeleton"]
