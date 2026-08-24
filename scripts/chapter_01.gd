@@ -54,10 +54,12 @@ var _active_amb_is_a: bool = true
 var _ambience_playlist: Array[AudioStream] = []
 var _ambience_queue: Array[AudioStream] = []
 var _last_ambience_stream: AudioStream = null
+var _is_ambience_crossfading: bool = false
 
-# Sistema Centralizado de Vento e Atmosfera
-var _wind_intensity: float = 0.70  # Base 0.70 = Vento forte constante; 1.0 = Pico de rajada
+# Sistema Centralizado de Vento Dinâmico Reativo ao Áudio Real
 var _wind_direction: Vector2 = Vector2(1.0, 0.35).normalized()
+var _wind_audio_energy: float = 0.35  # Seguidor de envelope do áudio de vento em tempo real [0.0 .. 1.0]
+var _wind_bus_idx: int = -1
 var audio_wind: AudioStreamPlayer = null
 var _tree_materials: Array[ShaderMaterial] = []
 var _wind_leaves_mat: ParticleProcessMaterial = null
@@ -260,8 +262,6 @@ func _setup_ambience_system() -> void:
 		"res://assets/audio/ambience/newambiences/soundescape/NightTImeNoSiren.mp3",
 		"res://assets/audio/ambience/newambiences/soundescape/Lowkeybizarrenight.mp3",
 		"res://assets/audio/ambience/newambiences/soundescape/SoundCityNightWithPoliceSirens.mp3",
-		"res://assets/audio/ambience/newambiences/newambiences/EerieAmbience.mp3",
-		"res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/Soundtracks/Ambience/AMBIENCE 1.wav",
 		"res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/Soundtracks/Ambience/AMBIENCE WIND.wav",
 	]
 
@@ -294,47 +294,77 @@ func _get_next_ambience_stream() -> AudioStream:
 	return next_stream
 
 func _play_next_ambience_crossfade() -> void:
+	if _is_ambience_crossfading:
+		return
+	_is_ambience_crossfading = true
+
 	var stream = _get_next_ambience_stream()
-	if not stream: return
+	if not stream:
+		_is_ambience_crossfading = false
+		return
 
 	var incoming: AudioStreamPlayer = audio_amb_b if _active_amb_is_a else audio_amb_a
 	var outgoing: AudioStreamPlayer = audio_amb_a if _active_amb_is_a else audio_amb_b
 	_active_amb_is_a = not _active_amb_is_a
 
 	incoming.stream = stream
-	incoming.volume_db = -80.0
+	incoming.volume_db = -40.0 # Piso inicial de -40dB (sem tempo morto de -80dB)
 	incoming.pitch_scale = randf_range(0.98, 1.02)
 	incoming.play()
 
-	# Crossfade suave de 4.5 segundos sem corte brusco
-	var tw = create_tween().set_parallel(true)
-	tw.tween_property(incoming, "volume_db", -6.0, 4.5).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	if outgoing.playing:
-		tw.tween_property(outgoing, "volume_db", -80.0, 4.5).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-		tw.finished.connect(func(): if is_instance_valid(outgoing): outgoing.stop())
+	# Fallback automático: caso a faixa termine inesperadamente, aciona o próximo crossfade
+	if not incoming.finished.is_connected(_on_ambience_finished_fallback):
+		incoming.finished.connect(_on_ambience_finished_fallback)
 
-	# Agenda a próxima troca com crossfade 5 segundos antes da faixa atual acabar
-	var track_len: float = stream.get_length() if stream.has_method("get_length") else 45.0
-	if track_len <= 10.0: track_len = 45.0
-	var wait_time: float = max(10.0, track_len - 5.0)
+	var duration: float = 6.0
+	var target_base_db: float = -6.0
+	var target_gain: float = db_to_linear(target_base_db)
 
-	get_tree().create_timer(wait_time).timeout.connect(func():
-		if is_instance_valid(self):
-			_play_next_ambience_crossfade()
+	# CROSSFADE DE POTÊNCIA CONSTANTE (EQUAL-POWER: sin² + cos² = 1.0)
+	# Garante energia sonora ininterrupta sem buraco ou vale de silêncio!
+	var tw = create_tween()
+	tw.tween_method(func(prog: float):
+		var in_gain: float = sin(prog * PI * 0.5) * target_gain
+		var out_gain: float = cos(prog * PI * 0.5) * target_gain
+		
+		if is_instance_valid(incoming):
+			incoming.volume_db = max(-40.0, linear_to_db(in_gain)) if in_gain > 0.0001 else -40.0
+		if is_instance_valid(outgoing) and outgoing.playing:
+			outgoing.volume_db = max(-40.0, linear_to_db(out_gain)) if out_gain > 0.0001 else -40.0
+	, 0.0, 1.0, duration)
+
+	tw.finished.connect(func():
+		if is_instance_valid(outgoing):
+			outgoing.stop()
+			outgoing.volume_db = -40.0
+		_is_ambience_crossfading = false
 	)
+
+func _on_ambience_finished_fallback() -> void:
+	if is_instance_valid(self) and not _is_ambience_crossfading:
+		_play_next_ambience_crossfade()
 
 # ============================================================
 # SISTEMA DE VENTO COM CROSSFADE SUAVE
 # ============================================================
 
 func _setup_wind_audio_system() -> void:
+	# Cria ou obtém barramento de áudio dedicado 'Wind' para análise de envelope limpa
+	_wind_bus_idx = AudioServer.get_bus_index("Wind")
+	if _wind_bus_idx == -1:
+		AudioServer.add_bus()
+		_wind_bus_idx = AudioServer.bus_count - 1
+		AudioServer.set_bus_name(_wind_bus_idx, "Wind")
+		AudioServer.set_bus_send(_wind_bus_idx, "Master")
+	
 	audio_wind = AudioStreamPlayer.new()
 	audio_wind.name = "AudioWindSeamless"
-	audio_wind.volume_db = -3.0
+	audio_wind.volume_db = 0.0 # Volume pleno no bus, controlado pelo master
+	audio_wind.bus = "Wind"
 	audio_wind.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(audio_wind)
 
-	# Loop infinito garantido via sinal finished (funciona 100% em qualquer formato/versão do Godot)
+	# Loop infinito garantido sem pausas
 	audio_wind.finished.connect(func():
 		if is_instance_valid(audio_wind):
 			audio_wind.play()
@@ -760,6 +790,10 @@ func _aplicar_vento_automatico_em_todas_arvores() -> void:
 		var mi := m as MeshInstance3D
 		var full_name = (mi.name + " " + mi.get_parent().name).to_lower()
 		
+		# IGNORA POSTES, LUZES DE RUA (street_light), SEMÁFOROS E LÂMPADAS (evita poste dançando com o vento!)
+		if "street" in full_name or "post" in full_name or "light" in full_name or "lamp" in full_name or "semaforo" in full_name or "traffic" in full_name:
+			continue
+		
 		if "tree" in full_name or "arvore" in full_name or "palm" in full_name or \
 		   "palmeira" in full_name or "bosquinho" in full_name or "folha" in full_name or \
 		   "branch" in full_name or "commontree" in full_name or "grass_p" in full_name or \
@@ -784,9 +818,9 @@ func _aplicar_vento_automatico_em_todas_arvores() -> void:
 					if albedo_tex:
 						sm.set_shader_parameter("texture_albedo", albedo_tex)
 					sm.set_shader_parameter("direcao_vento", _wind_direction)
-					sm.set_shader_parameter("velocidade_vento", 0.95)
-					sm.set_shader_parameter("forca_vento", 0.65)
-					sm.set_shader_parameter("forca_flutter", 0.035)
+					sm.set_shader_parameter("velocidade_vento", 0.38)
+					sm.set_shader_parameter("forca_vento", 0.45)
+					sm.set_shader_parameter("forca_flutter", 0.015)
 					mat_cache[cache_key] = sm
 					_tree_materials.append(sm)
 					if clima_manager:
@@ -840,15 +874,51 @@ func _setup_wind_particles() -> void:
 
 func _process(delta: float) -> void:
 	_update_wind_systems(delta)
+	_monitor_ambience_playback(delta)
 
-func _update_wind_systems(_delta: float) -> void:
-	# Normaliza a intensidade [0.70 base .. 1.0 pico rajada] -> progresso [0.0 .. 1.0]
-	var gust_progress: float = clamp((_wind_intensity - 0.70) / 0.30, 0.0, 1.0)
+func _monitor_ambience_playback(_delta: float) -> void:
+	if _is_ambience_crossfading:
+		return
 	
-	# 1. Shader de Árvores: inclinação profunda e balanço forte na rajada (sem vibrar)
-	var cur_forca: float = lerp(0.65, 1.15, gust_progress)
-	var cur_velocidade: float = lerp(0.95, 1.15, gust_progress)
-	var cur_flutter: float = lerp(0.035, 0.055, gust_progress)
+	var cur_player: AudioStreamPlayer = audio_amb_a if _active_amb_is_a else audio_amb_b
+	if is_instance_valid(cur_player) and cur_player.playing:
+		var st: AudioStream = cur_player.stream
+		if st:
+			var total_len: float = st.get_length() if st.has_method("get_length") else 0.0
+			if total_len > 12.0:
+				var cur_pos: float = cur_player.get_playback_position()
+				# Inicia o crossfade suave quando faltarem 6.5s para terminar a faixa real
+				if total_len - cur_pos <= 6.5:
+					_play_next_ambience_crossfade()
+
+func _start_dynamic_wind_system() -> void:
+	# O sistema agora é 100% reativo ao áudio real do arquivo de vento (Opção A)
+	pass
+
+func _update_wind_systems(delta: float) -> void:
+	# LÊ A ENERGIA REAL DO ÁUDIO DE VENTO EM TEMPO REAL
+	var peak_db: float = -35.0
+	if _wind_bus_idx >= 0 and _wind_bus_idx < AudioServer.bus_count:
+		var p_left: float = AudioServer.get_bus_peak_volume_left_db(_wind_bus_idx, 0)
+		var p_right: float = AudioServer.get_bus_peak_volume_right_db(_wind_bus_idx, 0)
+		peak_db = max(p_left, p_right)
+	
+	# Mapeia [-38 dB calmo .. -6 dB rajada forte] para linear [0.0 .. 1.0]
+	var raw_energy: float = clamp((peak_db - (-38.0)) / 32.0, 0.0, 1.0)
+	
+	# Envelope follower: Ataque rápido (subida com o sopro), decay suave (retorno natural)
+	if raw_energy > _wind_audio_energy:
+		_wind_audio_energy = lerp(_wind_audio_energy, raw_energy, delta * 6.5)
+	else:
+		_wind_audio_energy = lerp(_wind_audio_energy, raw_energy, delta * 2.2)
+	
+	var energy: float = clamp(_wind_audio_energy, 0.0, 1.0)
+	
+	# 1. SHADER DAS ÁRVORES: Movimento amplo, perceptível e 100% amarrado ao som
+	# No silêncio/calma: força 0.35 (balanço suave). No pico de rajada do áudio: força 1.15 (envergada profunda e visível)
+	var cur_forca: float = lerp(0.35, 1.15, energy)
+	var cur_velocidade: float = lerp(0.32, 0.52, energy)
+	var cur_flutter: float = lerp(0.012, 0.038, energy)
 	
 	for sm in _tree_materials:
 		if is_instance_valid(sm):
@@ -856,37 +926,10 @@ func _update_wind_systems(_delta: float) -> void:
 			sm.set_shader_parameter("velocidade_vento", cur_velocidade)
 			sm.set_shader_parameter("forca_flutter", cur_flutter)
 	
-	# 2. Áudio de Vento Contínuo: volume e pitch sincronizados em tempo real com a rajada
-	if is_instance_valid(audio_wind):
-		if not audio_wind.playing:
-			audio_wind.play()
-		audio_wind.volume_db = lerp(-3.2, -0.3, gust_progress)
-		audio_wind.pitch_scale = lerp(0.98, 1.06, gust_progress)
-	
-	# 3. Partículas de Folhas: velocidade escala junto com o vento
+	# 2. PARTÍCULAS DE FOLHAS: Aceleram em perfeita sincronia com o pico de som
 	if _wind_leaves_mat:
-		_wind_leaves_mat.initial_velocity_min = lerp(12.0, 24.0, gust_progress)
-		_wind_leaves_mat.initial_velocity_max = lerp(18.0, 34.0, gust_progress)
-
-func _start_dynamic_wind_system() -> void:
-	# Loop de rajadas de vento espaçadas (a cada 16-28 segundos)
-	while is_instance_valid(self) and not is_queued_for_deletion():
-		var wait_time = randf_range(16.0, 28.0)
-		await get_tree().create_timer(wait_time).timeout
-		if not is_instance_valid(self): break
-		_trigger_wind_gust()
-
-func _trigger_wind_gust() -> void:
-	var gust_duration = randf_range(7.0, 10.0)
-	var peak_intensity = randf_range(0.92, 1.0)
-	
-	# Uma única fonte de verdade: tween apenas em _wind_intensity
-	# O _process propaga para áudio, shader e partículas sincronizadamente!
-	var tw = create_tween()
-	# Sobe a rajada (vento ganha força)
-	tw.tween_property(self, "_wind_intensity", peak_intensity, gust_duration * 0.42).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	# Retorna suavemente ao vento base forte (0.70)
-	tw.tween_property(self, "_wind_intensity", 0.70, gust_duration * 0.58).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		_wind_leaves_mat.initial_velocity_min = lerp(9.0, 26.0, energy)
+		_wind_leaves_mat.initial_velocity_max = lerp(15.0, 38.0, energy)
 
 # ============================================================
 # BOOT VHS - ESTÉTICA AUTÊNTICA VHS / OSD & CAR DOOR OPEN

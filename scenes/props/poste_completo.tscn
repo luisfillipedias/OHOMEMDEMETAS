@@ -6,8 +6,8 @@
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ocq0d"]
 albedo_texture = ExtResource("2_1wovd")
 emission_enabled = true
-emission = Color(1, 1, 0, 1)
-emission_energy_multiplier = 3.69
+emission = Color(1, 0.75, 0.45, 1)
+emission_energy_multiplier = 4.2
 
 [sub_resource type="SphereMesh" id="SphereMesh_f6kev"]
 
@@ -19,10 +19,13 @@ transform = Transform3D(-0.10046117, 0, -0.994941, 0, 1, 0, 0.994941, 0, -0.1004
 
 [node name="SpotLight3D" type="SpotLight3D" parent="street_light2" unique_id=421647105]
 transform = Transform3D(0.9905904, -0.10023102, -0.09319106, 0.10023096, 0.06764995, 0.9926617, -0.09319113, -0.9926617, 0.07705964, 11.241252, 6.419796, -12.611031)
-light_color = Color(1, 1, 0, 1)
-light_energy = 2.455
+light_color = Color(1, 0.72, 0.42, 1)
+light_energy = 2.2
 shadow_enabled = true
-spot_range = 14.142
+shadow_blur = 2.0
+spot_range = 16.0
+spot_attenuation = 1.35
+spot_angle = 56.0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="street_light2" unique_id=430899850]
 transform = Transform3D(0.4000001, 0, -1.3038516e-08, 0, 0.1, 0, 2.2351742e-08, 0, 0.25, 11.137471, 6.420146, -12.63946)
