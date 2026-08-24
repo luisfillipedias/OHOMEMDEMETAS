@@ -838,8 +838,8 @@ func _aplicar_vento_automatico_em_todas_arvores() -> void:
 					sm.set_shader_parameter("tipo_arvore", tipo)
 					sm.set_shader_parameter("seed_individual", float(seed_bucket) * 7.3)
 					sm.set_shader_parameter("velocidade_vento", 0.35)
-					sm.set_shader_parameter("forca_vento", 0.50)
-					sm.set_shader_parameter("forca_flutter", 0.02)
+					sm.set_shader_parameter("forca_vento", 0.85)
+					sm.set_shader_parameter("forca_flutter", 0.025)
 					mat_cache[cache_key] = sm
 					_tree_materials.append(sm)
 					if clima_manager:
@@ -916,38 +916,37 @@ func _start_dynamic_wind_system() -> void:
 
 func _update_wind_systems(delta: float) -> void:
 	# LÊ A ENERGIA REAL DO ÁUDIO DE VENTO EM TEMPO REAL
-	var peak_db: float = -35.0
+	var peak_db: float = -24.0
 	if _wind_bus_idx >= 0 and _wind_bus_idx < AudioServer.bus_count:
 		var p_left: float = AudioServer.get_bus_peak_volume_left_db(_wind_bus_idx, 0)
 		var p_right: float = AudioServer.get_bus_peak_volume_right_db(_wind_bus_idx, 0)
 		peak_db = max(p_left, p_right)
 	
-	# Mapeia [-36 dB calmo .. -4 dB rajada forte] para linear [0.0 .. 1.0]
-	var raw_energy: float = clamp((peak_db - (-36.0)) / 32.0, 0.0, 1.0)
+	# Mapeamento calibrado com a faixa real do arquivo de som (-24.0 dB calmo .. -12.5 dB rajada máxima)
+	var raw_energy: float = clamp((peak_db - (-24.0)) / 11.5, 0.0, 1.0)
 	
-	# Filtro de Inércia de Massa de Ar: Ataque orgânico (2.8) e retorno lento e pesado (1.4)
-	# Elimina ruídos de milissegundos do áudio e dá sensação de peso real ao ar
+	# Filtro de Inércia de Massa de Ar: Ataque orgânico (3.2) e retorno lento (1.6)
 	if raw_energy > _wind_audio_energy:
-		_wind_audio_energy = lerp(_wind_audio_energy, raw_energy, delta * 2.8)
+		_wind_audio_energy = lerp(_wind_audio_energy, raw_energy, delta * 3.2)
 	else:
-		_wind_audio_energy = lerp(_wind_audio_energy, raw_energy, delta * 1.4)
+		_wind_audio_energy = lerp(_wind_audio_energy, raw_energy, delta * 1.6)
 	
 	var energy: float = clamp(_wind_audio_energy, 0.0, 1.0)
 	
-	# 1. SHADER DAS ÁRVORES: Modulação EXCLUSIVA de amplitude/força (sem alterar velocidade no TIME)
-	# Calma: 0.35 (balanço suave e majestoso). Pico de rajada: 1.15 (envergadura profunda e cinematográfica)
-	var cur_forca: float = lerp(0.35, 1.15, energy)
-	var cur_flutter: float = lerp(0.006, 0.016, energy)
+	# 1. SHADER DAS ÁRVORES: Amplitude forte e dramática (Fears to Fathom Storm)
+	# Vento base constante: 0.85 (balanço bem evidente). Rajada forte: 2.35 (envergadura profunda e dramática)
+	var cur_forca: float = lerp(0.85, 2.35, energy)
+	var cur_flutter: float = lerp(0.015, 0.045, energy)
 	
 	for sm in _tree_materials:
 		if is_instance_valid(sm):
 			sm.set_shader_parameter("forca_vento", cur_forca)
 			sm.set_shader_parameter("forca_flutter", cur_flutter)
 	
-	# 2. PARTÍCULAS DE FOLHAS: Aceleram suavemente com o fluxo de ar
+	# 2. PARTÍCULAS DE FOLHAS: Folhas voam rápido e longe
 	if _wind_leaves_mat:
-		_wind_leaves_mat.initial_velocity_min = lerp(8.0, 24.0, energy)
-		_wind_leaves_mat.initial_velocity_max = lerp(14.0, 36.0, energy)
+		_wind_leaves_mat.initial_velocity_min = lerp(12.0, 32.0, energy)
+		_wind_leaves_mat.initial_velocity_max = lerp(20.0, 48.0, energy)
 
 # ============================================================
 # BOOT VHS - ESTÉTICA AUTÊNTICA VHS / OSD & CAR DOOR OPEN

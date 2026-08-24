@@ -9,8 +9,8 @@ uniform vec2 direcao_vento = vec2(1.0, 0.35);
 
 // Parâmetros de vento (velocidade FIXA constante para evitar saltos temporais; modulação exclusiva por FORÇA)
 uniform float velocidade_vento : hint_range(0.05, 1.5) = 0.34;
-uniform float forca_vento : hint_range(0.0, 2.0) = 0.55;
-uniform float forca_flutter : hint_range(0.0, 0.05) = 0.008;
+uniform float forca_vento : hint_range(0.0, 4.0) = 1.0;
+uniform float forca_flutter : hint_range(0.0, 0.15) = 0.025;
 
 // Perfil de Espécie da Árvore:
 // 0 = Conífera / Pinheiro (estrutura rígida, cone uniforme)
@@ -43,78 +43,74 @@ void vertex() {
 	float rigidez_tronco = 1.0;
 	float mult_lateral = 1.0;
 	float mult_galho = 1.0;
-	float limite_h = 1.35;
+	float limite_h = 1.55;
 	
 	if (tipo_arvore == 0) {
 		// PINHEIRO / CONÍFERA
-		rigidez_tronco = 0.85;
-		mult_lateral = 0.40;
-		mult_galho = 0.20;
-		limite_h = 1.25;
+		rigidez_tronco = 0.95;
+		mult_lateral = 0.45;
+		mult_galho = 0.30;
+		limite_h = 1.40;
 	} else if (tipo_arvore == 1) {
-		// ÁRVORE LARGA / COPADA
-		rigidez_tronco = 0.70;
-		mult_lateral = 0.80;
-		mult_galho = 1.40;
-		limite_h = 1.15;
+		// ÁRVORE LARGA / COPADA (Carvalhos, árvores urbanas de campus)
+		rigidez_tronco = 0.85;
+		mult_lateral = 0.85;
+		mult_galho = 1.80;
+		limite_h = 1.35;
 	} else {
-		// ÁRVORE FINA / ARBUSTO
-		rigidez_tronco = 1.35;
-		mult_lateral = 0.70;
-		mult_galho = 0.50;
-		limite_h = 1.45;
+		// ÁRVORE FINA / PALMEIRA / ARBUSTO
+		rigidez_tronco = 1.45;
+		mult_lateral = 0.75;
+		mult_galho = 0.60;
+		limite_h = 1.70;
 	}
 
-	// Curva física quadrática de envergadura vertical
-	float h_factor = clamp(altura_mundo * 0.11, 0.0, limite_h);
+	// Curva física quadrática de envergadura vertical (aumentada para ser claramente visível)
+	float h_factor = clamp(altura_mundo * 0.12, 0.0, limite_h);
 	float bend_curve = h_factor * h_factor;
 
 	// -------------------------------------------------------------
-	// 2. ÓRBITA AERODINÂMICA CONTÍNUA (Lissajous / Elipse Suave)
-	// Usa seno e cosseno acoplados na mesma frequência fundamental:
-	// O movimento é 100% contínuo, suave e impossível de travar ou inverter bruscamente!
+	// 2. ÓRBITA AERODINÂMICA CONTÍNUA (Lissajous / Elipse Ampla)
+	// Balanço profundo e imponente que enverga a árvore no vento
 	// -------------------------------------------------------------
 	float t_fundamental = TIME * velocidade_vento + fase_global;
 	
-	// Onda longitudinal (na direção do vento) - oscilação primária
-	float wave_fwd = sin(t_fundamental) * 0.75 + sin(t_fundamental * 0.5 + 1.2) * 0.25;
-	// Inclinação contínua sempre positiva na direção do vento (sem recuar contra o vento)
-	float lean_fwd = forca_vento * rigidez_tronco * (0.75 + wave_fwd * 0.25) * bend_curve;
+	// Onda longitudinal (na direção do vento) - 45% inclinação base + 55% arco de oscilação
+	float wave_fwd = sin(t_fundamental) * 0.72 + sin(t_fundamental * 0.48 + 1.2) * 0.28;
+	float lean_fwd = forca_vento * rigidez_tronco * (0.45 + wave_fwd * 0.55) * bend_curve;
 	vec3 world_disp = vec3(dir.x, 0.0, dir.y) * lean_fwd;
 
 	// Onda transversal (lateral / órbita suave em fase de 90 graus / cosseno)
-	// Amplitude controlada e sutil: 15% da força principal
-	float wave_lat = cos(t_fundamental * 0.9 + 0.5);
-	float lean_lat = forca_vento * (0.15 * mult_lateral) * wave_lat * bend_curve;
+	float wave_lat = cos(t_fundamental * 0.88 + 0.5);
+	float lean_lat = forca_vento * (0.28 * mult_lateral) * wave_lat * bend_curve;
 	world_disp += vec3(perp.x, 0.0, perp.y) * lean_lat;
 
 	// -------------------------------------------------------------
-	// 3. RESPIRAÇÃO ORGÂNICA DE GALHOS (Volume 3D Suave, sem cancelamento de onda)
-	// Amplitude pequena e subordinada (8% da força) usando fase ESTÁTICA do vértice
+	// 3. RESPIRAÇÃO E ONDULAÇÃO ORGÂNICA DE GALHOS E COPA
+	// Ondulação tridimensional de grande escala nos galhos externos
 	// -------------------------------------------------------------
 	if (mult_galho > 0.1) {
-		float branch_t = TIME * (velocidade_vento * 1.3) + fase_local;
+		float branch_t = TIME * (velocidade_vento * 1.35) + fase_local;
 		float branch_wave = sin(branch_t);
-		float branch_disp = forca_vento * (0.07 * mult_galho) * branch_wave * clamp(altura_mundo * 0.15, 0.0, 1.0);
-		// Galhos ondulam radialmente sem competir com o eixo do tronco
+		float branch_disp = forca_vento * (0.16 * mult_galho) * branch_wave * clamp(altura_mundo * 0.16, 0.0, 1.4);
+		// Galhos ondulam radialmente e verticalmente
 		world_disp.x += perp.x * branch_disp;
 		world_disp.z += perp.y * branch_disp;
-		world_disp.y += branch_disp * 0.35;
+		world_disp.y += sin(branch_t * 0.75) * (branch_disp * 0.45);
 	}
 
 	// -------------------------------------------------------------
-	// 4. MICRO-FARFALHAR DAS FOLHAS (Shimmer local minúsculo nas pontas)
-	// Amplitude mínima de milímetros (nunca empurra o galho)
+	// 4. MICRO-FARFALHAR DAS FOLHAS (Shimmer natural)
 	// -------------------------------------------------------------
-	float leaf_wave = sin(TIME * 2.2 + fase_local * 2.0);
-	float leaf_disp = leaf_wave * forca_flutter * clamp(altura_mundo * 0.20, 0.0, 0.4);
-	world_disp += vec3(dir.x, 0.0, dir.y) * (leaf_disp * 0.3);
-	world_disp += vec3(perp.x, 0.0, perp.y) * (leaf_disp * 0.7);
+	float leaf_wave = sin(TIME * 2.4 + fase_local * 2.0);
+	float leaf_disp = leaf_wave * forca_flutter * clamp(altura_mundo * 0.20, 0.0, 0.6);
+	world_disp.x += (dir.x * 0.3 + perp.x * 0.7) * leaf_disp;
+	world_disp.z += (dir.y * 0.3 + perp.y * 0.7) * leaf_disp;
 
 	// -------------------------------------------------------------
-	// 5. COMPRESSÃO GRAVITACIONAL NATURAL
+	// 5. COMPRESSÃO GRAVITACIONAL NATURAL AO ENVERGAR
 	// -------------------------------------------------------------
-	world_disp.y -= lean_fwd * 0.05;
+	world_disp.y -= lean_fwd * 0.06;
 
 	// 6. Converte de volta para o espaço local da malha
 	mat3 inv_model = inverse(mat3(MODEL_MATRIX));
