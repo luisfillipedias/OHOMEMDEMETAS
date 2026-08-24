@@ -1,7 +1,7 @@
 extends Control
 
 # ============================================================
-# TITLE SCREEN -- O Homem De Metas (Menu com Áudio & VHS Boot)
+# TITLE SCREEN CONTROLLER - VHS PSX HORROR MENU COM UI AUDIO
 # ============================================================
 
 @onready var background: TextureRect = $Background
@@ -10,7 +10,7 @@ extends Control
 @onready var btn_continuar: Button = $MenuContainer/Options/BtnContinuar
 @onready var btn_config: Button = $MenuContainer/Options/BtnConfig
 @onready var btn_sair: Button = $MenuContainer/Options/BtnSair
-@onready var settings_panel: Control = $SettingsPanel
+@onready var settings_panel: ColorRect = $SettingsPanel
 @onready var btn_close_settings: Button = $SettingsPanel/VBox/BtnCloseSettings
 @onready var master_slider: HSlider = $SettingsPanel/VBox/MasterSlider
 @onready var sfx_slider: HSlider = $SettingsPanel/VBox/SFXSlider
@@ -26,13 +26,19 @@ extends Control
 @onready var audio_rare_glitch: AudioStreamPlayer = $AudioRareGlitch
 @onready var audio_menu_music: AudioStreamPlayer = $AudioMenuMusic
 
+var audio_ui_select: AudioStreamPlayer = null
+var audio_ui_cursor: AudioStreamPlayer = null
+var audio_ui_back: AudioStreamPlayer = null
+var audio_ui_close_settings: AudioStreamPlayer = null
+
+var snd_select = preload("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Select - 1.ogg")
+var snd_cursor = preload("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cursor - 1.ogg")
+var snd_back_settings = preload("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Select - 2.ogg")
+var snd_close_settings = preload("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cursor - 2.ogg")
+
 var music_track_1 = preload("res://assets/audio/menu/music/titlescreenmusic1.mp3")
 var music_track_2 = preload("res://assets/audio/menu/music/titlescreenmusic2.mp3")
 
-
-var audio_ui_select: AudioStreamPlayer = null
-var audio_ui_cursor: AudioStreamPlayer = null
-var audio_ui_cancel: AudioStreamPlayer = null
 var buttons: Array = []
 var selected_index: int = 0
 var _titles := ["JOGAR", "CONTINUAR", "CONFIGURAÇÕES", "SAIR"]
@@ -50,6 +56,9 @@ func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	settings_panel.hide()
 	base_bg_pos = background.position
+	
+	_setup_ui_sounds()
+
 	# Verifica se há save game: arquivo + flag de progresso
 	if GameManager:
 		var save_existe: bool = FileAccess.file_exists("user://save.json")
@@ -65,11 +74,20 @@ func _ready() -> void:
 	btn_continuar.pressed.connect(_on_continuar_pressed)
 	btn_config.pressed.connect(_on_config_pressed)
 	btn_sair.pressed.connect(_on_sair_pressed)
+	
+	# Configurações & Controles
 	btn_close_settings.pressed.connect(_on_close_settings_pressed)
+	btn_close_settings.mouse_entered.connect(play_ui_cursor)
 
 	master_slider.value_changed.connect(_on_master_volume_changed)
+	master_slider.mouse_entered.connect(play_ui_cursor)
+	
 	sfx_slider.value_changed.connect(_on_sfx_volume_changed)
+	sfx_slider.mouse_entered.connect(play_ui_cursor)
+	sfx_slider.drag_ended.connect(func(_val): play_ui_select())
+	
 	btn_fullscreen.toggled.connect(_on_fullscreen_toggled)
+	btn_fullscreen.mouse_entered.connect(play_ui_cursor)
 
 	for i in range(buttons.size()):
 		var idx: int = i
@@ -82,6 +100,58 @@ func _ready() -> void:
 
 	next_glitch_time = randf_range(4.0, 8.0)
 	next_rare_glitch_time = randf_range(25.0, 50.0)
+
+func _setup_ui_sounds() -> void:
+	audio_ui_select = AudioStreamPlayer.new()
+	audio_ui_select.name = "AudioUISelect"
+	audio_ui_select.process_mode = Node.PROCESS_MODE_ALWAYS
+	audio_ui_select.volume_db = -1.0
+	audio_ui_select.stream = snd_select
+	add_child(audio_ui_select)
+
+	# Volume mais suave para hover
+	audio_ui_cursor = AudioStreamPlayer.new()
+	audio_ui_cursor.name = "AudioUICursor"
+	audio_ui_cursor.process_mode = Node.PROCESS_MODE_ALWAYS
+	audio_ui_cursor.volume_db = -10.0
+	audio_ui_cursor.stream = snd_cursor
+	add_child(audio_ui_cursor)
+
+	# Som de voltar em Settings (Select - 2)
+	audio_ui_back = AudioStreamPlayer.new()
+	audio_ui_back.name = "AudioUIBack"
+	audio_ui_back.process_mode = Node.PROCESS_MODE_ALWAYS
+	audio_ui_back.volume_db = -2.0
+	audio_ui_back.stream = snd_back_settings
+	add_child(audio_ui_back)
+
+	# Som de fechar settings (Cursor - 2)
+	audio_ui_close_settings = AudioStreamPlayer.new()
+	audio_ui_close_settings.name = "AudioUICloseSettings"
+	audio_ui_close_settings.process_mode = Node.PROCESS_MODE_ALWAYS
+	audio_ui_close_settings.volume_db = -2.0
+	audio_ui_close_settings.stream = snd_close_settings
+	add_child(audio_ui_close_settings)
+
+func play_ui_select() -> void:
+	if is_instance_valid(audio_ui_select) and audio_ui_select.stream:
+		audio_ui_select.pitch_scale = randf_range(0.97, 1.03)
+		audio_ui_select.play()
+
+func play_ui_cursor() -> void:
+	if is_instance_valid(audio_ui_cursor) and audio_ui_cursor.stream:
+		audio_ui_cursor.pitch_scale = randf_range(0.97, 1.03)
+		audio_ui_cursor.play()
+
+func play_ui_back() -> void:
+	if is_instance_valid(audio_ui_back) and audio_ui_back.stream:
+		audio_ui_back.pitch_scale = randf_range(0.98, 1.02)
+		audio_ui_back.play()
+
+func play_ui_close_settings() -> void:
+	if is_instance_valid(audio_ui_close_settings) and audio_ui_close_settings.stream:
+		audio_ui_close_settings.pitch_scale = randf_range(0.98, 1.02)
+		audio_ui_close_settings.play()
 
 func _play_vhs_boot_sequence() -> void:
 	# 1. Som de ligar TV / VHS
@@ -177,6 +247,7 @@ func _input(event: InputEvent) -> void:
 		_navigate_menu(1)
 	elif event.is_action_pressed("ui_accept") or (event is InputEventKey and event.pressed and event.keycode == KEY_ENTER):
 		if not buttons[selected_index].disabled:
+			play_ui_select()
 			buttons[selected_index].emit_signal("pressed")
 
 func _navigate_menu(dir: int) -> void:
@@ -232,7 +303,8 @@ func _on_config_pressed() -> void:
 	settings_panel.show()
 
 func _on_close_settings_pressed() -> void:
-	play_ui_cancel()
+	# Som de voltar em settings (Select - 2) e fechar (Cursor - 2)
+	play_ui_back()
 	settings_panel.hide()
 
 func _on_sair_pressed() -> void:
@@ -251,39 +323,3 @@ func _on_fullscreen_toggled(button_pressed: bool) -> void:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	else:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
-
-func _setup_ui_sounds() -> void:
-	audio_ui_select = AudioStreamPlayer.new()
-	audio_ui_select.name = "AudioUISelect"
-	audio_ui_select.volume_db = -6.0
-	if ResourceLoader.exists("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Select - 1.ogg"):
-		audio_ui_select.stream = load("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Select - 1.ogg")
-	add_child(audio_ui_select)
-
-	audio_ui_cursor = AudioStreamPlayer.new()
-	audio_ui_cursor.name = "AudioUICursor"
-	audio_ui_cursor.volume_db = -12.0
-	if ResourceLoader.exists("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cursor - 1.ogg"):
-		audio_ui_cursor.stream = load("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cursor - 1.ogg")
-	add_child(audio_ui_cursor)
-
-	audio_ui_cancel = AudioStreamPlayer.new()
-	audio_ui_cancel.name = "AudioUICancel"
-	audio_ui_cancel.volume_db = -6.0
-	if ResourceLoader.exists("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cancel - 1.ogg"):
-		audio_ui_cancel.stream = load("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cancel - 1.ogg")
-	add_child(audio_ui_cancel)
-
-func play_ui_select() -> void:
-	if is_instance_valid(audio_ui_select) and audio_ui_select.stream:
-		audio_ui_select.pitch_scale = randf_range(0.96, 1.04)
-		audio_ui_select.play()
-
-func play_ui_cursor() -> void:
-	if is_instance_valid(audio_ui_cursor) and audio_ui_cursor.stream:
-		audio_ui_cursor.pitch_scale = randf_range(0.96, 1.04)
-		audio_ui_cursor.play()
-
-func play_ui_cancel() -> void:
-	if is_instance_valid(audio_ui_cancel) and audio_ui_cancel.stream:
-		audio_ui_cancel.play()

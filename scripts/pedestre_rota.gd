@@ -28,14 +28,15 @@ const CALIBRACAO_FRENTE_GRAUS := {
 	"velhinha.tscn": 180.0,
 }
 
-var _snd_step_pedestre: AudioStream = null
+var _snds_pedestre: Array[AudioStream] = []
 
 func _ready() -> void:
 	randomize()
-	if ResourceLoader.exists("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/footsteps/tunnel steps.wav"):
-		_snd_step_pedestre = load("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/footsteps/tunnel steps.wav")
-	elif ResourceLoader.exists("res://assets/audio/footstep.wav"):
-		_snd_step_pedestre = load("res://assets/audio/footstep.wav")
+	# Carrega amostras de passos de concreto individuais
+	for i in range(1, 5):
+		var p = "res://assets/audio/footsteps_single/concrete_%d.wav" % i
+		if ResourceLoader.exists(p):
+			_snds_pedestre.append(load(p))
 
 	timer = Timer.new()
 	timer.one_shot = true
@@ -52,10 +53,9 @@ func _spawn_pedestre() -> void:
 		_agendar_proximo()
 		return
 
-	var escolha = PedestreManager.pick_pedestre()
+	var escolha: Dictionary = PedestreManager.pick_pedestre()
 	if escolha.is_empty():
-		# Pool lotado: tenta de novo em 15-30 segundos
-		timer.start(randf_range(15.0, 30.0))
+		_agendar_proximo()
 		return
 
 	var index: int = escolha["index"]
@@ -87,18 +87,17 @@ func _spawn_pedestre() -> void:
 	holder.add_child(modelo_inst)
 	follow.add_child(holder)
 
-	# Áudio 3D posicional de passos para o pedestre
+	# Áudio 3D posicional de passos com atenuação espacial real
 	var audio_3d := AudioStreamPlayer3D.new()
 	audio_3d.name = "FootstepAudio3D"
-	audio_3d.unit_size = 2.5
-	audio_3d.max_distance = 18.0
-	audio_3d.volume_db = -12.0
+	audio_3d.unit_size = 3.0
+	audio_3d.max_distance = 24.0
+	audio_3d.volume_db = -6.0
+	audio_3d.panning_strength = 1.0
 	audio_3d.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
-	if _snd_step_pedestre:
-		audio_3d.stream = _snd_step_pedestre
 	holder.add_child(audio_3d)
 
-	# Calibração de frente: 180Â° padrão para todos os modelos Mixamo
+	# Calibração de frente: 180° padrão para todos os modelos Mixamo
 	var nome_arquivo := cena.resource_path.get_file()
 	var correcao_graus: float = CALIBRACAO_FRENTE_GRAUS.get(nome_arquivo, 180.0)
 	modelo_inst.rotation_degrees.y = correcao_graus
@@ -117,6 +116,7 @@ func _spawn_pedestre() -> void:
 				break
 
 	var anim_player = modelo_inst.find_child("AnimationPlayer", true, false) as AnimationPlayer
+	var anim_speed: float = randf_range(1.1, 1.25)
 	if anim_player:
 		var anim_list = anim_player.get_animation_list()
 		if not anim_list.is_empty():
@@ -125,18 +125,22 @@ func _spawn_pedestre() -> void:
 			if anim:
 				anim.loop_mode = Animation.LOOP_LINEAR
 			anim_player.play(anim_name)
-			anim_player.speed_scale = randf_range(1.1, 1.3)
+			anim_player.speed_scale = anim_speed
 
 	var path_len = curve.get_baked_length() if curve else 50.0
 	if path_len <= 1.0:
 		path_len = 50.0
 	var duracao = path_len / velocidade_base
 
+	# Intervalo de passos sincronizado com a animação de caminhada (~0.48s normalizado)
+	var step_interval: float = 0.52 / anim_speed
+
 	var pedestre_data := {
 		"follow": follow,
 		"holder": holder,
 		"audio_3d": audio_3d,
 		"step_timer": 0.0,
+		"step_interval": step_interval,
 		"skeleton": skeleton,
 		"head_bone_idx": head_bone_idx,
 		"rest_bone_pose": Transform3D() if skeleton == null or head_bone_idx == -1 else skeleton.get_bone_pose(head_bone_idx),
@@ -170,13 +174,16 @@ func _process(delta: float) -> void:
 			continue
 		_orientar_para_frente(p["follow"], p["holder"])
 		
-		# Processa som de passos 3D do pedestre
+		# Processa som de passos 3D espacial do pedestre
 		p["step_timer"] += delta
-		if p["step_timer"] >= 0.50:
+		if p["step_timer"] >= p["step_interval"]:
 			p["step_timer"] = 0.0
 			var a3d: AudioStreamPlayer3D = p["audio_3d"]
-			if is_instance_valid(a3d) and a3d.stream:
-				a3d.pitch_scale = randf_range(0.90, 1.10)
+			if is_instance_valid(a3d) and not _snds_pedestre.is_empty():
+				var snd = _snds_pedestre[randi() % _snds_pedestre.size()]
+				a3d.stream = snd
+				a3d.pitch_scale = randf_range(0.92, 1.08)
+				a3d.volume_db = randf_range(-7.0, -4.0)
 				a3d.play()
 		
 		if permitir_olhar_jogador and jogador:

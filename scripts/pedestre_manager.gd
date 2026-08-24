@@ -86,3 +86,5 @@ func pick_pedestre() -> Dictionary:
 
 func liberar_pedestre(index: int) -> void:
 	em_uso[index] = false
+func obter_pedestre_disponivel() -> Dictionary:
+	return pick_pedestre()

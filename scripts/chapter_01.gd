@@ -1,15 +1,13 @@
 extends Node3D
 
 # ============================================================
-# CHAPTER 01: O HOMEM DE METAS -- CEFET-MG & A PERSEGUIÇÃƒO
+# CHAPTER 01: O HOMEM DE METAS -- CEFET-MG & A PERSEGUIÇÃO
 # ============================================================
 
 @onready var player: CharacterBody3D = get_node_or_null("PlayerController")
 @onready var camera_mount: Node3D = get_node_or_null("PlayerController/CameraMount")
 @onready var dialogue_ui: CanvasLayer = get_node_or_null("DialogueUI")
 @onready var celular_ui: CanvasLayer = get_node_or_null("CelularUI")
-@onready var audio_amb: AudioStreamPlayer = get_node_or_null("AudioAmbience")
-@onready var audio_sfx: AudioStreamPlayer = get_node_or_null("AudioSFX")
 @onready var world_env: WorldEnvironment = get_node_or_null("WorldEnvironment")
 @onready var sun_light: DirectionalLight3D = get_node_or_null("SunLight")
 var clima_manager: ClimaManager = null
@@ -29,18 +27,9 @@ var clima_manager: ClimaManager = null
 
 # State Machine Flags
 var doc_pegou: bool = false
-var doc_entregue: bool = false
-var otavio_falou: bool = false
-var pode_falar_atendente: bool = false
-var matricula_feita: bool = false
-var portao_aberto: bool = false
-var elevador_chamado: bool = false
-var stalker_sms_visto: bool = false
-var quarto_trancado: bool = false
 var is_paused: bool = false
 
 var pause_menu_control: Control = null
-var audio_wind_extra: AudioStreamPlayer = null
 var font_retro: Font = null
 var _objective_typing_token: int = 0
 
@@ -49,14 +38,26 @@ var audio_typewriter: AudioStreamPlayer = null
 var audio_ui_select: AudioStreamPlayer = null
 var audio_ui_cursor: AudioStreamPlayer = null
 var audio_ui_cancel: AudioStreamPlayer = null
+var audio_ui_resume: AudioStreamPlayer = null
+var audio_ui_close_pause: AudioStreamPlayer = null
 var audio_obj_appear: AudioStreamPlayer = null
+var audio_obj_shrink: AudioStreamPlayer = null
 var audio_obj_solved: AudioStreamPlayer = null
 var audio_save_game: AudioStreamPlayer = null
 var audio_wrong_obj: AudioStreamPlayer = null
 
-# Ambience Playlist
+# Sistema de Ambience com Crossfade Suave (Dois Players)
+var audio_amb_a: AudioStreamPlayer = null
+var audio_amb_b: AudioStreamPlayer = null
+var _active_amb_is_a: bool = true
 var _ambience_playlist: Array[AudioStream] = []
 var _current_ambience_idx: int = 0
+
+# Sistema de Vento com Crossfade Suave (Dois Players)
+var audio_wind_a: AudioStreamPlayer = null
+var audio_wind_b: AudioStreamPlayer = null
+var _active_wind_is_a: bool = true
+var _wind_streams: Array[AudioStream] = []
 
 # Referências para Rajadas Dinâmicas de Vento
 var _tree_materials: Array[ShaderMaterial] = []
@@ -86,9 +87,9 @@ func _ready() -> void:
 	clima_manager = ClimaManager.new()
 	add_child(clima_manager)
 	
-	# Configuração de playlist dinâmica de ambience e vento
+	# Configuração de playlist dinâmica de ambience e vento com crossfade contínuo
 	_setup_ambience_system()
-	_setup_extra_wind_audio()
+	_setup_wind_audio_system()
 	_setup_wind_particles()
 	
 	# Aplica shader de vento nas árvores
@@ -105,10 +106,10 @@ func _ready() -> void:
 # ============================================================
 
 func _setup_audio_system() -> void:
-	# 1. Typewriter SFX
+	# 1. Typewriter SFX (Imediato)
 	audio_typewriter = AudioStreamPlayer.new()
 	audio_typewriter.name = "AudioTypewriter"
-	audio_typewriter.volume_db = -4.0
+	audio_typewriter.volume_db = -1.0
 	if ResourceLoader.exists("res://assets/audio/menu/typewriter.ogg"):
 		audio_typewriter.stream = load("res://assets/audio/menu/typewriter.ogg")
 	add_child(audio_typewriter)
@@ -117,7 +118,7 @@ func _setup_audio_system() -> void:
 	audio_ui_select = AudioStreamPlayer.new()
 	audio_ui_select.name = "AudioUISelect"
 	audio_ui_select.process_mode = Node.PROCESS_MODE_ALWAYS
-	audio_ui_select.volume_db = -6.0
+	audio_ui_select.volume_db = -2.0
 	if ResourceLoader.exists("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Select - 1.ogg"):
 		audio_ui_select.stream = load("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Select - 1.ogg")
 	add_child(audio_ui_select)
@@ -126,130 +127,227 @@ func _setup_audio_system() -> void:
 	audio_ui_cursor = AudioStreamPlayer.new()
 	audio_ui_cursor.name = "AudioUICursor"
 	audio_ui_cursor.process_mode = Node.PROCESS_MODE_ALWAYS
-	audio_ui_cursor.volume_db = -12.0
+	audio_ui_cursor.volume_db = -10.0
 	if ResourceLoader.exists("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cursor - 1.ogg"):
 		audio_ui_cursor.stream = load("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cursor - 1.ogg")
 	add_child(audio_ui_cursor)
 
-	# 4. UI Cancel / Close
+	# 4. UI Cancel / Close (Cursor - 2)
 	audio_ui_cancel = AudioStreamPlayer.new()
 	audio_ui_cancel.name = "AudioUICancel"
 	audio_ui_cancel.process_mode = Node.PROCESS_MODE_ALWAYS
-	audio_ui_cancel.volume_db = -6.0
-	if ResourceLoader.exists("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cancel - 1.ogg"):
-		audio_ui_cancel.stream = load("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cancel - 1.ogg")
+	audio_ui_cancel.volume_db = -2.0
+	if ResourceLoader.exists("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cursor - 2.ogg"):
+		audio_ui_cancel.stream = load("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cursor - 2.ogg")
 	add_child(audio_ui_cancel)
+
+	# 4b. UI Retomar Jogo (Cursor - 5)
+	audio_ui_resume = AudioStreamPlayer.new()
+	audio_ui_resume.name = "AudioUIResume"
+	audio_ui_resume.process_mode = Node.PROCESS_MODE_ALWAYS
+	audio_ui_resume.volume_db = -1.0
+	if ResourceLoader.exists("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cursor - 5.ogg"):
+		audio_ui_resume.stream = load("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cursor - 5.ogg")
+	add_child(audio_ui_resume)
 
 	# 5. Objetivo Aparecendo (PICK UP OBJECT)
 	audio_obj_appear = AudioStreamPlayer.new()
 	audio_obj_appear.name = "AudioObjAppear"
-	audio_obj_appear.volume_db = -4.0
+	audio_obj_appear.volume_db = -2.0
 	if ResourceLoader.exists("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/Objects & Interaction/PICK UP OBJECT.wav"):
 		audio_obj_appear.stream = load("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/Objects & Interaction/PICK UP OBJECT.wav")
 	add_child(audio_obj_appear)
 
-	# 6. Objetivo Concluído (PUZZLE SOLVED)
+	# 6. Objetivo Diminuindo / Encolhendo (Select - 2)
+	audio_obj_shrink = AudioStreamPlayer.new()
+	audio_obj_shrink.name = "AudioObjShrink"
+	audio_obj_shrink.volume_db = -3.0
+	if ResourceLoader.exists("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Select - 2.ogg"):
+		audio_obj_shrink.stream = load("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Select - 2.ogg")
+	add_child(audio_obj_shrink)
+
+	# 7. Objetivo Concluído (PUZZLE SOLVED)
 	audio_obj_solved = AudioStreamPlayer.new()
 	audio_obj_solved.name = "AudioObjSolved"
-	audio_obj_solved.volume_db = -3.0
+	audio_obj_solved.volume_db = -2.0
 	if ResourceLoader.exists("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/Objects & Interaction/PUZZLE SOLVED.wav"):
 		audio_obj_solved.stream = load("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/Objects & Interaction/PUZZLE SOLVED.wav")
 	add_child(audio_obj_solved)
 
-	# 7. Jogo Salvo (SAVE GAME)
+	# 8. Jogo Salvo (SAVE GAME)
 	audio_save_game = AudioStreamPlayer.new()
 	audio_save_game.name = "AudioSaveGame"
-	audio_save_game.volume_db = -4.0
+	audio_save_game.volume_db = -3.0
 	if ResourceLoader.exists("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/Objects & Interaction/SAVE GAME.wav"):
 		audio_save_game.stream = load("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/Objects & Interaction/SAVE GAME.wav")
 	add_child(audio_save_game)
 
-	# 8. Erro / Ação Inválida (WRONG OBJECT)
+	# 9. Erro / Ação Inválida (WRONG OBJECT)
 	audio_wrong_obj = AudioStreamPlayer.new()
 	audio_wrong_obj.name = "AudioWrongObj"
-	audio_wrong_obj.volume_db = -5.0
+	audio_wrong_obj.volume_db = -4.0
 	if ResourceLoader.exists("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/Objects & Interaction/WRONG OBJECT.wav"):
 		audio_wrong_obj.stream = load("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/Objects & Interaction/WRONG OBJECT.wav")
 	add_child(audio_wrong_obj)
 
 func play_sfx_select() -> void:
-	if is_instance_valid(audio_ui_select):
-		audio_ui_select.pitch_scale = randf_range(0.95, 1.05)
+	if is_instance_valid(audio_ui_select) and audio_ui_select.stream:
+		audio_ui_select.pitch_scale = randf_range(0.97, 1.03)
 		audio_ui_select.play()
 
 func play_sfx_cursor() -> void:
-	if is_instance_valid(audio_ui_cursor):
-		audio_ui_cursor.pitch_scale = randf_range(0.95, 1.05)
+	if is_instance_valid(audio_ui_cursor) and audio_ui_cursor.stream:
+		audio_ui_cursor.pitch_scale = randf_range(0.97, 1.03)
 		audio_ui_cursor.play()
 
 func play_sfx_cancel() -> void:
-	if is_instance_valid(audio_ui_cancel):
+	if is_instance_valid(audio_ui_cancel) and audio_ui_cancel.stream:
 		audio_ui_cancel.play()
 
+func play_sfx_resume() -> void:
+	if is_instance_valid(audio_ui_resume) and audio_ui_resume.stream:
+		audio_ui_resume.pitch_scale = randf_range(0.98, 1.02)
+		audio_ui_resume.play()
+
+func play_sfx_objective_shrink() -> void:
+	if is_instance_valid(audio_obj_shrink) and audio_obj_shrink.stream:
+		audio_obj_shrink.pitch_scale = randf_range(0.98, 1.02)
+		audio_obj_shrink.play()
+
 func play_objective_completed() -> void:
-	if is_instance_valid(audio_obj_solved):
+	if is_instance_valid(audio_obj_solved) and audio_obj_solved.stream:
 		audio_obj_solved.play()
 
 func play_game_saved() -> void:
-	if is_instance_valid(audio_save_game):
+	if is_instance_valid(audio_save_game) and audio_save_game.stream:
 		audio_save_game.play()
 
 func play_wrong_action() -> void:
-	if is_instance_valid(audio_wrong_obj):
+	if is_instance_valid(audio_wrong_obj) and audio_wrong_obj.stream:
 		audio_wrong_obj.play()
 
 # ============================================================
-# PLAYLIST DINÃ‚MICA DE AMBIENCE (ROTAÇÃƒO CONTÍNUA)
+# SISTEMA DE AMBIENCE PLAYLIST COM CROSSFADE SUAVE
 # ============================================================
 
 func _setup_ambience_system() -> void:
-	if not audio_amb:
-		audio_amb = AudioStreamPlayer.new()
-		audio_amb.name = "AudioAmbience"
-		add_child(audio_amb)
-	
-	audio_amb.volume_db = -6.0
+	audio_amb_a = AudioStreamPlayer.new()
+	audio_amb_a.name = "AudioAmbienceA"
+	audio_amb_a.volume_db = -80.0
+	add_child(audio_amb_a)
 
-	var paths := [
+	audio_amb_b = AudioStreamPlayer.new()
+	audio_amb_b.name = "AudioAmbienceB"
+	audio_amb_b.volume_db = -80.0
+	add_child(audio_amb_b)
+
+	var ambience_paths := [
 		"res://assets/audio/ambience/newambiences/soundescape/CalmCozyCityNight.mp3",
 		"res://assets/audio/ambience/newambiences/soundescape/Citystreet_distant_siren.mp3",
 		"res://assets/audio/ambience/newambiences/soundescape/NightTImeNoSiren.mp3",
 		"res://assets/audio/ambience/newambiences/soundescape/Lowkeybizarrenight.mp3",
 		"res://assets/audio/ambience/newambiences/soundescape/SoundCityNightWithPoliceSirens.mp3",
-		"res://assets/audio/ambience/newambiences/mysticalambience/EerieAmbience.mp3",
+		"res://assets/audio/ambience/newambiences/newambiences/EerieAmbience.mp3",
 		"res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/Soundtracks/Ambience/AMBIENCE 1.wav",
-		"res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/Soundtracks/Ambience/AMBIENCE WIND.wav"
+		"res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/Soundtracks/Ambience/AMBIENCE WIND.wav",
 	]
-	
+
 	_ambience_playlist.clear()
-	for p in paths:
+	for p in ambience_paths:
 		if ResourceLoader.exists(p):
 			var stream = load(p) as AudioStream
 			if stream:
 				_ambience_playlist.append(stream)
-	
+
 	if not _ambience_playlist.is_empty():
 		_ambience_playlist.shuffle()
-		_play_next_ambience_track()
-		if not audio_amb.finished.is_connected(_on_ambience_finished):
-			audio_amb.finished.connect(_on_ambience_finished)
+		_play_next_ambience_crossfade()
 
-func _play_next_ambience_track() -> void:
+func _play_next_ambience_crossfade() -> void:
 	if _ambience_playlist.is_empty(): return
 	var stream = _ambience_playlist[_current_ambience_idx]
 	_current_ambience_idx = (_current_ambience_idx + 1) % _ambience_playlist.size()
-	
-	audio_amb.stream = stream
-	audio_amb.volume_db = -24.0
-	audio_amb.play()
-	var tw = create_tween()
-	tw.tween_property(audio_amb, "volume_db", -6.0, 3.0)
 
-func _on_ambience_finished() -> void:
-	_play_next_ambience_track()
+	var incoming: AudioStreamPlayer = audio_amb_b if _active_amb_is_a else audio_amb_a
+	var outgoing: AudioStreamPlayer = audio_amb_a if _active_amb_is_a else audio_amb_b
+	_active_amb_is_a = not _active_amb_is_a
+
+	incoming.stream = stream
+	incoming.volume_db = -80.0
+	incoming.play()
+
+	# Crossfade suave de 4.5 segundos sem corte brusco
+	var tw = create_tween().set_parallel(true)
+	tw.tween_property(incoming, "volume_db", -6.0, 4.5).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	if outgoing.playing:
+		tw.tween_property(outgoing, "volume_db", -80.0, 4.5).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		tw.finished.connect(func(): if is_instance_valid(outgoing): outgoing.stop())
+
+	# Agenda a próxima troca com crossfade 5 segundos antes da faixa atual acabar
+	var track_len: float = stream.get_length() if stream.has_method("get_length") else 45.0
+	if track_len <= 10.0: track_len = 45.0
+	var wait_time: float = max(10.0, track_len - 5.0)
+
+	get_tree().create_timer(wait_time).timeout.connect(func():
+		if is_instance_valid(self):
+			_play_next_ambience_crossfade()
+	)
 
 # ============================================================
-# ESTILIZAÇÃƒO E CALIBRAÇÃƒO DINÃ‚MICA DO HUD (VHS OSD)
+# SISTEMA DE VENTO COM CROSSFADE SUAVE
+# ============================================================
+
+func _setup_wind_audio_system() -> void:
+	audio_wind_a = AudioStreamPlayer.new()
+	audio_wind_a.name = "AudioWindA"
+	audio_wind_a.volume_db = -80.0
+	add_child(audio_wind_a)
+
+	audio_wind_b = AudioStreamPlayer.new()
+	audio_wind_b.name = "AudioWindB"
+	audio_wind_b.volume_db = -80.0
+	add_child(audio_wind_b)
+
+	for p in ["res://assets/audio/Free PSX Wind Ambience/Wind 2.wav", "res://assets/audio/Free PSX Wind Ambience/Wind 3.wav"]:
+		if ResourceLoader.exists(p):
+			var st = load(p) as AudioStream
+			if st: _wind_streams.append(st)
+
+	if not _wind_streams.is_empty():
+		_loop_continuous_wind_crossfade()
+
+func _loop_continuous_wind_crossfade() -> void:
+	var wind_idx: int = 0
+	while is_instance_valid(self) and not is_queued_for_deletion():
+		if _wind_streams.is_empty():
+			await get_tree().create_timer(5.0).timeout
+			continue
+		
+		var stream = _wind_streams[wind_idx % _wind_streams.size()]
+		wind_idx += 1
+		
+		var incoming: AudioStreamPlayer = audio_wind_b if _active_wind_is_a else audio_wind_a
+		var outgoing: AudioStreamPlayer = audio_wind_a if _active_wind_is_a else audio_wind_b
+		_active_wind_is_a = not _active_wind_is_a
+		
+		incoming.stream = stream
+		incoming.volume_db = -80.0
+		incoming.play()
+		
+		var tw = create_tween().set_parallel(true)
+		tw.tween_property(incoming, "volume_db", -5.0, 4.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		if outgoing.playing:
+			tw.tween_property(outgoing, "volume_db", -80.0, 4.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+			tw.finished.connect(func(): if is_instance_valid(outgoing): outgoing.stop())
+		
+		var track_len: float = stream.get_length() if stream.has_method("get_length") else 30.0
+		if track_len <= 8.0: track_len = 30.0
+		var wait_time: float = max(8.0, track_len - 4.5)
+		
+		await get_tree().create_timer(wait_time).timeout
+
+# ============================================================
+# ESTILIZAÇÃO E CALIBRAÇÃO DINÂMICA DO HUD (VHS OSD)
 # ============================================================
 
 func _setup_hud_styling() -> void:
@@ -336,7 +434,7 @@ func _setup_hud_styling() -> void:
 		interact_hint.hide()
 
 # ============================================================
-# SISTEMA DE PAUSA RETRO VHS / TV AZUL [ESC] EM PORTUGUÃŠS
+# SISTEMA DE PAUSA RETRO VHS / TV AZUL [ESC] EM PORTUGUÊS
 # ============================================================
 
 func _setup_pause_menu() -> void:
@@ -351,10 +449,12 @@ func _setup_pause_menu() -> void:
 		pause_menu_control.set_anchors_preset(Control.PRESET_FULL_RECT)
 		pause_menu_control.z_index = 100
 		
-		# Fundo semitransparente escurecido
+		# Fundo semitransparente escurecido que consome cliques (impede travamento do mouse)
 		var dark_dim = ColorRect.new()
 		dark_dim.color = Color(0.0, 0.0, 0.0, 0.65)
 		dark_dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+		dark_dim.mouse_filter = Control.MOUSE_FILTER_STOP
+		pause_menu_control.mouse_filter = Control.MOUSE_FILTER_STOP
 		pause_menu_control.add_child(dark_dim)
 		
 		# Caixa Azul Retrô VCR (CONFIGURAÇÕES)
@@ -417,51 +517,51 @@ func _setup_pause_menu() -> void:
 		btn_resume.flat = true
 		btn_resume.mouse_entered.connect(play_sfx_cursor)
 		btn_resume.pressed.connect(func():
-			play_sfx_cancel()
-			toggle_pause_menu()
+			play_sfx_resume()
+			_toggle_pause()
 		)
 		vbox.add_child(btn_resume)
 		
-		# Volume Master
+		# Slider Volume Geral
 		var lbl_vol = Label.new()
 		lbl_vol.text = "VOLUME GERAL"
 		if font_retro:
 			lbl_vol.add_theme_font_override("font", font_retro)
 		lbl_vol.add_theme_font_size_override("font_size", 15)
-		lbl_vol.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85, 1))
+		lbl_vol.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9, 1))
 		vbox.add_child(lbl_vol)
 		
 		var slider_vol = HSlider.new()
-		slider_vol.process_mode = Node.PROCESS_MODE_ALWAYS
 		slider_vol.min_value = 0.0
 		slider_vol.max_value = 1.0
 		slider_vol.step = 0.05
 		slider_vol.value = db_to_linear(AudioServer.get_bus_volume_db(AudioServer.get_bus_index("Master")))
+		slider_vol.mouse_entered.connect(play_sfx_cursor)
 		slider_vol.value_changed.connect(func(v: float):
 			AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Master"), linear_to_db(v))
 		)
 		vbox.add_child(slider_vol)
 		
-		# Volume SFX
+		# Slider SFX
 		var lbl_sfx = Label.new()
 		lbl_sfx.text = "VOLUME DE EFEITOS (SFX)"
 		if font_retro:
 			lbl_sfx.add_theme_font_override("font", font_retro)
 		lbl_sfx.add_theme_font_size_override("font_size", 15)
-		lbl_sfx.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85, 1))
+		lbl_sfx.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9, 1))
 		vbox.add_child(lbl_sfx)
 		
 		var slider_sfx = HSlider.new()
-		slider_sfx.process_mode = Node.PROCESS_MODE_ALWAYS
 		slider_sfx.min_value = 0.0
 		slider_sfx.max_value = 1.0
 		slider_sfx.step = 0.05
 		slider_sfx.value = 0.8
+		slider_sfx.mouse_entered.connect(play_sfx_cursor)
+		slider_sfx.drag_ended.connect(func(_val): play_sfx_select())
 		vbox.add_child(slider_sfx)
 		
-		# Tela Cheia
+		# Opção Tela Cheia
 		var check_fs = CheckBox.new()
-		check_fs.process_mode = Node.PROCESS_MODE_ALWAYS
 		check_fs.text = " TELA CHEIA (FULLSCREEN)"
 		if font_retro:
 			check_fs.add_theme_font_override("font", font_retro)
@@ -478,7 +578,10 @@ func _setup_pause_menu() -> void:
 		)
 		vbox.add_child(check_fs)
 		
-		# Menu Principal
+		var sep2 = HSeparator.new()
+		vbox.add_child(sep2)
+		
+		# Botão Menu Principal
 		var btn_main = Button.new()
 		btn_main.text = "► MENU PRINCIPAL"
 		btn_main.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -499,12 +602,9 @@ func _setup_pause_menu() -> void:
 		hud.add_child(pause_menu_control)
 		pause_menu_control.hide()
 
-func _process(_delta: float) -> void:
-	if Input.is_action_just_pressed("ui_cancel") or (Input.is_key_pressed(KEY_ESCAPE) and Input.is_action_just_pressed("ui_cancel")):
-		toggle_pause_menu()
-
-func toggle_pause_menu() -> void:
-	_toggle_pause()
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE):
+		_toggle_pause()
 
 func _toggle_pause() -> void:
 	if not pause_menu_control:
@@ -520,26 +620,29 @@ func _toggle_pause() -> void:
 
 func _on_main_menu_pressed() -> void:
 	get_tree().paused = false
-	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	get_tree().change_scene_to_file("res://scenes/ui/title_screen.tscn")
 
 # ============================================================
-# HUD / TIMECARD / OBJETIVOS - ESTÉTICA VHS RETRÃ” PROFISSIONAL
+# HUD / TIMECARD / OBJETIVOS - ESTÉTICA VHS RETRÔ PROFISSIONAL
 # ============================================================
 
 func _show_timecard(local_text: String, hora_text: String, duration: float = 6.0) -> void:
-	if not timecard_panel: return
-	if timecard_label:
-		timecard_label.text = local_text.to_upper() + "\n" + hora_text
-		if font_retro:
-			timecard_label.add_theme_font_override("font", font_retro)
-		timecard_label.add_theme_font_size_override("font_size", 22)
-		timecard_label.add_theme_color_override("font_color", Color(0.88, 0.90, 0.94, 1.0))
-		timecard_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 1.0))
-		timecard_label.add_theme_constant_override("shadow_offset_x", 2)
-		timecard_label.add_theme_constant_override("shadow_offset_y", 2)
+	if not timecard_panel or not timecard_label:
+		return
+	
+	if font_retro:
+		timecard_label.add_theme_font_override("font", font_retro)
+	timecard_label.add_theme_font_size_override("font_size", 22)
+	timecard_label.add_theme_color_override("font_color", Color(0.88, 0.90, 0.94, 1.0))
+	timecard_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 1.0))
+	timecard_label.add_theme_constant_override("shadow_offset_x", 2)
+	timecard_label.add_theme_constant_override("shadow_offset_y", 2)
+	timecard_label.add_theme_constant_override("line_spacing", 4)
+	
+	timecard_label.text = local_text.to_upper() + "\n" + hora_text
 	timecard_panel.modulate.a = 0.0
 	timecard_panel.show()
+	
 	var tween = create_tween()
 	tween.tween_property(timecard_panel, "modulate:a", 1.0, 0.4)
 	tween.tween_interval(duration)
@@ -564,43 +667,28 @@ func _set_objective(text: String, transition: bool = true) -> void:
 	objective_label.add_theme_constant_override("shadow_offset_y", 2)
 	objective_label.add_theme_constant_override("line_spacing", 4)
 	objective_panel.pivot_offset = Vector2(0, 0)
-	objective_panel.modulate.a = 1.0
-	objective_panel.show()
 	
-	# Som de objetivo aparecendo (PICK UP OBJECT)
+	# Som de objetivo aparecendo no MOMENTO EXATO em que surge na tela
 	if is_instance_valid(audio_obj_appear):
 		audio_obj_appear.play()
 	
-	# Resize Smooth para o Modo Destaque (Tamanho 100% normal)
-	var tw_grow = create_tween().set_parallel(true)
-	tw_grow.tween_property(objective_panel, "scale", Vector2(1.0, 1.0), 0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	tw_grow.tween_property(objective_panel, "position", Vector2(36.0, 28.0), 0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	# Exibe o painel em tamanho 100% normal
+	objective_panel.scale = Vector2(1.0, 1.0)
+	objective_panel.position = Vector2(36.0, 28.0)
+	objective_panel.modulate.a = 1.0
+	objective_panel.show()
 	
 	if not transition:
 		objective_label.text = "OBJETIVO:\n" + clean_text.to_upper()
 		_start_objective_idle_shrink(my_token)
 		return
 	
-	# Efeito Profissional de Digitação VHS / Typewriter
-	var current_text = objective_label.text
-	if current_text != "" and current_text != "OBJETIVO:" and current_text != "OBJETIVO:\n":
-		var newline_pos = current_text.find("\n")
-		if newline_pos != -1:
-			var body_content = current_text.substr(newline_pos + 1)
-			while body_content.length() > 0 and my_token == _objective_typing_token:
-				body_content = body_content.substr(0, body_content.length() - 1)
-				objective_label.text = "OBJETIVO:\n" + body_content
-				await get_tree().create_timer(0.015).timeout
-	
-	if my_token != _objective_typing_token:
-		return
-	
+	# Efeito Profissional de Digitação VHS / Typewriter IMEDIATO (sem delay de apagar)
 	objective_label.text = "OBJETIVO:\n"
-	await get_tree().create_timer(0.15).timeout
 	
-	# Inicia som de máquina de escrever durante a digitação
+	# Inicia som de máquina de escrever sincronizado com o 1o caractere digitado
 	if is_instance_valid(audio_typewriter):
-		audio_typewriter.pitch_scale = randf_range(0.96, 1.04)
+		audio_typewriter.pitch_scale = randf_range(0.98, 1.02)
 		audio_typewriter.play()
 	
 	# Digita novo conteúdo caractere por caractere
@@ -613,9 +701,9 @@ func _set_objective(text: String, transition: bool = true) -> void:
 			return
 		typed += target_body[i]
 		objective_label.text = "OBJETIVO:\n" + typed
-		await get_tree().create_timer(0.03).timeout
+		await get_tree().create_timer(0.035).timeout
 	
-	# Para o som da máquina de escrever ao terminar a digitação
+	# Para o som da máquina de escrever exatamente ao terminar a digitação
 	if is_instance_valid(audio_typewriter):
 		audio_typewriter.stop()
 	
@@ -625,6 +713,9 @@ func _set_objective(text: String, transition: bool = true) -> void:
 func _start_objective_idle_shrink(token: int) -> void:
 	await get_tree().create_timer(10.0).timeout
 	if token == _objective_typing_token and is_instance_valid(objective_panel):
+		# Toca o som quando o objetivo for encolher (Select - 2)
+		play_sfx_objective_shrink()
+		
 		# Resize Smooth para o Modo Compacto / Encolhido no canto superior esquerdo
 		var tw_shrink = create_tween().set_parallel(true)
 		tw_shrink.tween_property(objective_panel, "scale", Vector2(0.76, 0.76), 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
@@ -647,7 +738,7 @@ func hide_interact_hint() -> void:
 	interact_hint.hide()
 
 # ============================================================
-# SISTEMA DE VEGETAÇÃƒO E VENTO REALISTA
+# SISTEMA DE VEGETAÇÃO E VENTO REALISTA (SHADERS + RAJADAS)
 # ============================================================
 
 func _aplicar_vento_automatico_em_todas_arvores() -> void:
@@ -658,6 +749,7 @@ func _aplicar_vento_automatico_em_todas_arvores() -> void:
 	_tree_materials.clear()
 	var mat_cache := {}
 	var mesh_instances = find_children("*", "MeshInstance3D", true, false)
+	
 	for m in mesh_instances:
 		var mi := m as MeshInstance3D
 		var full_name = (mi.name + " " + mi.get_parent().name).to_lower()
@@ -676,7 +768,7 @@ func _aplicar_vento_automatico_em_todas_arvores() -> void:
 				if active_mat is BaseMaterial3D and active_mat.albedo_texture:
 					albedo_tex = active_mat.albedo_texture
 				
-				var cache_key = albedo_tex.resource_path if albedo_tex else "default_tree_mat"
+				var cache_key = albedo_tex.resource_path if albedo_tex else ("mat_" + str(mi.name) + "_" + str(s))
 				var sm: ShaderMaterial
 				if mat_cache.has(cache_key):
 					sm = mat_cache[cache_key]
@@ -686,10 +778,9 @@ func _aplicar_vento_automatico_em_todas_arvores() -> void:
 					if albedo_tex:
 						sm.set_shader_parameter("texture_albedo", albedo_tex)
 					sm.set_shader_parameter("direcao_vento", Vector2(1.0, 0.35))
-					sm.set_shader_parameter("velocidade_rajada", 0.85)
+					sm.set_shader_parameter("velocidade_rajada", 0.75)
 					sm.set_shader_parameter("forca_rajada", 0.28)
-					sm.set_shader_parameter("velocidade_flutter", 7.5)
-					sm.set_shader_parameter("forca_flutter", 0.04)
+					sm.set_shader_parameter("forca_flutter", 0.03)
 					mat_cache[cache_key] = sm
 					_tree_materials.append(sm)
 					if clima_manager:
@@ -697,122 +788,104 @@ func _aplicar_vento_automatico_em_todas_arvores() -> void:
 				
 				mi.set_surface_override_material(s, sm)
 
-func _setup_extra_wind_audio() -> void:
-	audio_wind_extra = AudioStreamPlayer.new()
-	audio_wind_extra.name = "AudioWindExtra"
-	var wind_stream = load("res://assets/audio/Free PSX Wind Ambience/Wind 2.wav") as AudioStream
-	if wind_stream:
-		audio_wind_extra.stream = wind_stream
-		audio_wind_extra.volume_db = -5.0
-		add_child(audio_wind_extra)
-		audio_wind_extra.play()
-		audio_wind_extra.finished.connect(func():
-			var next_stream = load("res://assets/audio/Free PSX Wind Ambience/Wind 3.wav") as AudioStream
-			if audio_wind_extra.stream == next_stream:
-				audio_wind_extra.stream = load("res://assets/audio/Free PSX Wind Ambience/Wind 2.wav") as AudioStream
-			else:
-				audio_wind_extra.stream = next_stream
-			audio_wind_extra.play()
-		)
-
 func _setup_wind_particles() -> void:
 	# Partículas de Folhas Voando no Vento (Vento laranja / outono original)
 	var leaves_particles := GPUParticles3D.new()
 	leaves_particles.name = "WindLeavesParticles"
 	leaves_particles.amount = 90
-	leaves_particles.lifetime = 3.0
-	leaves_particles.preprocess = 1.5
-	leaves_particles.visibility_aabb = AABB(Vector3(-40, -15, -40), Vector3(80, 30, 80))
+	leaves_particles.lifetime = 4.5
+	leaves_particles.preprocess = 2.0
+	leaves_particles.explosiveness = 0.0
+	leaves_particles.randomness = 0.4
 	
-	var mat := ParticleProcessMaterial.new()
-	mat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
-	mat.emission_box_extents = Vector3(30.0, 10.0, 30.0)
-	mat.direction = Vector3(1.0, -0.12, 0.35).normalized()
-	mat.spread = 12.0
-	mat.initial_velocity_min = 9.0
-	mat.initial_velocity_max = 16.0
-	mat.gravity = Vector3(0.0, -1.0, 0.0)
-	mat.angular_velocity_min = -220.0
-	mat.angular_velocity_max = 220.0
-	mat.scale_min = 0.08
-	mat.scale_max = 0.22
-	mat.color = Color(0.38, 0.29, 0.20, 0.85)
-	leaves_particles.process_material = mat
-	_wind_leaves_mat = mat
+	_wind_leaves_mat = ParticleProcessMaterial.new()
+	_wind_leaves_mat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+	_wind_leaves_mat.emission_box_extents = Vector3(25.0, 8.0, 25.0)
+	_wind_leaves_mat.direction = Vector3(1.0, -0.15, 0.35).normalized()
+	_wind_leaves_mat.spread = 18.0
+	_wind_leaves_mat.initial_velocity_min = 7.0
+	_wind_leaves_mat.initial_velocity_max = 14.0
+	_wind_leaves_mat.gravity = Vector3(0.3, -1.2, 0.2)
+	_wind_leaves_mat.scale_min = 0.08
+	_wind_leaves_mat.scale_max = 0.22
+	_wind_leaves_mat.color = Color(0.85, 0.45, 0.12, 0.85)
+	
+	leaves_particles.process_material = _wind_leaves_mat
 	
 	var quad := QuadMesh.new()
-	quad.size = Vector2(0.22, 0.16)
+	quad.size = Vector2(0.18, 0.18)
 	var quad_mat := StandardMaterial3D.new()
-	quad_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	quad_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	quad_mat.albedo_color = Color(0.42, 0.32, 0.20, 0.9)
-	quad_mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	quad_mat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
+	quad_mat.albedo_color = Color(0.88, 0.48, 0.15, 0.88)
+	quad_mat.billboard_mode = StandardMaterial3D.BILLBOARD_PARTICLES
 	quad.material = quad_mat
 	leaves_particles.draw_pass_1 = quad
 	
 	if player:
 		player.add_child(leaves_particles)
-		leaves_particles.position = Vector3(-10.0, 4.0, -10.0)
+		leaves_particles.position = Vector3(0.0, 5.0, 0.0)
 	else:
 		add_child(leaves_particles)
 		leaves_particles.position = Vector3(0.0, 5.0, 0.0)
 
 # ============================================================
-# CONTROLADOR DE RAJADAS DINÃ‚MICAS DE VENTO (Espaçadas e Raras)
+# CONTROLADOR DE RAJADAS DINÂMICAS DE VENTO (Espaçadas e Raras)
 # ============================================================
 
 func _start_dynamic_wind_system() -> void:
-	# Loop de rajadas raras e atmosféricas (a cada 25-45 segundos)
+	# Loop de rajadas raras e atmosféricas (a cada 20-35 segundos)
 	while is_instance_valid(self) and not is_queued_for_deletion():
-		var wait_time = randf_range(25.0, 45.0)
+		var wait_time = randf_range(20.0, 35.0)
 		await get_tree().create_timer(wait_time).timeout
-		if not is_instance_valid(self) or is_queued_for_deletion():
-			break
+		if not is_instance_valid(self): break
 		_trigger_wind_gust()
 
 func _trigger_wind_gust() -> void:
-	var gust_duration = randf_range(4.0, 5.5)
-	var peak_wind_force = randf_range(0.46, 0.58)
-	var peak_flutter = randf_range(11.0, 14.0)
+	var gust_duration = randf_range(6.0, 9.0)
+	var peak_wind_speed = randf_range(0.85, 1.05) # Mantém velocidade suave e pesada, sem vibrar
+	var peak_wind_force = randf_range(0.55, 0.75) # Inclinação profunda e majestosa na direção do vento
+	var peak_forca_flutter = 0.055
 	
-	# 1. Aumenta balanço das árvores
+	# 1. Aumenta curvatura suave e majestosa das árvores na direção do vento
 	var tw = create_tween().set_parallel(true)
 	for sm in _tree_materials:
 		if is_instance_valid(sm):
-			tw.tween_property(sm, "shader_parameter/forca_rajada", peak_wind_force, gust_duration * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-			tw.tween_property(sm, "shader_parameter/velocidade_flutter", peak_flutter, gust_duration * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+			tw.tween_method(func(v: float): sm.set_shader_parameter("velocidade_rajada", v), 0.75, peak_wind_speed, gust_duration * 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+			tw.tween_method(func(v: float): sm.set_shader_parameter("forca_rajada", v), 0.28, peak_wind_force, gust_duration * 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+			tw.tween_method(func(v: float): sm.set_shader_parameter("forca_flutter", v), 0.03, peak_forca_flutter, gust_duration * 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	
-	# 2. Som do vento ruge na rajada
-	if is_instance_valid(audio_wind_extra):
-		tw.tween_property(audio_wind_extra, "volume_db", -1.5, gust_duration * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-		tw.tween_property(audio_wind_extra, "pitch_scale", 1.10, gust_duration * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	
-	# 3. Folhas de vento aceleram no pico da rajada
+	# 2. Aumenta velocidade e densidade das partículas de folhas
 	if _wind_leaves_mat:
-		tw.tween_property(_wind_leaves_mat, "initial_velocity_min", 14.0, gust_duration * 0.3)
-		tw.tween_property(_wind_leaves_mat, "initial_velocity_max", 22.0, gust_duration * 0.3)
+		tw.tween_property(_wind_leaves_mat, "initial_velocity_min", 16.0, gust_duration * 0.45)
+		tw.tween_property(_wind_leaves_mat, "initial_velocity_max", 26.0, gust_duration * 0.45)
 	
-	await get_tree().create_timer(gust_duration * 0.45).timeout
-	if not is_instance_valid(self) or is_queued_for_deletion():
-		return
+	# 3. Aumenta volume do áudio do vento durante a rajada
+	var cur_wind: AudioStreamPlayer = audio_wind_a if _active_wind_is_a else audio_wind_b
+	if is_instance_valid(cur_wind) and cur_wind.playing:
+		tw.tween_property(cur_wind, "volume_db", -0.5, gust_duration * 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tw.tween_property(cur_wind, "pitch_scale", 1.08, gust_duration * 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	
-	# Volta suavemente ao vento normal
+	# 4. Retorno suave e calmo ao vento base
+	await tw.finished
+	if not is_instance_valid(self): return
+	
 	var tw_back = create_tween().set_parallel(true)
 	for sm in _tree_materials:
 		if is_instance_valid(sm):
-			tw_back.tween_property(sm, "shader_parameter/forca_rajada", 0.28, gust_duration * 0.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-			tw_back.tween_property(sm, "shader_parameter/velocidade_flutter", 7.5, gust_duration * 0.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	
-	if is_instance_valid(audio_wind_extra):
-		tw_back.tween_property(audio_wind_extra, "volume_db", -5.0, gust_duration * 0.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-		tw_back.tween_property(audio_wind_extra, "pitch_scale", 1.0, gust_duration * 0.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+			tw_back.tween_method(func(v: float): sm.set_shader_parameter("velocidade_rajada", v), peak_wind_speed, 0.75, gust_duration * 0.55).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+			tw_back.tween_method(func(v: float): sm.set_shader_parameter("forca_rajada", v), peak_wind_force, 0.28, gust_duration * 0.55).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+			tw_back.tween_method(func(v: float): sm.set_shader_parameter("forca_flutter", v), peak_forca_flutter, 0.03, gust_duration * 0.55).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	
 	if _wind_leaves_mat:
-		tw_back.tween_property(_wind_leaves_mat, "initial_velocity_min", 9.0, gust_duration * 0.6)
-		tw_back.tween_property(_wind_leaves_mat, "initial_velocity_max", 16.0, gust_duration * 0.6)
+		tw_back.tween_property(_wind_leaves_mat, "initial_velocity_min", 7.0, gust_duration * 0.55)
+		tw_back.tween_property(_wind_leaves_mat, "initial_velocity_max", 14.0, gust_duration * 0.55)
+	
+	if is_instance_valid(cur_wind) and cur_wind.playing:
+		tw_back.tween_property(cur_wind, "volume_db", -5.0, gust_duration * 0.55).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		tw_back.tween_property(cur_wind, "pitch_scale", 1.0, gust_duration * 0.55).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 # ============================================================
-# BOOT VHS - ESTÉTICA AUTÃŠNTICA VHS / OSD & CAR DOOR OPEN
+# BOOT VHS - ESTÉTICA AUTÊNTICA VHS / OSD & CAR DOOR OPEN
 # ============================================================
 
 func _play_vhs_intro_sequence() -> void:
