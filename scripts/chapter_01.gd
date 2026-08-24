@@ -44,6 +44,11 @@ var audio_wind_extra: AudioStreamPlayer = null
 var font_retro: Font = null
 var _objective_typing_token: int = 0
 
+# Referências para Rajadas Dinâmicas de Vento
+var _tree_materials: Array[ShaderMaterial] = []
+var _wind_leaves_mat: ParticleProcessMaterial = null
+var _ground_dust_mat: ParticleProcessMaterial = null
+
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	add_to_group("chapter")
@@ -72,12 +77,15 @@ func _ready() -> void:
 	clima_manager = ClimaManager.new()
 	add_child(clima_manager)
 	
-	# Áudio de vento extra e folhas voando
+	# Áudio de vento direcional e partículas (folhas + poeira de chão)
 	_setup_extra_wind_audio()
 	_setup_wind_particles()
 	
 	# Aplica shader de vento nas árvores
 	_aplicar_vento_automatico_em_todas_arvores()
+	
+	# Inicia sistema de rajadas dinâmicas ocasionais de vento
+	_start_dynamic_wind_system()
 	
 	# Boot VHS
 	_play_vhs_intro_sequence()
@@ -95,13 +103,13 @@ func _setup_hud_styling() -> void:
 	if timecard_panel:
 		timecard_panel.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 		timecard_panel.offset_left = 36.0
-		timecard_panel.offset_top = -110.0
-		timecard_panel.offset_right = 500.0
+		timecard_panel.offset_top = -140.0
+		timecard_panel.offset_right = 550.0
 		timecard_panel.offset_bottom = -28.0
 		timecard_panel.modulate.a = 0.0
 		timecard_panel.hide()
 	if timecard_label:
-		timecard_label.text = "CEFET-MG  -  CAMPUS 1\n08:17"
+		timecard_label.text = "CEFET-MG  -  CAMPUS 1\n17:52:31\nDIA - 10/01/2024"
 		if font_retro:
 			timecard_label.add_theme_font_override("font", font_retro)
 		timecard_label.add_theme_font_size_override("font_size", 22)
@@ -109,8 +117,9 @@ func _setup_hud_styling() -> void:
 		timecard_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 1.0))
 		timecard_label.add_theme_constant_override("shadow_offset_x", 2)
 		timecard_label.add_theme_constant_override("shadow_offset_y", 2)
+		timecard_label.add_theme_constant_override("line_spacing", 4)
 
-	# 2. Configura Objective (Canto superior esquerdo, SEM fundo cinza!)
+	# 2. Configura Objective (Canto superior esquerdo, SEM fundo cinza e com pivot no topo-esquerdo)
 	if objective_panel:
 		var empty_style := StyleBoxEmpty.new()
 		objective_panel.add_theme_stylebox_override("panel", empty_style)
@@ -118,7 +127,9 @@ func _setup_hud_styling() -> void:
 		objective_panel.offset_left = 36.0
 		objective_panel.offset_top = 28.0
 		objective_panel.offset_right = 520.0
-		objective_panel.offset_bottom = 180.0
+		objective_panel.offset_bottom = 220.0
+		objective_panel.pivot_offset = Vector2(0, 0)
+		objective_panel.scale = Vector2(1.0, 1.0)
 		objective_panel.modulate.a = 0.0
 		objective_panel.hide()
 	if objective_label:
@@ -131,7 +142,7 @@ func _setup_hud_styling() -> void:
 		objective_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 1.0))
 		objective_label.add_theme_constant_override("shadow_offset_x", 2)
 		objective_label.add_theme_constant_override("shadow_offset_y", 2)
-		objective_label.add_theme_constant_override("line_spacing", 6)
+		objective_label.add_theme_constant_override("line_spacing", 4)
 
 	# 3. Configura InteractHint (Centro inferior, Amarelo retrô VCR)
 	if interact_hint:
@@ -341,7 +352,7 @@ func _on_main_menu_pressed() -> void:
 # HUD / TIMECARD / OBJETIVOS - ESTÉTICA VHS RETRÔ PROFISSIONAL
 # ============================================================
 
-func _show_timecard(local_text: String, hora_text: String) -> void:
+func _show_timecard(local_text: String, hora_text: String, duration: float = 6.0) -> void:
 	if not timecard_panel: return
 	if timecard_label:
 		timecard_label.text = local_text.to_upper() + "\n" + hora_text
@@ -355,9 +366,9 @@ func _show_timecard(local_text: String, hora_text: String) -> void:
 	timecard_panel.modulate.a = 0.0
 	timecard_panel.show()
 	var tween = create_tween()
-	tween.tween_property(timecard_panel, "modulate:a", 1.0, 0.8)
-	tween.tween_interval(7.5)
-	tween.tween_property(timecard_panel, "modulate:a", 0.0, 1.2)
+	tween.tween_property(timecard_panel, "modulate:a", 1.0, 0.4)
+	tween.tween_interval(duration)
+	tween.tween_property(timecard_panel, "modulate:a", 0.0, 0.8)
 	tween.tween_callback(timecard_panel.hide)
 
 func _set_objective(text: String, transition: bool = true) -> void:
@@ -376,15 +387,22 @@ func _set_objective(text: String, transition: bool = true) -> void:
 	objective_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 1.0))
 	objective_label.add_theme_constant_override("shadow_offset_x", 2)
 	objective_label.add_theme_constant_override("shadow_offset_y", 2)
-	objective_label.add_theme_constant_override("line_spacing", 6)
+	objective_label.add_theme_constant_override("line_spacing", 4)
+	objective_panel.pivot_offset = Vector2(0, 0)
 	objective_panel.modulate.a = 1.0
 	objective_panel.show()
 	
+	# Resize Smooth para o Modo Destaque (Tamanho 100% normal)
+	var tw_grow = create_tween().set_parallel(true)
+	tw_grow.tween_property(objective_panel, "scale", Vector2(1.0, 1.0), 0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tw_grow.tween_property(objective_panel, "position", Vector2(36.0, 28.0), 0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	
 	if not transition:
 		objective_label.text = "OBJETIVO:\n" + clean_text.to_upper()
+		_start_objective_idle_shrink(my_token)
 		return
 	
-	# Efeito Profissional de Digitação VHS / Typewriter
+	# Efeito Profissional de Digitação VHS / Typewriter (espaço elegante e natural de 1 linha)
 	var current_text = objective_label.text
 	if current_text != "" and current_text != "OBJETIVO:" and current_text != "OBJETIVO:\n":
 		var newline_pos = current_text.find("\n")
@@ -410,6 +428,17 @@ func _set_objective(text: String, transition: bool = true) -> void:
 		typed += target_body[i]
 		objective_label.text = "OBJETIVO:\n" + typed
 		await get_tree().create_timer(0.03).timeout
+	
+	# Inicia contagem de 10 segundos para encolher suavemente se não houver novas mudanças
+	_start_objective_idle_shrink(my_token)
+
+func _start_objective_idle_shrink(token: int) -> void:
+	await get_tree().create_timer(10.0).timeout
+	if token == _objective_typing_token and is_instance_valid(objective_panel):
+		# Resize Smooth para o Modo Compacto / Encolhido no canto superior esquerdo
+		var tw_shrink = create_tween().set_parallel(true)
+		tw_shrink.tween_property(objective_panel, "scale", Vector2(0.76, 0.76), 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		tw_shrink.tween_property(objective_panel, "position", Vector2(20.0, 16.0), 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 func show_interact_hint(text: String) -> void:
 	if not interact_hint: return
@@ -428,7 +457,7 @@ func hide_interact_hint() -> void:
 	interact_hint.hide()
 
 # ============================================================
-# SISTEMA DE VEGETAÇÃO E VENTO
+# SISTEMA DE VEGETAÇÃO, VENTO E POEIRA REALISTA
 # ============================================================
 
 func _aplicar_vento_automatico_em_todas_arvores() -> void:
@@ -436,6 +465,7 @@ func _aplicar_vento_automatico_em_todas_arvores() -> void:
 	if not wind_shader:
 		return
 	
+	_tree_materials.clear()
 	var mat_cache := {}
 	var mesh_instances = find_children("*", "MeshInstance3D", true, false)
 	for m in mesh_instances:
@@ -471,6 +501,7 @@ func _aplicar_vento_automatico_em_todas_arvores() -> void:
 					sm.set_shader_parameter("velocidade_flutter", 7.5)
 					sm.set_shader_parameter("forca_flutter", 0.04)
 					mat_cache[cache_key] = sm
+					_tree_materials.append(sm)
 					if clima_manager:
 						clima_manager.tree_materials.append(sm)
 				
@@ -495,12 +526,13 @@ func _setup_extra_wind_audio() -> void:
 		)
 
 func _setup_wind_particles() -> void:
-	var particles := GPUParticles3D.new()
-	particles.name = "WindLeavesParticles"
-	particles.amount = 90
-	particles.lifetime = 3.0
-	particles.preprocess = 1.5
-	particles.visibility_aabb = AABB(Vector3(-40, -15, -40), Vector3(80, 30, 80))
+	# 1. Partículas de Folhas Voando
+	var leaves_particles := GPUParticles3D.new()
+	leaves_particles.name = "WindLeavesParticles"
+	leaves_particles.amount = 90
+	leaves_particles.lifetime = 3.0
+	leaves_particles.preprocess = 1.5
+	leaves_particles.visibility_aabb = AABB(Vector3(-40, -15, -40), Vector3(80, 30, 80))
 	
 	var mat := ParticleProcessMaterial.new()
 	mat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
@@ -515,8 +547,8 @@ func _setup_wind_particles() -> void:
 	mat.scale_min = 0.08
 	mat.scale_max = 0.22
 	mat.color = Color(0.38, 0.29, 0.20, 0.85)
-	
-	particles.process_material = mat
+	leaves_particles.process_material = mat
+	_wind_leaves_mat = mat
 	
 	var quad := QuadMesh.new()
 	quad.size = Vector2(0.22, 0.16)
@@ -526,14 +558,126 @@ func _setup_wind_particles() -> void:
 	quad_mat.albedo_color = Color(0.42, 0.32, 0.20, 0.9)
 	quad_mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
 	quad.material = quad_mat
-	particles.draw_pass_1 = quad
+	leaves_particles.draw_pass_1 = quad
+	
+	# 2. Partículas de Poeira / Névoa Rasteira Levantando do Chão
+	var dust_particles := GPUParticles3D.new()
+	dust_particles.name = "GroundDustParticles"
+	dust_particles.amount = 40
+	dust_particles.lifetime = 4.0
+	dust_particles.preprocess = 2.0
+	dust_particles.visibility_aabb = AABB(Vector3(-45, -5, -45), Vector3(90, 15, 90))
+	
+	var dmat := ParticleProcessMaterial.new()
+	dmat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+	dmat.emission_box_extents = Vector3(28.0, 0.5, 28.0)
+	dmat.direction = Vector3(1.0, 0.08, 0.35).normalized()
+	dmat.spread = 18.0
+	dmat.initial_velocity_min = 6.0
+	dmat.initial_velocity_max = 13.0
+	dmat.gravity = Vector3(0.0, 0.15, 0.0) # Flutua levemente
+	dmat.scale_min = 1.4
+	dmat.scale_max = 3.2
+	dmat.color = Color(0.60, 0.55, 0.50, 0.22)
+	dmat.damping_min = 1.0
+	dmat.damping_max = 2.0
+	dust_particles.process_material = dmat
+	_ground_dust_mat = dmat
+	
+	# Textura suave radial gerada proceduralmente
+	var grad := Gradient.new()
+	grad.add_point(0.0, Color(1, 1, 1, 0.35))
+	grad.add_point(0.5, Color(1, 1, 1, 0.15))
+	grad.add_point(1.0, Color(1, 1, 1, 0.0))
+	var grad_tex := GradientTexture2D.new()
+	grad_tex.gradient = grad
+	grad_tex.fill = GradientTexture2D.FILL_RADIAL
+	grad_tex.fill_from = Vector2(0.5, 0.5)
+	grad_tex.fill_to = Vector2(1.0, 0.5)
+	grad_tex.width = 128
+	grad_tex.height = 128
+	
+	var dust_quad := QuadMesh.new()
+	dust_quad.size = Vector2(2.2, 1.8)
+	var dust_qmat := StandardMaterial3D.new()
+	dust_qmat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	dust_qmat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	dust_qmat.vertex_color_use_as_albedo = true
+	dust_qmat.albedo_texture = grad_tex
+	dust_qmat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	dust_quad.material = dust_qmat
+	dust_particles.draw_pass_1 = dust_quad
 	
 	if player:
-		player.add_child(particles)
-		particles.position = Vector3(-10.0, 4.0, -10.0)
+		player.add_child(leaves_particles)
+		leaves_particles.position = Vector3(-10.0, 4.0, -10.0)
+		player.add_child(dust_particles)
+		dust_particles.position = Vector3(-8.0, 0.2, -8.0)
 	else:
-		add_child(particles)
-		particles.position = Vector3(0.0, 5.0, 0.0)
+		add_child(leaves_particles)
+		leaves_particles.position = Vector3(0.0, 5.0, 0.0)
+		add_child(dust_particles)
+		dust_particles.position = Vector3(0.0, 0.2, 0.0)
+
+# ============================================================
+# CONTROLADOR DE RAJADAS DINÂMICAS DE VENTO
+# ============================================================
+
+func _start_dynamic_wind_system() -> void:
+	# Loop assíncrono de rajadas imprevisíveis de vento
+	while is_instance_valid(self) and not is_queued_for_deletion():
+		var wait_time = randf_range(8.0, 14.0)
+		await get_tree().create_timer(wait_time).timeout
+		if not is_instance_valid(self) or is_queued_for_deletion():
+			break
+		_trigger_wind_gust()
+
+func _trigger_wind_gust() -> void:
+	var gust_duration = randf_range(3.5, 5.0)
+	var peak_wind_force = randf_range(0.48, 0.62)
+	var peak_flutter = randf_range(11.0, 15.0)
+	
+	# 1. Aumenta balanço das árvores
+	var tw = create_tween().set_parallel(true)
+	for sm in _tree_materials:
+		if is_instance_valid(sm):
+			tw.tween_property(sm, "shader_parameter/forca_rajada", peak_wind_force, gust_duration * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+			tw.tween_property(sm, "shader_parameter/velocidade_flutter", peak_flutter, gust_duration * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	
+	# 2. Som do vento ruge mais alto e com pitch variado (sensação física de rajada)
+	if is_instance_valid(audio_wind_extra):
+		tw.tween_property(audio_wind_extra, "volume_db", -1.0, gust_duration * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tw.tween_property(audio_wind_extra, "pitch_scale", 1.12, gust_duration * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	
+	# 3. Partículas aceleram no pico da rajada
+	if _wind_leaves_mat:
+		tw.tween_property(_wind_leaves_mat, "initial_velocity_min", 15.0, gust_duration * 0.3)
+		tw.tween_property(_wind_leaves_mat, "initial_velocity_max", 24.0, gust_duration * 0.3)
+	if _ground_dust_mat:
+		tw.tween_property(_ground_dust_mat, "initial_velocity_min", 11.0, gust_duration * 0.3)
+		tw.tween_property(_ground_dust_mat, "initial_velocity_max", 20.0, gust_duration * 0.3)
+	
+	await get_tree().create_timer(gust_duration * 0.45).timeout
+	if not is_instance_valid(self) or is_queued_for_deletion():
+		return
+	
+	# Volta suavemente ao vento normal
+	var tw_back = create_tween().set_parallel(true)
+	for sm in _tree_materials:
+		if is_instance_valid(sm):
+			tw_back.tween_property(sm, "shader_parameter/forca_rajada", 0.28, gust_duration * 0.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+			tw_back.tween_property(sm, "shader_parameter/velocidade_flutter", 7.5, gust_duration * 0.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	
+	if is_instance_valid(audio_wind_extra):
+		tw_back.tween_property(audio_wind_extra, "volume_db", -5.0, gust_duration * 0.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		tw_back.tween_property(audio_wind_extra, "pitch_scale", 1.0, gust_duration * 0.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	
+	if _wind_leaves_mat:
+		tw_back.tween_property(_wind_leaves_mat, "initial_velocity_min", 9.0, gust_duration * 0.6)
+		tw_back.tween_property(_wind_leaves_mat, "initial_velocity_max", 16.0, gust_duration * 0.6)
+	if _ground_dust_mat:
+		tw_back.tween_property(_ground_dust_mat, "initial_velocity_min", 6.0, gust_duration * 0.6)
+		tw_back.tween_property(_ground_dust_mat, "initial_velocity_max", 13.0, gust_duration * 0.6)
 
 # ============================================================
 # BOOT VHS - ESTÉTICA AUTÊNTICA VHS / OSD
@@ -563,7 +707,7 @@ func _play_vhs_intro_sequence() -> void:
 	
 	# ▶ PLAY Amarelo Retrô VCR (z_index 50 para ficar puro acima de qualquer overlay)
 	var vcr_label := Label.new()
-	vcr_label.text = "▶ PLAY   SP   17:50:00"
+	vcr_label.text = "▶ PLAY   SP   17:52:31"
 	vcr_label.position = Vector2(36, 28)
 	vcr_label.z_index = 50
 	if font_retro:
@@ -594,31 +738,40 @@ func _play_vhs_intro_sequence() -> void:
 	var tw := create_tween()
 	tw.tween_method(func(val: float): sm.set_shader_parameter("turn_on_progress", val), 0.0, 1.0, 1.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	
-	var tw_txt := create_tween()
-	tw_txt.tween_property(vcr_label, "modulate:a", 1.0, 0.3)
+	# 2. Exibe o PLAY e o TIMECARD simultaneamente com fade-in sincronizado
+	if timecard_panel:
+		timecard_panel.modulate.a = 0.0
+		timecard_panel.show()
 	
-	# 2. Exibe o Timecard no canto inferior esquerdo com tamanho grande correto
-	_show_timecard("CEFET-MG  -  CAMPUS 1", "08:17")
+	var tw_in := create_tween().set_parallel(true)
+	tw_in.tween_property(vcr_label, "modulate:a", 1.0, 0.3)
+	if timecard_panel:
+		tw_in.tween_property(timecard_panel, "modulate:a", 1.0, 0.3)
 	
-	# 3. Contagem real de segundos correndo no PLAY (17:50:00 até 17:50:05)
-	for sec in range(6):
+	# 3. Contagem real de segundos correndo no PLAY (17:52:31 até 17:52:36 - exatamente 6 segundos)
+	for sec in range(31, 37):
 		if is_instance_valid(vcr_label):
 			var sec_str = "%02d" % sec
-			vcr_label.text = "▶ PLAY   SP   17:50:" + sec_str
+			vcr_label.text = "▶ PLAY   SP   17:52:" + sec_str
 		await get_tree().create_timer(1.0).timeout
 	
-	# 4. Fade out suave do PLAY
+	# 4. Fade out 100% SINCRONIZADO do PLAY e do TIMECARD ao mesmo tempo
+	var tw_fade_both := create_tween().set_parallel(true)
 	if is_instance_valid(vcr_label):
-		var tw_fade_play = create_tween()
-		tw_fade_play.tween_property(vcr_label, "modulate:a", 0.0, 0.8)
-		await tw_fade_play.finished
-		vcr_label.queue_free()
-	
+		tw_fade_both.tween_property(vcr_label, "modulate:a", 0.0, 0.8)
+	if is_instance_valid(timecard_panel):
+		tw_fade_both.tween_property(timecard_panel, "modulate:a", 0.0, 0.8)
 	if is_instance_valid(vhs_overlay):
-		var tw_fade = create_tween()
-		tw_fade.tween_property(vhs_overlay, "modulate:a", 0.0, 0.5)
-		await tw_fade.finished
+		tw_fade_both.tween_property(vhs_overlay, "modulate:a", 0.0, 0.8)
+	
+	await tw_fade_both.finished
+	
+	if is_instance_valid(vcr_label):
+		vcr_label.queue_free()
+	if is_instance_valid(timecard_panel):
+		timecard_panel.hide()
+	if is_instance_valid(vhs_overlay):
 		vhs_overlay.queue_free()
 	
-	# 5. Após o PLAY sumir, inicia digitação do objetivo no canto superior esquerdo
+	# 5. Após o PLAY e o TIMECARD sumirem juntos, inicia digitação do objetivo no canto superior esquerdo
 	_set_objective("VÁ ATÉ O PRÉDIO\nADMINISTRATIVO E FAÇA\nSUA MATRÍCULA.", true)
