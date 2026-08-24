@@ -1,0 +1,7 @@
+newmtl MAT_Brian_Winne_Low_Poly_Nightmare_Fuel
+Ka 1.000 1.000 1.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+d 1.0
+illum 1
+map_Kd ../textures/Brian Winne Low Poly Nightmare Fuel Phase 4.png

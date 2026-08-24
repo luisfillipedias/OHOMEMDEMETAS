@@ -46,10 +46,12 @@ func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	settings_panel.hide()
 	base_bg_pos = background.position
-
-	# Verifica se há save game
-	if GameManager and GameManager.has_method("get_flag"):
-		has_save_game = GameManager.get_flag("chapter_1_completed", false) or GameManager.get_flag("chapter_progress", 0) > 0
+	# Verifica se há save game: arquivo + flag de progresso
+	if GameManager:
+		var save_existe: bool = FileAccess.file_exists("user://save.json")
+		var progresso: int = GameManager.get_flag("chapter_progress", 0)
+		var capitulo: int = GameManager.current_chapter
+		has_save_game = save_existe and (progresso > 0 or capitulo > 0)
 	
 	btn_continuar.disabled = not has_save_game
 

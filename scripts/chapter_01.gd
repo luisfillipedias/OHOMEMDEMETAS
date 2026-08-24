@@ -48,6 +48,12 @@ func _ready() -> void:
 	add_to_group("chapter")
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	
+	# Auto-salva ao entrar no capítulo 1 para habilitar o botão CONTINUAR no menu
+	if GameManager:
+		GameManager.set_flag("chapter_progress", 1)
+		GameManager.current_chapter = 1
+		GameManager.save_game()
+	
 	if ResourceLoader.exists("res://assets/fonts/text_font.ttf"):
 		font_retro = load("res://assets/fonts/text_font.ttf") as Font
 	
@@ -144,6 +150,7 @@ func _setup_pause_menu() -> void:
 		var btn_resume = Button.new()
 		btn_resume.text = "→ RETOMAR JOGO"
 		btn_resume.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		btn_resume.process_mode = Node.PROCESS_MODE_ALWAYS
 		if font_retro:
 			btn_resume.add_theme_font_override("font", font_retro)
 		btn_resume.add_theme_font_size_override("font_size", 18)
@@ -162,6 +169,7 @@ func _setup_pause_menu() -> void:
 		vbox.add_child(lbl_vol)
 		
 		var slider_vol = HSlider.new()
+		slider_vol.process_mode = Node.PROCESS_MODE_ALWAYS
 		slider_vol.min_value = 0.0
 		slider_vol.max_value = 1.0
 		slider_vol.step = 0.05
@@ -177,6 +185,7 @@ func _setup_pause_menu() -> void:
 		vbox.add_child(lbl_sfx)
 		
 		var slider_sfx = HSlider.new()
+		slider_sfx.process_mode = Node.PROCESS_MODE_ALWAYS
 		slider_sfx.min_value = 0.0
 		slider_sfx.max_value = 1.0
 		slider_sfx.step = 0.05
@@ -185,6 +194,7 @@ func _setup_pause_menu() -> void:
 		
 		# Checkbox Tela Cheia
 		var check_fs = CheckBox.new()
+		check_fs.process_mode = Node.PROCESS_MODE_ALWAYS
 		check_fs.text = "  TELA CHEIA"
 		if font_retro:
 			check_fs.add_theme_font_override("font", font_retro)
@@ -202,6 +212,7 @@ func _setup_pause_menu() -> void:
 		var btn_main = Button.new()
 		btn_main.text = "→ MENU PRINCIPAL"
 		btn_main.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		btn_main.process_mode = Node.PROCESS_MODE_ALWAYS
 		if font_retro:
 			btn_main.add_theme_font_override("font", font_retro)
 		btn_main.add_theme_font_size_override("font_size", 18)
