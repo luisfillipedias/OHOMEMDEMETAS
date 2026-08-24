@@ -254,7 +254,8 @@ roughness = 0.05
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nf4we"]
 emission_enabled = true
-emission = Color(1, 1, 0, 1)
+emission = Color(1, 0.82, 0.52, 1)
+emission_energy_multiplier = 2.4
 
 [sub_resource type="BoxMesh" id="BoxMesh_1iice"]
 size = Vector3(9.794922, 1, 4.7352295)
@@ -327,7 +328,8 @@ shadow_mesh = SubResource("ArrayMesh_tig42")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7obk3"]
 emission_enabled = true
-emission = Color(1, 1, 0, 1)
+emission = Color(1, 0.82, 0.52, 1)
+emission_energy_multiplier = 2.4
 
 [sub_resource type="SphereMesh" id="SphereMesh_frvqy"]
 radius = 0.012
@@ -335,8 +337,8 @@ height = 0.001
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_frvqy"]
 emission_enabled = true
-emission = Color(1, 1, 0, 1)
-emission_energy_multiplier = 1.3
+emission = Color(1, 0.82, 0.52, 1)
+emission_energy_multiplier = 2.4
 
 [sub_resource type="QuadMesh" id="QuadMesh_1iice"]
 
@@ -348,7 +350,6 @@ metallic = 0.28
 resource_name = "building_03"
 vertex_color_use_as_albedo = true
 albedo_color = Color(0.9063318, 0.9063318, 0.9063318, 1)
-emission_enabled = true
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_s1d20"]
 _surfaces = [{
@@ -425,13 +426,11 @@ resource_name = "Branch_2"
 transparency = 4
 vertex_color_use_as_albedo = true
 albedo_texture = ExtResource("72_vnow3")
-emission_enabled = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7lvpf"]
 resource_name = "Wood_6"
 vertex_color_use_as_albedo = true
 albedo_texture = ExtResource("73_qegs5")
-emission_enabled = true
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_b6qsx"]
 _surfaces = [{
@@ -495,14 +494,12 @@ shadow_mesh = SubResource("ArrayMesh_b6qsx")
 resource_name = "Wood_2"
 vertex_color_use_as_albedo = true
 albedo_texture = ExtResource("70_rpw6k")
-emission_enabled = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bds0m"]
 resource_name = "Branch_1"
 transparency = 4
 vertex_color_use_as_albedo = true
 albedo_texture = ExtResource("71_dnxia")
-emission_enabled = true
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_jrgo0"]
 _surfaces = [{
@@ -567,13 +564,11 @@ resource_name = "Branch_2"
 transparency = 4
 vertex_color_use_as_albedo = true
 albedo_texture = ExtResource("72_vnow3")
-emission_enabled = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jogxu"]
 resource_name = "Wood_6"
 vertex_color_use_as_albedo = true
 albedo_texture = ExtResource("73_qegs5")
-emission_enabled = true
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_2mhia"]
 _surfaces = [{
@@ -637,7 +632,6 @@ shadow_mesh = SubResource("ArrayMesh_2mhia")
 resource_name = "Wood_5"
 vertex_color_use_as_albedo = true
 albedo_texture = ExtResource("68_blhwd")
-emission_enabled = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_a6j6q"]
 resource_name = "Branch_6"
@@ -645,7 +639,6 @@ transparency = 4
 vertex_color_use_as_albedo = true
 albedo_color = Color(0.61745477, 0.61745477, 0.6174547, 1)
 albedo_texture = ExtResource("69_n0vxp")
-emission_enabled = true
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_elkow"]
 _surfaces = [{
@@ -999,7 +992,6 @@ resource_name = "Body.008mat"
 transparency = 4
 vertex_color_use_as_albedo = true
 albedo_texture = ExtResource("97_b6qsx")
-emission_enabled = true
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_jt81d"]
 resource_name = "Body_008mesh"
@@ -1112,7 +1104,6 @@ bind/27/pose = Transform3D(-0.98842716, -0.15159999, -0.0054051187, 0.1484686, -
 resource_name = "Face.008mat"
 vertex_color_use_as_albedo = true
 albedo_texture = ExtResource("98_x3v83")
-emission_enabled = true
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_1vpyl"]
 resource_name = "Face_008mesh"
