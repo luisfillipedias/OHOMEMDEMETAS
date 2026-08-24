@@ -241,11 +241,13 @@ func _converter_animacao_para_in_place(node: Node) -> void:
 		if not anim:
 			continue
 		for track_idx in range(anim.get_track_count()):
-			var track_path = str(anim.track_get_path(track_idx))
-			if ("hips" in track_path.to_lower() or "mixamorig" in track_path.to_lower()) and anim.track_get_type(track_idx) == Animation.TYPE_POSITION_3D:
-				var key_count = anim.track_get_key_count(track_idx)
-				for k in range(key_count):
-					var pos = anim.track_get_key_value(track_idx, k) as Vector3
-					pos.x = 0.0
-					pos.z = 0.0
-					anim.track_set_key_value(track_idx, k, pos)
+			if anim.track_get_type(track_idx) == Animation.TYPE_POSITION_3D:
+				var track_path: String = str(anim.track_get_path(track_idx)).to_lower()
+				# Zera translação horizontal em Armature, Hips, Pelvis, Root, etc. (evita teleporte do redneck e outros)
+				if "armature" in track_path or "hips" in track_path or "pelvis" in track_path or "root" in track_path or "mixamorig" in track_path or "skeleton" in track_path:
+					var key_count = anim.track_get_key_count(track_idx)
+					for k in range(key_count):
+						var pos = anim.track_get_key_value(track_idx, k) as Vector3
+						pos.x = 0.0
+						pos.z = 0.0
+						anim.track_set_key_value(track_idx, k, pos)
