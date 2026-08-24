@@ -922,33 +922,32 @@ func _update_wind_systems(delta: float) -> void:
 		var p_right: float = AudioServer.get_bus_peak_volume_right_db(_wind_bus_idx, 0)
 		peak_db = max(p_left, p_right)
 	
-	# Mapeia [-38 dB calmo .. -6 dB rajada forte] para linear [0.0 .. 1.0]
-	var raw_energy: float = clamp((peak_db - (-38.0)) / 32.0, 0.0, 1.0)
+	# Mapeia [-36 dB calmo .. -4 dB rajada forte] para linear [0.0 .. 1.0]
+	var raw_energy: float = clamp((peak_db - (-36.0)) / 32.0, 0.0, 1.0)
 	
-	# Envelope follower: Ataque rápido (subida com o sopro), decay suave (retorno natural)
+	# Filtro de Inércia de Massa de Ar: Ataque orgânico (2.8) e retorno lento e pesado (1.4)
+	# Elimina ruídos de milissegundos do áudio e dá sensação de peso real ao ar
 	if raw_energy > _wind_audio_energy:
-		_wind_audio_energy = lerp(_wind_audio_energy, raw_energy, delta * 6.5)
+		_wind_audio_energy = lerp(_wind_audio_energy, raw_energy, delta * 2.8)
 	else:
-		_wind_audio_energy = lerp(_wind_audio_energy, raw_energy, delta * 2.2)
+		_wind_audio_energy = lerp(_wind_audio_energy, raw_energy, delta * 1.4)
 	
 	var energy: float = clamp(_wind_audio_energy, 0.0, 1.0)
 	
-	# 1. SHADER DAS ÁRVORES: Movimento amplo, perceptível e 100% amarrado ao som
-	# No silêncio/calma: força 0.35 (balanço suave). No pico de rajada do áudio: força 1.15 (envergada profunda e visível)
+	# 1. SHADER DAS ÁRVORES: Modulação EXCLUSIVA de amplitude/força (sem alterar velocidade no TIME)
+	# Calma: 0.35 (balanço suave e majestoso). Pico de rajada: 1.15 (envergadura profunda e cinematográfica)
 	var cur_forca: float = lerp(0.35, 1.15, energy)
-	var cur_velocidade: float = lerp(0.32, 0.52, energy)
-	var cur_flutter: float = lerp(0.012, 0.038, energy)
+	var cur_flutter: float = lerp(0.006, 0.016, energy)
 	
 	for sm in _tree_materials:
 		if is_instance_valid(sm):
 			sm.set_shader_parameter("forca_vento", cur_forca)
-			sm.set_shader_parameter("velocidade_vento", cur_velocidade)
 			sm.set_shader_parameter("forca_flutter", cur_flutter)
 	
-	# 2. PARTÍCULAS DE FOLHAS: Aceleram em perfeita sincronia com o pico de som
+	# 2. PARTÍCULAS DE FOLHAS: Aceleram suavemente com o fluxo de ar
 	if _wind_leaves_mat:
-		_wind_leaves_mat.initial_velocity_min = lerp(9.0, 26.0, energy)
-		_wind_leaves_mat.initial_velocity_max = lerp(15.0, 38.0, energy)
+		_wind_leaves_mat.initial_velocity_min = lerp(8.0, 24.0, energy)
+		_wind_leaves_mat.initial_velocity_max = lerp(14.0, 36.0, energy)
 
 # ============================================================
 # BOOT VHS - ESTÉTICA AUTÊNTICA VHS / OSD & CAR DOOR OPEN

@@ -7,118 +7,114 @@ uniform float alpha_scissor_threshold : hint_range(0.0, 1.0) = 0.5;
 // Direção unificada do vento no plano XZ
 uniform vec2 direcao_vento = vec2(1.0, 0.35);
 
-// Parâmetros globais de vento (controlados pelo áudio de vento em tempo real)
-uniform float velocidade_vento : hint_range(0.05, 1.5) = 0.35;
+// Parâmetros de vento (velocidade FIXA constante para evitar saltos temporais; modulação exclusiva por FORÇA)
+uniform float velocidade_vento : hint_range(0.05, 1.5) = 0.34;
 uniform float forca_vento : hint_range(0.0, 2.0) = 0.55;
-uniform float forca_flutter : hint_range(0.0, 0.1) = 0.02;
+uniform float forca_flutter : hint_range(0.0, 0.05) = 0.008;
 
 // Perfil de Espécie da Árvore:
-// 0 = Conífera / Pinheiro (estrutura cônica rígida, flexão uniforme)
-// 1 = Árvore Larga / Copada (tronco grosso firme, copa volumosa com ondulação 3D de galhos)
-// 2 = Árvore Fina / Alta / Arbusto (haste flexível, grande arco no topo)
+// 0 = Conífera / Pinheiro (estrutura rígida, cone uniforme)
+// 1 = Árvore Larga / Copada (tronco firme, copa viva)
+// 2 = Árvore Fina / Palmeira / Arbusto (haste flexível)
 uniform int tipo_arvore : hint_range(0, 2) = 1;
 
-// Variação individual para evitar que árvores do mesmo tipo dancem em uníssono ("puxar corda")
+// Seed individual por árvore para quebrar sincronização coletiva
 uniform float seed_individual : hint_range(0.0, 100.0) = 0.0;
 
 void vertex() {
 	vec2 dir = normalize(direcao_vento);
-	// Vetor perpendicular (ortogonal) para turbulência e oscilação lateral 3D
 	vec2 perp = vec2(-dir.y, dir.x);
 	
-	// Posição mundial real do vértice e da base da árvore no terreno
-	vec3 world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	// Posição base do nó no mundo (fixa e estática no terreno, NUNCA muda durante a animação)
 	vec3 node_base = NODE_POSITION_WORLD;
 	
-	// Altura real em metros no mundo a partir do solo
-	float altura_mundo = max(0.0, world_pos.y - node_base.y);
+	// Posição de repouso estática no mundo (sem deformação)
+	vec3 rest_world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	float altura_mundo = max(0.0, rest_world_pos.y - node_base.y);
 	
-	// Fase espacial única por árvore (baseada na posição no terreno + seed individual)
-	float fase = dot(node_base.xz, dir) * 0.07 + seed_individual * 0.43;
+	// Fases estáticas baseadas na posição física fixa no mapa + seed individual
+	float fase_global = dot(node_base.xz, dir) * 0.06 + seed_individual * 0.41;
+	// Fase local estática de galhos baseada na coordenada local do vértice
+	float fase_local = dot(VERTEX.xyz, vec3(1.7, 1.2, 1.9)) + seed_individual;
 	
 	// -------------------------------------------------------------
-	// PERFIS DE COMPORTAMENTO FÍSICO POR ESPÉCIE
+	// 1. PERFIS FÍSICOS DE ESPÉCIE
 	// -------------------------------------------------------------
 	float rigidez_tronco = 1.0;
-	float flex_lateral = 1.0;
-	float ondulacao_copa = 1.0;
-	float mult_velocidade = 1.0;
-	float limite_altura = 1.35;
+	float mult_lateral = 1.0;
+	float mult_galho = 1.0;
+	float limite_h = 1.35;
 	
 	if (tipo_arvore == 0) {
-		// PINHEIRO / CONÍFERA: cone rígido, oscilação uniforme, pouco movimento de galhos soltos
-		rigidez_tronco = 0.90;
-		flex_lateral = 0.40;
-		ondulacao_copa = 0.25;
-		mult_velocidade = 1.05;
-		limite_altura = 1.25;
+		// PINHEIRO / CONÍFERA
+		rigidez_tronco = 0.85;
+		mult_lateral = 0.40;
+		mult_galho = 0.20;
+		limite_h = 1.25;
 	} else if (tipo_arvore == 1) {
-		// ÁRVORE LARGA / COPADA (Carvalhos, Mangueiras, árvores de campus):
-		// Tronco grosso firme, mas a copa volumosa ondula em ondas 3D amplas
-		rigidez_tronco = 0.65;
-		flex_lateral = 0.85;
-		ondulacao_copa = 1.75;
-		mult_velocidade = 0.80; // mais lenta e pesada
-		limite_altura = 1.10;
+		// ÁRVORE LARGA / COPADA
+		rigidez_tronco = 0.70;
+		mult_lateral = 0.80;
+		mult_galho = 1.40;
+		limite_h = 1.15;
 	} else {
-		// ÁRVORE FINA / PALMEIRA / ARBUSTO:
-		// Tronco altamente flexível, arco largo no topo
-		rigidez_tronco = 1.40;
-		flex_lateral = 0.70;
-		ondulacao_copa = 0.60;
-		mult_velocidade = 1.20; // mais ágil
-		limite_altura = 1.50;
+		// ÁRVORE FINA / ARBUSTO
+		rigidez_tronco = 1.35;
+		mult_lateral = 0.70;
+		mult_galho = 0.50;
+		limite_h = 1.45;
 	}
 
-	// Curva física quadrática de envergadura
-	float h_factor = clamp(altura_mundo * 0.11, 0.0, limite_altura);
+	// Curva física quadrática de envergadura vertical
+	float h_factor = clamp(altura_mundo * 0.11, 0.0, limite_h);
 	float bend_curve = h_factor * h_factor;
 
-	float vel = velocidade_vento * mult_velocidade;
+	// -------------------------------------------------------------
+	// 2. ÓRBITA AERODINÂMICA CONTÍNUA (Lissajous / Elipse Suave)
+	// Usa seno e cosseno acoplados na mesma frequência fundamental:
+	// O movimento é 100% contínuo, suave e impossível de travar ou inverter bruscamente!
+	// -------------------------------------------------------------
+	float t_fundamental = TIME * velocidade_vento + fase_global;
+	
+	// Onda longitudinal (na direção do vento) - oscilação primária
+	float wave_fwd = sin(t_fundamental) * 0.75 + sin(t_fundamental * 0.5 + 1.2) * 0.25;
+	// Inclinação contínua sempre positiva na direção do vento (sem recuar contra o vento)
+	float lean_fwd = forca_vento * rigidez_tronco * (0.75 + wave_fwd * 0.25) * bend_curve;
+	vec3 world_disp = vec3(dir.x, 0.0, dir.y) * lean_fwd;
+
+	// Onda transversal (lateral / órbita suave em fase de 90 graus / cosseno)
+	// Amplitude controlada e sutil: 15% da força principal
+	float wave_lat = cos(t_fundamental * 0.9 + 0.5);
+	float lean_lat = forca_vento * (0.15 * mult_lateral) * wave_lat * bend_curve;
+	world_disp += vec3(perp.x, 0.0, perp.y) * lean_lat;
 
 	// -------------------------------------------------------------
-	// 1. INCLINAÇÃO PRINCIPAL DO TRONCO (Ao longo da direção do vento)
-	// Balanço suave e majestoso de baixa frequência que NUNCA inverte contra o vento
+	// 3. RESPIRAÇÃO ORGÂNICA DE GALHOS (Volume 3D Suave, sem cancelamento de onda)
+	// Amplitude pequena e subordinada (8% da força) usando fase ESTÁTICA do vértice
 	// -------------------------------------------------------------
-	float wave_longitudinal = sin(TIME * vel + fase) * 0.7 + sin(TIME * (vel * 0.48) + fase * 1.3 + 1.2) * 0.3;
-	// Mantém inclinação positiva constante (0.72 base + 0.28 oscilação suave), sem puxar para trás
-	float lean_world = forca_vento * rigidez_tronco * (0.72 + wave_longitudinal * 0.28) * bend_curve;
-	vec3 world_disp = vec3(dir.x, 0.0, dir.y) * lean_world;
-
-	// -------------------------------------------------------------
-	// 2. OSCILAÇÃO LATERAL 3D AERODINÂMICA (Figura em 8 / Vórtices de vento)
-	// Age no eixo PERPENDICULAR (ortogonal) -> NUNCA briga com a inclinação do tronco!
-	// -------------------------------------------------------------
-	float wave_lateral = sin(TIME * (vel * 1.25) + fase * 1.7 + 0.85);
-	float sway_lateral = wave_lateral * (forca_vento * 0.25 * flex_lateral) * bend_curve;
-	world_disp += vec3(perp.x, 0.0, perp.y) * sway_lateral;
-
-	// -------------------------------------------------------------
-	// 3. ONDULAÇÃO ORGÂNICA DE GALHOS E COPA (Volume tridimensional vivo)
-	// -------------------------------------------------------------
-	if (ondulacao_copa > 0.1) {
-		float branch_time = TIME * (vel * 1.5);
-		float branch_phase = world_pos.x * 0.45 + world_pos.z * 0.45 + world_pos.y * 0.35 + seed_individual;
-		float branch_sway = sin(branch_time + branch_phase);
-		float branch_disp = branch_sway * (forca_vento * 0.16 * ondulacao_copa) * clamp(altura_mundo * 0.14, 0.0, 1.2);
-		// Ondula os galhos lateralmente e verticalmente sem forçar contra o vento
+	if (mult_galho > 0.1) {
+		float branch_t = TIME * (velocidade_vento * 1.3) + fase_local;
+		float branch_wave = sin(branch_t);
+		float branch_disp = forca_vento * (0.07 * mult_galho) * branch_wave * clamp(altura_mundo * 0.15, 0.0, 1.0);
+		// Galhos ondulam radialmente sem competir com o eixo do tronco
 		world_disp.x += perp.x * branch_disp;
 		world_disp.z += perp.y * branch_disp;
-		world_disp.y += sin(branch_time * 0.8 + branch_phase) * branch_disp * 0.25;
+		world_disp.y += branch_disp * 0.35;
 	}
 
 	// -------------------------------------------------------------
-	// 4. MICRO-FARFALHAR DE FOLHAS (Shimmer natural suave)
+	// 4. MICRO-FARFALHAR DAS FOLHAS (Shimmer local minúsculo nas pontas)
+	// Amplitude mínima de milímetros (nunca empurra o galho)
 	// -------------------------------------------------------------
-	float leaf_time = TIME * 2.5 + world_pos.x * 1.2 + world_pos.z * 1.2 + world_pos.y * 0.8;
-	float leaf_disp = sin(leaf_time) * (forca_flutter * 0.4) * clamp(altura_mundo * 0.18, 0.0, 0.6);
-	world_disp.x += perp.x * leaf_disp;
-	world_disp.z += perp.y * leaf_disp;
+	float leaf_wave = sin(TIME * 2.2 + fase_local * 2.0);
+	float leaf_disp = leaf_wave * forca_flutter * clamp(altura_mundo * 0.20, 0.0, 0.4);
+	world_disp += vec3(dir.x, 0.0, dir.y) * (leaf_disp * 0.3);
+	world_disp += vec3(perp.x, 0.0, perp.y) * (leaf_disp * 0.7);
 
 	// -------------------------------------------------------------
-	// 5. COMPRESSÃO GRAVITACIONAL NATURAL AO ENVERGAR
+	// 5. COMPRESSÃO GRAVITACIONAL NATURAL
 	// -------------------------------------------------------------
-	world_disp.y -= lean_world * 0.055;
+	world_disp.y -= lean_fwd * 0.05;
 
 	// 6. Converte de volta para o espaço local da malha
 	mat3 inv_model = inverse(mat3(MODEL_MATRIX));
