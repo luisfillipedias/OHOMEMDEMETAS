@@ -1,7 +1,8 @@
 extends CharacterBody3D
 
 # ============================================================
-# PLAYER CONTROLLER -- 1a Pessoa com sistema de passos por timer
+# PLAYER CONTROLLER -- 1a Pessoa com sistema de passos por
+#                      deslocamento físico real contínuo
 # ============================================================
 
 const WALK_SPEED := 3.2
@@ -9,17 +10,10 @@ const GRAVITY := 12.0
 var MOUSE_SENS := 0.0018
 const MAX_STEP_HEIGHT := 0.35
 
-# Head Bobbing
-const BOB_VERTICAL_AMP := 0.022
-const BOB_HORIZONTAL_AMP := 0.010
-var _bob_accumulator: float = 0.0
-
-# Sistema de Passos por Timer (simples e confiável)
-# Intervalo base em segundos entre dois passos a velocidade máxima
-const STEP_INTERVAL_BASE: float = 0.48
-const STEP_SPEED_MIN: float = 0.5  # velocidade mínima para tocar passo
-
-var _step_timer: float = STEP_INTERVAL_BASE * 0.5  # já meio carregado para primeiro passo
+# Head Bobbing e Passos Físicos
+const STEP_DISTANCE: float = 1.25 # Metros entre cada passo (1.25m = cadência humana natural)
+const BOB_VERTICAL_AMP: float = 0.022
+const BOB_HORIZONTAL_AMP: float = 0.010
 
 @onready var camera_mount: Node3D = $CameraMount
 @onready var camera: Camera3D = $CameraMount/Camera3D
@@ -28,6 +22,12 @@ var _step_timer: float = STEP_INTERVAL_BASE * 0.5  # já meio carregado para pri
 var is_frozen: bool = false
 var camera_base_y: float = 0.65
 
+# Head bobbing fase contínua (sem dupla suavização)
+var _bob_phase: float = 0.0
+var _bob_blend: float = 0.0
+var _last_step_phase_id: int = 0
+var _idle_time: float = 0.0
+const BOB_FREQUENCY: float = PI / STEP_DISTANCE
 var _audio_footstep: AudioStreamPlayer = null
 
 # Banco de sons de passos de alta qualidade (.ogg)
@@ -131,36 +131,32 @@ func _physics_process(delta: float) -> void:
 	_check_interaction()
 
 func _process_footsteps_and_headbob(delta: float, is_moving: bool) -> void:
-	var horiz_speed := Vector2(velocity.x, velocity.z).length()
-	var on_ground := is_on_floor()
-	var walking := is_moving and on_ground and horiz_speed > STEP_SPEED_MIN
+	var horiz_speed: float = Vector2(velocity.x, velocity.z).length()
+	var on_ground: bool = is_on_floor()
+	var moving: bool = on_ground and horiz_speed > 0.1
 
-	if walking:
-		# Timer sobe com o delta; intervalo escala inversamente com a velocidade
-		# (mais rápido = passos mais frequentes)
-		var speed_ratio := clamp(horiz_speed / WALK_SPEED, 0.5, 1.2)
-		var step_interval := STEP_INTERVAL_BASE / speed_ratio
+	# Suaviza APENAS a amplitude (fade in/out do bob), nunca a curva do passo em si
+	var target_blend: float = 1.0 if moving else 0.0
+	_bob_blend = lerp(_bob_blend, target_blend, delta * 8.0)
 
-		_step_timer += delta
+	if moving:
+		_idle_time = 0.0
+		# Fase avanca continuamente proporcional a distancia real percorrida
+		_bob_phase += horiz_speed * delta * BOB_FREQUENCY
 
-		if _step_timer >= step_interval:
-			# Subtrai o intervalo em vez de resetar para 0 → mantém cadência sem drift
-			_step_timer -= step_interval
+		# Dispara passo exatamente 1x por meia-volta de fase (cada pisada), sem duplicar e sem lag
+		var phase_id: int = int(_bob_phase / PI)
+		if phase_id != _last_step_phase_id:
+			_last_step_phase_id = phase_id
 			_play_footstep_sound()
-
-		# Head bobbing sincronizado com a mesma cadência do timer
-		_bob_accumulator += delta * (TAU / step_interval)
-		var target_y := camera_base_y - abs(sin(_bob_accumulator)) * BOB_VERTICAL_AMP
-		var target_x := sin(_bob_accumulator * 0.5) * BOB_HORIZONTAL_AMP
-		camera_mount.position.y = lerp(camera_mount.position.y, target_y, delta * 14.0)
-		camera_mount.position.x = lerp(camera_mount.position.x, target_x, delta * 14.0)
 	else:
-		# Ao parar: carrega o timer parcialmente para que o PRIMEIRO passo ao recomeçar
-		# saia imediatamente (sem esperar um intervalo inteiro)
-		_step_timer = STEP_INTERVAL_BASE * 0.6
-		_bob_accumulator = 0.0
-		camera_mount.position.y = lerp(camera_mount.position.y, camera_base_y, delta * 8.0)
-		camera_mount.position.x = lerp(camera_mount.position.x, 0.0, delta * 8.0)
+		_idle_time += delta
+
+	# Aplica a curva DIRETO, sem lerp por cima -- so a amplitude (_bob_blend) e suavizada
+	var vertical_offset: float = -abs(sin(_bob_phase)) * BOB_VERTICAL_AMP * _bob_blend
+	var horizontal_offset: float = sin(_bob_phase * 0.5) * BOB_HORIZONTAL_AMP * _bob_blend
+	camera_mount.position.y = camera_base_y + vertical_offset
+	camera_mount.position.x = horizontal_offset
 
 func _play_footstep_sound() -> void:
 	if not _audio_footstep or not is_on_floor():
@@ -177,8 +173,8 @@ func _play_footstep_sound() -> void:
 	var pool: Array[AudioStream] = _snds_floor
 	
 	if not hit.is_empty() and hit.has("collider"):
-		var col := hit["collider"]
-		var col_name := col.name.to_lower()
+		var col: Object = hit["collider"]
+		var col_name: String = col.name.to_lower()
 		if col.get_parent():
 			col_name += " " + col.get_parent().name.to_lower()
 		
@@ -194,7 +190,8 @@ func _play_footstep_sound() -> void:
 			pool = _snds_carpet if not _snds_carpet.is_empty() else _snds_floor
 	
 	if not pool.is_empty():
-		_audio_footstep.stream = pool[randi() % pool.size()]
+		var stream_to_play: AudioStream = pool[randi() % pool.size()]
+		_audio_footstep.stream = stream_to_play
 		_audio_footstep.pitch_scale = randf_range(0.95, 1.05)
 		_audio_footstep.volume_db = randf_range(-17.0, -15.0)
 		_audio_footstep.play()
@@ -217,7 +214,7 @@ func _check_interaction() -> void:
 		if chapter and chapter.has_method("hide_interact_hint"):
 			chapter.hide_interact_hint()
 		return
-	var col := interact_ray.get_collider()
+	var col: CollisionObject3D = interact_ray.get_collider() as CollisionObject3D
 	if col and col.is_in_group("interactable"):
 		var hint_text := "INTERAGIR"
 		if "interaction_hint" in col and str(col.interaction_hint).strip_edges() != "":

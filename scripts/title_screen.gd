@@ -98,8 +98,8 @@ func _ready() -> void:
 	# Inicia sequência de boot de VHS e áudios
 	_play_vhs_boot_sequence()
 
-	next_glitch_time = randf_range(4.0, 8.0)
-	next_rare_glitch_time = randf_range(25.0, 50.0)
+	next_glitch_time = randf_range(22.0, 40.0)
+	next_rare_glitch_time = randf_range(60.0, 120.0)
 
 func _setup_ui_sounds() -> void:
 	audio_ui_select = AudioStreamPlayer.new()
@@ -113,7 +113,7 @@ func _setup_ui_sounds() -> void:
 	audio_ui_cursor = AudioStreamPlayer.new()
 	audio_ui_cursor.name = "AudioUICursor"
 	audio_ui_cursor.process_mode = Node.PROCESS_MODE_ALWAYS
-	audio_ui_cursor.volume_db = -10.0
+	audio_ui_cursor.volume_db = -16.0
 	audio_ui_cursor.stream = snd_cursor
 	add_child(audio_ui_cursor)
 
@@ -210,14 +210,14 @@ func _process(delta: float) -> void:
 	glitch_timer += delta
 	if glitch_timer >= next_glitch_time:
 		glitch_timer = 0.0
-		next_glitch_time = randf_range(5.0, 10.0)
+		next_glitch_time = randf_range(22.0, 40.0)
 		_trigger_title_glitch()
 
 	# Glitch sonoro raro no menu
 	rare_glitch_timer += delta
 	if rare_glitch_timer >= next_rare_glitch_time:
 		rare_glitch_timer = 0.0
-		next_rare_glitch_time = randf_range(30.0, 60.0)
+		next_rare_glitch_time = randf_range(60.0, 120.0)
 		_trigger_rare_glitch()
 
 func _trigger_title_glitch() -> void:
@@ -312,10 +312,14 @@ func _on_sair_pressed() -> void:
 	get_tree().quit()
 
 func _on_master_volume_changed(val: float) -> void:
-	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Master"), linear_to_db(val))
+	var db: float = linear_to_db(val) if val > 0.0 else -80.0
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Master"), db)
 
-func _on_sfx_volume_changed(_val: float) -> void:
-	pass
+func _on_sfx_volume_changed(val: float) -> void:
+	var db: float = linear_to_db(val) if val > 0.0 else -80.0
+	var sfx_bus: int = AudioServer.get_bus_index("SFX")
+	if sfx_bus >= 0:
+		AudioServer.set_bus_volume_db(sfx_bus, db)
 
 func _on_fullscreen_toggled(button_pressed: bool) -> void:
 	play_ui_select()

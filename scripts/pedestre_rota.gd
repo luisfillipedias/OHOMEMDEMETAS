@@ -7,7 +7,7 @@ extends Path3D
 @export var tempo_min_espera: float = 12.0
 @export var tempo_max_espera: float = 28.0
 @export var velocidade_base: float = 1.35
-@export var altura_offset: float = 0.0
+@export var altura_offset: float = 0.055
 
 @export_group("Comportamento de Olhar")
 @export var permitir_olhar_jogador: bool = true
@@ -86,7 +86,7 @@ func _spawn_pedestre() -> void:
 
 	var holder := Node3D.new()
 	holder.name = "ModelHolder"
-	holder.position.y = altura_offset
+	holder.position.y = altura_offset + 0.045 # Elevação para a sola do sapato não afundar no chão
 	holder.add_child(modelo_inst)
 	follow.add_child(holder)
 
@@ -135,8 +135,9 @@ func _spawn_pedestre() -> void:
 		path_len = 50.0
 	var duracao = path_len / velocidade_base
 
-	# Intervalo de passos sincronizado com a animação de caminhada (~0.48s normalizado)
-	var step_interval: float = 0.52 / anim_speed
+	# Intervalo de passos sincronizado com a velocidade real de caminhada (metros/passo)
+	# Um passo a cada ~0.62m caminhado; divide pelo ritmo real de deslocamento
+	var step_interval: float = 0.62 / velocidade_base
 
 	var pedestre_data := {
 		"follow": follow,
@@ -180,7 +181,7 @@ func _process(delta: float) -> void:
 		# Processa som de passos 3D espacial do pedestre
 		p["step_timer"] += delta
 		if p["step_timer"] >= p["step_interval"]:
-			p["step_timer"] = 0.0
+			p["step_timer"] -= p["step_interval"]  # subtrai para manter cadencia sem drift
 			var a3d: AudioStreamPlayer3D = p["audio_3d"]
 			if is_instance_valid(a3d) and not _snds_pedestre.is_empty():
 				var snd = _snds_pedestre[randi() % _snds_pedestre.size()]

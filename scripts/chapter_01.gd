@@ -40,6 +40,7 @@ var audio_ui_cursor: AudioStreamPlayer = null
 var audio_ui_cancel: AudioStreamPlayer = null
 var audio_ui_resume: AudioStreamPlayer = null
 var audio_ui_close_pause: AudioStreamPlayer = null
+var audio_ui_back: AudioStreamPlayer = null
 var audio_obj_appear: AudioStreamPlayer = null
 var audio_obj_shrink: AudioStreamPlayer = null
 var audio_obj_solved: AudioStreamPlayer = null
@@ -141,7 +142,7 @@ func _setup_audio_system() -> void:
 		audio_ui_cancel.stream = load("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cursor - 2.ogg")
 	add_child(audio_ui_cancel)
 
-	# 4b. UI Retomar Jogo (Cursor - 5)
+	# 4b. UI Retomar / Voltar (Select - 2, mais suave)
 	audio_ui_resume = AudioStreamPlayer.new()
 	audio_ui_resume.name = "AudioUIResume"
 	audio_ui_resume.process_mode = Node.PROCESS_MODE_ALWAYS
@@ -149,6 +150,15 @@ func _setup_audio_system() -> void:
 	if ResourceLoader.exists("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cursor - 5.ogg"):
 		audio_ui_resume.stream = load("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cursor - 5.ogg")
 	add_child(audio_ui_resume)
+
+	# 4c. UI Back / Menu Principal (Select - 2)
+	audio_ui_back = AudioStreamPlayer.new()
+	audio_ui_back.name = "AudioUIBack"
+	audio_ui_back.process_mode = Node.PROCESS_MODE_ALWAYS
+	audio_ui_back.volume_db = -6.0
+	if ResourceLoader.exists("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Select - 2.ogg"):
+		audio_ui_back.stream = load("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Select - 2.ogg")
+	add_child(audio_ui_back)
 
 	# 5. Objetivo Aparecendo (PICK UP OBJECT)
 	audio_obj_appear = AudioStreamPlayer.new()
@@ -208,6 +218,11 @@ func play_sfx_resume() -> void:
 	if is_instance_valid(audio_ui_resume) and audio_ui_resume.stream:
 		audio_ui_resume.pitch_scale = randf_range(0.98, 1.02)
 		audio_ui_resume.play()
+
+func play_sfx_back() -> void:
+	if is_instance_valid(audio_ui_back) and audio_ui_back.stream:
+		audio_ui_back.pitch_scale = randf_range(0.98, 1.02)
+		audio_ui_back.play()
 
 func play_sfx_objective_shrink() -> void:
 	if is_instance_valid(audio_obj_shrink) and audio_obj_shrink.stream:
@@ -517,7 +532,7 @@ func _setup_pause_menu() -> void:
 		btn_resume.flat = true
 		btn_resume.mouse_entered.connect(play_sfx_cursor)
 		btn_resume.pressed.connect(func():
-			play_sfx_resume()
+			play_sfx_back()
 			_toggle_pause()
 		)
 		vbox.add_child(btn_resume)
@@ -594,7 +609,7 @@ func _setup_pause_menu() -> void:
 		btn_main.flat = true
 		btn_main.mouse_entered.connect(play_sfx_cursor)
 		btn_main.pressed.connect(func():
-			play_sfx_select()
+			play_sfx_back()
 			_on_main_menu_pressed()
 		)
 		vbox.add_child(btn_main)
@@ -668,15 +683,15 @@ func _set_objective(text: String, transition: bool = true) -> void:
 	objective_label.add_theme_constant_override("line_spacing", 4)
 	objective_panel.pivot_offset = Vector2(0, 0)
 	
-	# Som de objetivo aparecendo no MOMENTO EXATO em que surge na tela
-	if is_instance_valid(audio_obj_appear):
-		audio_obj_appear.play()
-	
-	# Exibe o painel em tamanho 100% normal
+	# Exibe o painel PRIMEIRO — som dispara no mesmo frame que fica visivel
 	objective_panel.scale = Vector2(1.0, 1.0)
 	objective_panel.position = Vector2(36.0, 28.0)
 	objective_panel.modulate.a = 1.0
 	objective_panel.show()
+	
+	# Som dispara logo apos o painel aparecer
+	if is_instance_valid(audio_obj_appear):
+		audio_obj_appear.play()
 	
 	if not transition:
 		objective_label.text = "OBJETIVO:\n" + clean_text.to_upper()
