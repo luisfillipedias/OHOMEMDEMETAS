@@ -1,32 +1,39 @@
 extends CharacterBody3D
 
 # ============================================================
-# PLAYER CONTROLLER -- 1a Pessoa com step assist, head bobbing
-#                      100% sincronizado com sons de passos
+# PLAYER CONTROLLER -- 1a Pessoa com sistema físico de passos
+#                      baseado em distância percorrida real
 # ============================================================
 
-const WALK_SPEED := 3.6
+const WALK_SPEED := 3.2
 const GRAVITY := 12.0
-const BOB_FREQUENCY := 8.2 # Frequência de passos (rad/s)
-const BOB_VERTICAL_AMP := 0.028 # Altura do balanço da cabeça
-const BOB_HORIZONTAL_AMP := 0.014 # Balanço lateral suave
 var MOUSE_SENS := 0.0018
 const MAX_STEP_HEIGHT := 0.35
+
+# Sistema de Head Bobbing e Passos por Distância (Passadas Físicas Reais)
+const STEP_CYCLE_LENGTH := 2.6 # Metros por ciclo completo (2 passos = 1.30m por passo)
+const BOB_VERTICAL_AMP := 0.026 # Altura do impacto da cabeça no passo
+const BOB_HORIZONTAL_AMP := 0.012 # Balanço sutil lateral do corpo
 
 @onready var camera_mount: Node3D = $CameraMount
 @onready var camera: Camera3D = $CameraMount/Camera3D
 @onready var interact_ray: RayCast3D = $CameraMount/Camera3D/InteractRay
 
 var is_frozen: bool = false
-var bob_time: float = 0.0
 var camera_base_y: float = 0.65
-var last_step_sign: float = 1.0
 
-# Sistema de Sons de Passos
+# Distância percorrida e estado dos passos
+var _step_dist_accumulator: float = STEP_CYCLE_LENGTH * 0.35 # Pronto para o primeiro passo
+var _last_step_threshold: int = 0
 var _audio_footstep: AudioStreamPlayer = null
-var _snds_concrete: Array[AudioStream] = []
-var _snds_grass: Array[AudioStream] = []
+
+# Banco de sons de passos de alta qualidade (.ogg)
+var _snds_floor: Array[AudioStream] = []
+var _snds_tiles: Array[AudioStream] = []
 var _snds_dirt: Array[AudioStream] = []
+var _snds_gravel: Array[AudioStream] = []
+var _snds_wood: Array[AudioStream] = []
+var _snds_carpet: Array[AudioStream] = []
 
 func _ready() -> void:
 	add_to_group("player")
@@ -47,23 +54,24 @@ func _ready() -> void:
 func _setup_footstep_audio() -> void:
 	_audio_footstep = AudioStreamPlayer.new()
 	_audio_footstep.name = "PlayerFootstepAudio"
-	_audio_footstep.volume_db = -6.0
+	_audio_footstep.volume_db = -16.0
 	add_child(_audio_footstep)
 
-	# Carrega amostras individuais de passos (sem corte abrupto)
-	for i in range(1, 5):
-		var p = "res://assets/audio/footsteps_single/concrete_%d.wav" % i
+	_carregar_amostras_pasta("Floor", _snds_floor, 21)
+	_carregar_amostras_pasta("Tiles", _snds_tiles, 22)
+	_carregar_amostras_pasta("Dirt", _snds_dirt, 21)
+	_carregar_amostras_pasta("Gravel", _snds_gravel, 21)
+	_carregar_amostras_pasta("Wood", _snds_wood, 21)
+	_carregar_amostras_pasta("Carpet", _snds_carpet, 21)
+
+func _carregar_amostras_pasta(pasta: String, array_destino: Array[AudioStream], max_count: int) -> void:
+	for i in range(1, max_count + 1):
+		var num_str = "%03d" % i
+		var p = "res://assets/audio/pegadas/%s/Steps_%s-%s.ogg" % [pasta, pasta.to_lower(), num_str]
 		if ResourceLoader.exists(p):
-			_snds_concrete.append(load(p))
-	
-	for i in range(1, 4):
-		var p_grass = "res://assets/audio/footsteps_single/grass_%d.wav" % i
-		if ResourceLoader.exists(p_grass):
-			_snds_grass.append(load(p_grass))
-		
-		var p_mud = "res://assets/audio/footsteps_single/mud_%d.wav" % i
-		if ResourceLoader.exists(p_mud):
-			_snds_dirt.append(load(p_mud))
+			var st = load(p) as AudioStream
+			if st:
+				array_destino.append(st)
 
 func _input(event: InputEvent) -> void:
 	if is_frozen:
@@ -118,44 +126,43 @@ func _physics_process(delta: float) -> void:
 		# Step assist para subir calçadas e meios-fios suavemente
 		_handle_step_assist(dir)
 	else:
-		velocity.x = lerp(velocity.x, 0.0, delta * 10.0)
-		velocity.z = lerp(velocity.z, 0.0, delta * 10.0)
+		velocity.x = lerp(velocity.x, 0.0, delta * 12.0)
+		velocity.z = lerp(velocity.z, 0.0, delta * 12.0)
 
 	move_and_slide()
 
-	# Head bobbing e detecção de passos 100% sincronizada
-	_process_head_bob_and_footsteps(delta, is_moving)
+	# Sistema Físico de Passos e Head Bobbing
+	_process_footsteps_and_headbob(delta, is_moving)
 
 	# Interação
 	_check_interaction()
 
-func _process_head_bob_and_footsteps(delta: float, is_moving: bool) -> void:
-	var horiz_vel := Vector2(velocity.x, velocity.z).length()
+func _process_footsteps_and_headbob(delta: float, is_moving: bool) -> void:
+	var horiz_speed = Vector2(velocity.x, velocity.z).length()
 	
-	if is_moving and is_on_floor() and horiz_vel > 0.5:
-		var speed_factor = clamp(horiz_vel / WALK_SPEED, 0.4, 1.2)
-		var prev_bob = bob_time
-		bob_time += delta * BOB_FREQUENCY * speed_factor
+	if is_moving and is_on_floor() and horiz_speed > 0.4:
+		# Acumula a distância física real percorrida no solo
+		var dist_moved = horiz_speed * delta
+		_step_dist_accumulator += dist_moved
 		
-		# Curva natural de passos (cabeça desce no momento em que o pé atinge o chão)
-		var current_step_cycle = sin(bob_time)
+		# Ciclo normalizado [0.0 .. 1.0] (1 ciclo = 2 passos: Esquerdo e Direito)
+		var cycle_prog = fmod(_step_dist_accumulator, STEP_CYCLE_LENGTH) / STEP_CYCLE_LENGTH
 		
-		# Dispara som de passo exatamente no ponto mais baixo do impacto do pé
-		if current_step_cycle < 0.0 and last_step_sign >= 0.0:
+		# Limiares de impacto do pé: Passo 1 em 0.5 (50%), Passo 2 em 0.0 (100% / 0%)
+		var current_threshold = 1 if cycle_prog >= 0.5 else 0
+		if current_threshold != _last_step_threshold:
+			_last_step_threshold = current_threshold
 			_play_footstep_sound()
-		elif current_step_cycle >= 0.0 and last_step_sign < 0.0:
-			_play_footstep_sound()
 		
-		last_step_sign = current_step_cycle
+		# Head bobbing suave sincronizado com a passada
+		var step_phase = cycle_prog * TAU
+		var target_y = camera_base_y - abs(sin(step_phase)) * BOB_VERTICAL_AMP
+		var target_x = sin(step_phase * 0.5) * BOB_HORIZONTAL_AMP
 		
-		var target_y = camera_base_y - abs(sin(bob_time)) * BOB_VERTICAL_AMP
-		var target_x = sin(bob_time * 0.5) * BOB_HORIZONTAL_AMP
-		camera_mount.position.y = lerp(camera_mount.position.y, target_y, delta * 12.0)
-		camera_mount.position.x = lerp(camera_mount.position.x, target_x, delta * 12.0)
+		camera_mount.position.y = lerp(camera_mount.position.y, target_y, delta * 15.0)
+		camera_mount.position.x = lerp(camera_mount.position.x, target_x, delta * 15.0)
 	else:
 		# Retorno suave ao centro quando parado
-		bob_time = 0.0
-		last_step_sign = 1.0
 		camera_mount.position.y = lerp(camera_mount.position.y, camera_base_y, delta * 8.0)
 		camera_mount.position.x = lerp(camera_mount.position.x, 0.0, delta * 8.0)
 
@@ -169,29 +176,30 @@ func _play_footstep_sound() -> void:
 	ray_query.exclude = [self]
 	var hit = space_state.intersect_ray(ray_query)
 	
-	var surface_type := "concrete"
+	var pool: Array[AudioStream] = _snds_floor
+	
 	if not hit.is_empty() and hit.has("collider"):
 		var col = hit["collider"]
 		var col_name = col.name.to_lower()
 		if col.get_parent():
 			col_name += " " + col.get_parent().name.to_lower()
 		
-		if "grass" in col_name or "grama" in col_name or "folha" in col_name or "jardim" in col_name or "vegetat" in col_name:
-			surface_type = "grass"
+		if "tile" in col_name or "piso" in col_name or "predio" in col_name or "admin" in col_name or "sala" in col_name or "interno" in col_name:
+			pool = _snds_tiles if not _snds_tiles.is_empty() else _snds_floor
+		elif "grass" in col_name or "grama" in col_name or "gravel" in col_name or "cascalho" in col_name or "jardim" in col_name:
+			pool = _snds_gravel if not _snds_gravel.is_empty() else _snds_floor
 		elif "mud" in col_name or "dirt" in col_name or "terra" in col_name or "lama" in col_name:
-			surface_type = "dirt"
-	
-	var pool: Array[AudioStream] = _snds_concrete
-	if surface_type == "grass" and not _snds_grass.is_empty():
-		pool = _snds_grass
-	elif surface_type == "dirt" and not _snds_dirt.is_empty():
-		pool = _snds_dirt
+			pool = _snds_dirt if not _snds_dirt.is_empty() else _snds_floor
+		elif "wood" in col_name or "madeira" in col_name or "tabua" in col_name:
+			pool = _snds_wood if not _snds_wood.is_empty() else _snds_floor
+		elif "carpet" in col_name or "tapete" in col_name:
+			pool = _snds_carpet if not _snds_carpet.is_empty() else _snds_floor
 	
 	if not pool.is_empty():
 		var stream_to_play: AudioStream = pool[randi() % pool.size()]
 		_audio_footstep.stream = stream_to_play
-		_audio_footstep.pitch_scale = randf_range(0.95, 1.05)
-		_audio_footstep.volume_db = randf_range(-7.0, -5.0)
+		_audio_footstep.pitch_scale = randf_range(0.96, 1.04)
+		_audio_footstep.volume_db = randf_range(-17.0, -15.0)
 		_audio_footstep.play()
 
 func _handle_step_assist(dir: Vector3) -> void:

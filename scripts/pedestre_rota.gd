@@ -32,11 +32,14 @@ var _snds_pedestre: Array[AudioStream] = []
 
 func _ready() -> void:
 	randomize()
-	# Carrega amostras de passos de concreto individuais
-	for i in range(1, 5):
-		var p = "res://assets/audio/footsteps_single/concrete_%d.wav" % i
+	# Carrega amostras de passos de alta qualidade (.ogg)
+	for i in range(1, 22):
+		var num_str = "%03d" % i
+		var p = "res://assets/audio/pegadas/Floor/Steps_floor-%s.ogg" % num_str
 		if ResourceLoader.exists(p):
-			_snds_pedestre.append(load(p))
+			var st = load(p) as AudioStream
+			if st:
+				_snds_pedestre.append(st)
 
 	timer = Timer.new()
 	timer.one_shot = true
@@ -87,12 +90,12 @@ func _spawn_pedestre() -> void:
 	holder.add_child(modelo_inst)
 	follow.add_child(holder)
 
-	# Áudio 3D posicional de passos com atenuação espacial real
+	# Áudio 3D posicional de passos com atenuação espacial audível
 	var audio_3d := AudioStreamPlayer3D.new()
 	audio_3d.name = "FootstepAudio3D"
-	audio_3d.unit_size = 3.0
-	audio_3d.max_distance = 24.0
-	audio_3d.volume_db = -6.0
+	audio_3d.unit_size = 8.0
+	audio_3d.max_distance = 32.0
+	audio_3d.volume_db = 0.0
 	audio_3d.panning_strength = 1.0
 	audio_3d.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
 	holder.add_child(audio_3d)
@@ -183,7 +186,7 @@ func _process(delta: float) -> void:
 				var snd = _snds_pedestre[randi() % _snds_pedestre.size()]
 				a3d.stream = snd
 				a3d.pitch_scale = randf_range(0.92, 1.08)
-				a3d.volume_db = randf_range(-7.0, -4.0)
+				a3d.volume_db = randf_range(-2.0, +1.0)
 				a3d.play()
 		
 		if permitir_olhar_jogador and jogador:
