@@ -1,7 +1,8 @@
 extends CharacterBody3D
 
 # ============================================================
-# PLAYER CONTROLLER -- 1a Pessoa com step assist e head bobbing
+# PLAYER CONTROLLER -- 1a Pessoa com step assist, head bobbing
+#                      e passos realistas por tipo de solo
 # ============================================================
 
 const WALK_SPEED := 3.8
@@ -19,12 +20,41 @@ var is_frozen: bool = false
 var bob_time: float = 0.0
 var camera_base_y: float = 0.65
 
+# Sistema de Sons de Passos
+var _step_timer: float = 0.0
+const STEP_INTERVAL: float = 0.44
+var _audio_footstep: AudioStreamPlayer = null
+var _snd_step_concrete: AudioStream = null
+var _snd_step_grass: AudioStream = null
+var _snd_step_dirt: AudioStream = null
+var _snd_step_wood: AudioStream = null
+
 func _ready() -> void:
 	add_to_group("player")
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	camera_base_y = camera_mount.position.y
 	floor_snap_length = 0.4
 	floor_max_angle = deg_to_rad(50.0)
+	_setup_footstep_audio()
+
+func _setup_footstep_audio() -> void:
+	_audio_footstep = AudioStreamPlayer.new()
+	_audio_footstep.name = "PlayerFootstepAudio"
+	_audio_footstep.volume_db = -10.0
+	add_child(_audio_footstep)
+
+	if ResourceLoader.exists("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/footsteps/tunnel steps.wav"):
+		_snd_step_concrete = load("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/footsteps/tunnel steps.wav")
+	elif ResourceLoader.exists("res://assets/audio/footstep.wav"):
+		_snd_step_concrete = load("res://assets/audio/footstep.wav")
+
+	if ResourceLoader.exists("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/footsteps/tall grass steps.wav"):
+		_snd_step_grass = load("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/footsteps/tall grass steps.wav")
+
+	if ResourceLoader.exists("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/footsteps/mud steps.wav"):
+		_snd_step_dirt = load("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/footsteps/mud steps.wav")
+	elif ResourceLoader.exists("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/footsteps/forest steps.wav"):
+		_snd_step_dirt = load("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/footsteps/forest steps.wav")
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
@@ -69,9 +99,17 @@ func _physics_process(delta: float) -> void:
 
 		# Step assist para subir calçadas e meios-fios suavemente
 		_handle_step_assist(dir)
+		
+		# Processa passos na superfície
+		if is_on_floor():
+			_step_timer += delta
+			if _step_timer >= STEP_INTERVAL:
+				_step_timer = 0.0
+				_play_footstep_sound()
 	else:
 		velocity.x = lerp(velocity.x, 0.0, delta * 9.0)
 		velocity.z = lerp(velocity.z, 0.0, delta * 9.0)
+		_step_timer = STEP_INTERVAL * 0.8 # Deixa pronto para o primeiro passo ao andar
 
 	move_and_slide()
 
@@ -83,6 +121,40 @@ func _physics_process(delta: float) -> void:
 
 	# Interação
 	_check_interaction()
+
+func _play_footstep_sound() -> void:
+	if not _audio_footstep:
+		return
+	
+	# Detecta tipo de superfície abaixo do jogador via Raycast
+	var space_state = get_world_3d().direct_space_state
+	var ray_query = PhysicsRayQueryParameters3D.create(global_position + Vector3(0, 0.5, 0), global_position + Vector3(0, -1.2, 0))
+	ray_query.exclude = [self]
+	var hit = space_state.intersect_ray(ray_query)
+	
+	var surface_type := "concrete"
+	if not hit.is_empty() and hit.has("collider"):
+		var col = hit["collider"]
+		var col_name = col.name.to_lower()
+		if col.get_parent():
+			col_name += " " + col.get_parent().name.to_lower()
+		
+		if "grass" in col_name or "grama" in col_name or "folha" in col_name or "jardim" in col_name or "vegetat" in col_name:
+			surface_type = "grass"
+		elif "mud" in col_name or "dirt" in col_name or "terra" in col_name or "lama" in col_name:
+			surface_type = "dirt"
+	
+	var stream_to_play: AudioStream = _snd_step_concrete
+	if surface_type == "grass" and _snd_step_grass:
+		stream_to_play = _snd_step_grass
+	elif surface_type == "dirt" and _snd_step_dirt:
+		stream_to_play = _snd_step_dirt
+	
+	if stream_to_play:
+		_audio_footstep.stream = stream_to_play
+		_audio_footstep.pitch_scale = randf_range(0.92, 1.08)
+		_audio_footstep.volume_db = randf_range(-12.0, -9.0)
+		_audio_footstep.play()
 
 func _handle_step_assist(dir: Vector3) -> void:
 	if not is_on_floor():

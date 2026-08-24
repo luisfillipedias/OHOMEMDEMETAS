@@ -29,6 +29,10 @@ extends Control
 var music_track_1 = preload("res://assets/audio/menu/music/titlescreenmusic1.mp3")
 var music_track_2 = preload("res://assets/audio/menu/music/titlescreenmusic2.mp3")
 
+
+var audio_ui_select: AudioStreamPlayer = null
+var audio_ui_cursor: AudioStreamPlayer = null
+var audio_ui_cancel: AudioStreamPlayer = null
 var buttons: Array = []
 var selected_index: int = 0
 var _titles := ["JOGAR", "CONTINUAR", "CONFIGURAÇÕES", "SAIR"]
@@ -181,12 +185,14 @@ func _navigate_menu(dir: int) -> void:
 		new_idx = (new_idx + dir + buttons.size()) % buttons.size()
 	selected_index = new_idx
 	_update_button_visuals()
+	play_ui_cursor()
 
 func _on_mouse_enter_button(index: int) -> void:
 	if index == 1 and not has_save_game:
 		return
 	selected_index = index
 	_update_button_visuals()
+	play_ui_cursor()
 
 func _update_button_visuals() -> void:
 	for i in range(buttons.size()):
@@ -203,6 +209,7 @@ func _update_button_visuals() -> void:
 			buttons[i].add_theme_color_override("font_color", Color(0.70, 0.70, 0.70, 1.0))
 
 func _on_jogar_pressed() -> void:
+	play_ui_select()
 	if audio_menu_music:
 		var tw_mus = create_tween()
 		tw_mus.tween_property(audio_menu_music, "volume_db", -40.0, 1.5)
@@ -221,12 +228,15 @@ func _on_continuar_pressed() -> void:
 		_on_jogar_pressed()
 
 func _on_config_pressed() -> void:
+	play_ui_select()
 	settings_panel.show()
 
 func _on_close_settings_pressed() -> void:
+	play_ui_cancel()
 	settings_panel.hide()
 
 func _on_sair_pressed() -> void:
+	play_ui_select()
 	get_tree().quit()
 
 func _on_master_volume_changed(val: float) -> void:
@@ -236,7 +246,44 @@ func _on_sfx_volume_changed(_val: float) -> void:
 	pass
 
 func _on_fullscreen_toggled(button_pressed: bool) -> void:
+	play_ui_select()
 	if button_pressed:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	else:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+
+func _setup_ui_sounds() -> void:
+	audio_ui_select = AudioStreamPlayer.new()
+	audio_ui_select.name = "AudioUISelect"
+	audio_ui_select.volume_db = -6.0
+	if ResourceLoader.exists("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Select - 1.ogg"):
+		audio_ui_select.stream = load("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Select - 1.ogg")
+	add_child(audio_ui_select)
+
+	audio_ui_cursor = AudioStreamPlayer.new()
+	audio_ui_cursor.name = "AudioUICursor"
+	audio_ui_cursor.volume_db = -12.0
+	if ResourceLoader.exists("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cursor - 1.ogg"):
+		audio_ui_cursor.stream = load("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cursor - 1.ogg")
+	add_child(audio_ui_cursor)
+
+	audio_ui_cancel = AudioStreamPlayer.new()
+	audio_ui_cancel.name = "AudioUICancel"
+	audio_ui_cancel.volume_db = -6.0
+	if ResourceLoader.exists("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cancel - 1.ogg"):
+		audio_ui_cancel.stream = load("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cancel - 1.ogg")
+	add_child(audio_ui_cancel)
+
+func play_ui_select() -> void:
+	if is_instance_valid(audio_ui_select) and audio_ui_select.stream:
+		audio_ui_select.pitch_scale = randf_range(0.96, 1.04)
+		audio_ui_select.play()
+
+func play_ui_cursor() -> void:
+	if is_instance_valid(audio_ui_cursor) and audio_ui_cursor.stream:
+		audio_ui_cursor.pitch_scale = randf_range(0.96, 1.04)
+		audio_ui_cursor.play()
+
+func play_ui_cancel() -> void:
+	if is_instance_valid(audio_ui_cancel) and audio_ui_cancel.stream:
+		audio_ui_cancel.play()

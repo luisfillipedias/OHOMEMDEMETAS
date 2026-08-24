@@ -1,48 +1,47 @@
 extends Path3D
 
 # ============================================================
-# CONTROLADOR DE ROTA DE PEDESTRE - HOMEM DE METAS
-# ============================================================
-# ORIENTAÇÃO: calcula a direção olhando a tangente da curva
-# em espaço GLOBAL — funciona igual nas 3 rotas independente
-# da rotação/transform que cada Path3D tenha no editor.
+# SISTEMA DE PEDESTRES -- ROTAS VIVAS & REALISTAS COM ÁUDIO 3D
 # ============================================================
 
-@export var tempo_min_espera: float = 60.0
-@export var tempo_max_espera: float = 160.0
-@export var velocidade_base: float = 2.4
+@export var tempo_min_espera: float = 12.0
+@export var tempo_max_espera: float = 28.0
+@export var velocidade_base: float = 1.35
 @export var altura_offset: float = 0.0
 
-# --- Interação com o jogador (olhar de cabeça) ---
+@export_group("Comportamento de Olhar")
 @export var permitir_olhar_jogador: bool = true
-@export var distancia_max_olhar: float = 4.5
-@export var angulo_max_olhar_graus: float = 70.0
-@export var velocidade_giro_cabeca: float = 4.0
+@export var distancia_max_olhar: float = 7.5
+@export var angulo_max_olhar_graus: float = 90.0
 @export var angulo_max_cabeca_graus: float = 55.0
+@export var velocidade_giro_cabeca: float = 4.0
 
-const AMOSTRA_FRENTE_METROS := 0.35
-
-var timer: Timer = null
+var timer: Timer
 var pedestres_ativos: Array = []
 
-# Calibração de "para frente" por personagem.
-# 180.0 = padrão Mixamo (todos os FBX baixados do Mixamo vêm olhando pra -Z)
+const AMOSTRA_FRENTE_METROS := 0.4
 const CALIBRACAO_FRENTE_GRAUS := {
-	"male_01.tscn": 180.0,
-	"mulher_walking.tscn": 180.0,
-	"velho_bebado.tscn": 180.0,
-	"policia.tscn": 180.0,
-	"redneck.tscn": 180.0,
+	"executivo.tscn": 180.0,
 	"gordola.tscn": 180.0,
+	"mendigo.tscn": 180.0,
+	"redneck.tscn": 180.0,
+	"velhinha.tscn": 180.0,
 }
+
+var _snd_step_pedestre: AudioStream = null
 
 func _ready() -> void:
 	randomize()
+	if ResourceLoader.exists("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/footsteps/tunnel steps.wav"):
+		_snd_step_pedestre = load("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/footsteps/tunnel steps.wav")
+	elif ResourceLoader.exists("res://assets/audio/footstep.wav"):
+		_snd_step_pedestre = load("res://assets/audio/footstep.wav")
+
 	timer = Timer.new()
 	timer.one_shot = true
 	timer.timeout.connect(_spawn_pedestre)
 	add_child(timer)
-	# Primeiro pedestre: 3-8 segundos após o jogo iniciar (aparece logo!)
+	# Primeiro pedestre: 3-8 segundos após o jogo iniciar
 	timer.start(randf_range(3.0, 8.0))
 
 func _agendar_proximo() -> void:
@@ -88,12 +87,21 @@ func _spawn_pedestre() -> void:
 	holder.add_child(modelo_inst)
 	follow.add_child(holder)
 
-	# Calibração de frente: 180° padrão para todos os modelos Mixamo
+	# Áudio 3D posicional de passos para o pedestre
+	var audio_3d := AudioStreamPlayer3D.new()
+	audio_3d.name = "FootstepAudio3D"
+	audio_3d.unit_size = 2.5
+	audio_3d.max_distance = 18.0
+	audio_3d.volume_db = -12.0
+	audio_3d.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
+	if _snd_step_pedestre:
+		audio_3d.stream = _snd_step_pedestre
+	holder.add_child(audio_3d)
+
+	# Calibração de frente: 180Â° padrão para todos os modelos Mixamo
 	var nome_arquivo := cena.resource_path.get_file()
 	var correcao_graus: float = CALIBRACAO_FRENTE_GRAUS.get(nome_arquivo, 180.0)
 	modelo_inst.rotation_degrees.y = correcao_graus
-
-	print("🚶 [SPAWN] '%s' iniciou caminhada na rota '%s'!" % [nome_arquivo, name])
 
 	# Alinha orientação inicial imediatamente
 	_orientar_para_frente(follow, holder)
@@ -127,6 +135,8 @@ func _spawn_pedestre() -> void:
 	var pedestre_data := {
 		"follow": follow,
 		"holder": holder,
+		"audio_3d": audio_3d,
+		"step_timer": 0.0,
 		"skeleton": skeleton,
 		"head_bone_idx": head_bone_idx,
 		"rest_bone_pose": Transform3D() if skeleton == null or head_bone_idx == -1 else skeleton.get_bone_pose(head_bone_idx),
@@ -159,6 +169,16 @@ func _process(delta: float) -> void:
 		if not is_instance_valid(p["follow"]):
 			continue
 		_orientar_para_frente(p["follow"], p["holder"])
+		
+		# Processa som de passos 3D do pedestre
+		p["step_timer"] += delta
+		if p["step_timer"] >= 0.50:
+			p["step_timer"] = 0.0
+			var a3d: AudioStreamPlayer3D = p["audio_3d"]
+			if is_instance_valid(a3d) and a3d.stream:
+				a3d.pitch_scale = randf_range(0.90, 1.10)
+				a3d.play()
+		
 		if permitir_olhar_jogador and jogador:
 			_atualizar_olhar_cabeca(p, jogador, delta)
 		elif p["skeleton"] != null and p["head_bone_idx"] != -1:

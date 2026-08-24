@@ -1,7 +1,7 @@
 extends Node3D
 
 # ============================================================
-# CHAPTER 01: O HOMEM DE METAS -- CEFET-MG & A PERSEGUIÇÃO
+# CHAPTER 01: O HOMEM DE METAS -- CEFET-MG & A PERSEGUIÇÃƒO
 # ============================================================
 
 @onready var player: CharacterBody3D = get_node_or_null("PlayerController")
@@ -44,6 +44,20 @@ var audio_wind_extra: AudioStreamPlayer = null
 var font_retro: Font = null
 var _objective_typing_token: int = 0
 
+# Audio Players do Sistema de Sons
+var audio_typewriter: AudioStreamPlayer = null
+var audio_ui_select: AudioStreamPlayer = null
+var audio_ui_cursor: AudioStreamPlayer = null
+var audio_ui_cancel: AudioStreamPlayer = null
+var audio_obj_appear: AudioStreamPlayer = null
+var audio_obj_solved: AudioStreamPlayer = null
+var audio_save_game: AudioStreamPlayer = null
+var audio_wrong_obj: AudioStreamPlayer = null
+
+# Ambience Playlist
+var _ambience_playlist: Array[AudioStream] = []
+var _current_ambience_idx: int = 0
+
 # Referências para Rajadas Dinâmicas de Vento
 var _tree_materials: Array[ShaderMaterial] = []
 var _wind_leaves_mat: ParticleProcessMaterial = null
@@ -62,21 +76,18 @@ func _ready() -> void:
 	if ResourceLoader.exists("res://assets/fonts/text_font.ttf"):
 		font_retro = load("res://assets/fonts/text_font.ttf") as Font
 	
+	# Inicializa gerenciador de SFX e UI
+	_setup_audio_system()
+	
 	_setup_hud_styling()
 	_setup_pause_menu()
-	
-	# Som de vento e tempestade contínuo em loop
-	if audio_amb:
-		if not audio_amb.playing:
-			audio_amb.play()
-		if not audio_amb.finished.is_connected(audio_amb.play):
-			audio_amb.finished.connect(audio_amb.play)
 	
 	# Gerenciador de Clima
 	clima_manager = ClimaManager.new()
 	add_child(clima_manager)
 	
-	# Áudio de vento direcional e partículas (folhas + poeira de chão)
+	# Configuração de playlist dinâmica de ambience e vento
+	_setup_ambience_system()
 	_setup_extra_wind_audio()
 	_setup_wind_particles()
 	
@@ -86,16 +97,176 @@ func _ready() -> void:
 	# Inicia sistema de rajadas dinâmicas ocasionais de vento
 	_start_dynamic_wind_system()
 	
-	# Boot VHS
+	# Boot VHS (com som de porta do carro na tela preta antes da transição)
 	_play_vhs_intro_sequence()
 
 # ============================================================
-# ESTILIZAÇÃO E CALIBRAÇÃO DINÂMICA DO HUD (VHS OSD)
+# SISTEMA DE ÁUDIO CENTRALIZADO (SFX, TYPEWRITER, UI, OBJETIVOS)
+# ============================================================
+
+func _setup_audio_system() -> void:
+	# 1. Typewriter SFX
+	audio_typewriter = AudioStreamPlayer.new()
+	audio_typewriter.name = "AudioTypewriter"
+	audio_typewriter.volume_db = -4.0
+	if ResourceLoader.exists("res://assets/audio/menu/typewriter.ogg"):
+		audio_typewriter.stream = load("res://assets/audio/menu/typewriter.ogg")
+	add_child(audio_typewriter)
+
+	# 2. UI Click / Select
+	audio_ui_select = AudioStreamPlayer.new()
+	audio_ui_select.name = "AudioUISelect"
+	audio_ui_select.process_mode = Node.PROCESS_MODE_ALWAYS
+	audio_ui_select.volume_db = -6.0
+	if ResourceLoader.exists("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Select - 1.ogg"):
+		audio_ui_select.stream = load("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Select - 1.ogg")
+	add_child(audio_ui_select)
+
+	# 3. UI Hover / Cursor
+	audio_ui_cursor = AudioStreamPlayer.new()
+	audio_ui_cursor.name = "AudioUICursor"
+	audio_ui_cursor.process_mode = Node.PROCESS_MODE_ALWAYS
+	audio_ui_cursor.volume_db = -12.0
+	if ResourceLoader.exists("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cursor - 1.ogg"):
+		audio_ui_cursor.stream = load("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cursor - 1.ogg")
+	add_child(audio_ui_cursor)
+
+	# 4. UI Cancel / Close
+	audio_ui_cancel = AudioStreamPlayer.new()
+	audio_ui_cancel.name = "AudioUICancel"
+	audio_ui_cancel.process_mode = Node.PROCESS_MODE_ALWAYS
+	audio_ui_cancel.volume_db = -6.0
+	if ResourceLoader.exists("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cancel - 1.ogg"):
+		audio_ui_cancel.stream = load("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cancel - 1.ogg")
+	add_child(audio_ui_cancel)
+
+	# 5. Objetivo Aparecendo (PICK UP OBJECT)
+	audio_obj_appear = AudioStreamPlayer.new()
+	audio_obj_appear.name = "AudioObjAppear"
+	audio_obj_appear.volume_db = -4.0
+	if ResourceLoader.exists("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/Objects & Interaction/PICK UP OBJECT.wav"):
+		audio_obj_appear.stream = load("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/Objects & Interaction/PICK UP OBJECT.wav")
+	add_child(audio_obj_appear)
+
+	# 6. Objetivo Concluído (PUZZLE SOLVED)
+	audio_obj_solved = AudioStreamPlayer.new()
+	audio_obj_solved.name = "AudioObjSolved"
+	audio_obj_solved.volume_db = -3.0
+	if ResourceLoader.exists("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/Objects & Interaction/PUZZLE SOLVED.wav"):
+		audio_obj_solved.stream = load("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/Objects & Interaction/PUZZLE SOLVED.wav")
+	add_child(audio_obj_solved)
+
+	# 7. Jogo Salvo (SAVE GAME)
+	audio_save_game = AudioStreamPlayer.new()
+	audio_save_game.name = "AudioSaveGame"
+	audio_save_game.volume_db = -4.0
+	if ResourceLoader.exists("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/Objects & Interaction/SAVE GAME.wav"):
+		audio_save_game.stream = load("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/Objects & Interaction/SAVE GAME.wav")
+	add_child(audio_save_game)
+
+	# 8. Erro / Ação Inválida (WRONG OBJECT)
+	audio_wrong_obj = AudioStreamPlayer.new()
+	audio_wrong_obj.name = "AudioWrongObj"
+	audio_wrong_obj.volume_db = -5.0
+	if ResourceLoader.exists("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/Objects & Interaction/WRONG OBJECT.wav"):
+		audio_wrong_obj.stream = load("res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/Objects & Interaction/WRONG OBJECT.wav")
+	add_child(audio_wrong_obj)
+
+func play_sfx_select() -> void:
+	if is_instance_valid(audio_ui_select):
+		audio_ui_select.pitch_scale = randf_range(0.95, 1.05)
+		audio_ui_select.play()
+
+func play_sfx_cursor() -> void:
+	if is_instance_valid(audio_ui_cursor):
+		audio_ui_cursor.pitch_scale = randf_range(0.95, 1.05)
+		audio_ui_cursor.play()
+
+func play_sfx_cancel() -> void:
+	if is_instance_valid(audio_ui_cancel):
+		audio_ui_cancel.play()
+
+func play_objective_completed() -> void:
+	if is_instance_valid(audio_obj_solved):
+		audio_obj_solved.play()
+
+func play_game_saved() -> void:
+	if is_instance_valid(audio_save_game):
+		audio_save_game.play()
+
+func play_wrong_action() -> void:
+	if is_instance_valid(audio_wrong_obj):
+		audio_wrong_obj.play()
+
+# ============================================================
+# PLAYLIST DINÃ‚MICA DE AMBIENCE (ROTAÇÃƒO CONTÍNUA)
+# ============================================================
+
+func _setup_ambience_system() -> void:
+	if not audio_amb:
+		audio_amb = AudioStreamPlayer.new()
+		audio_amb.name = "AudioAmbience"
+		add_child(audio_amb)
+	
+	audio_amb.volume_db = -6.0
+
+	var paths := [
+		"res://assets/audio/ambience/newambiences/soundescape/CalmCozyCityNight.mp3",
+		"res://assets/audio/ambience/newambiences/soundescape/Citystreet_distant_siren.mp3",
+		"res://assets/audio/ambience/newambiences/soundescape/NightTImeNoSiren.mp3",
+		"res://assets/audio/ambience/newambiences/soundescape/Lowkeybizarrenight.mp3",
+		"res://assets/audio/ambience/newambiences/soundescape/SoundCityNightWithPoliceSirens.mp3",
+		"res://assets/audio/ambience/newambiences/mysticalambience/EerieAmbience.mp3",
+		"res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/Soundtracks/Ambience/AMBIENCE 1.wav",
+		"res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/Soundtracks/Ambience/AMBIENCE WIND.wav"
+	]
+	
+	_ambience_playlist.clear()
+	for p in paths:
+		if ResourceLoader.exists(p):
+			var stream = load(p) as AudioStream
+			if stream:
+				_ambience_playlist.append(stream)
+	
+	if not _ambience_playlist.is_empty():
+		_ambience_playlist.shuffle()
+		_play_next_ambience_track()
+		if not audio_amb.finished.is_connected(_on_ambience_finished):
+			audio_amb.finished.connect(_on_ambience_finished)
+
+func _play_next_ambience_track() -> void:
+	if _ambience_playlist.is_empty(): return
+	var stream = _ambience_playlist[_current_ambience_idx]
+	_current_ambience_idx = (_current_ambience_idx + 1) % _ambience_playlist.size()
+	
+	audio_amb.stream = stream
+	audio_amb.volume_db = -24.0
+	audio_amb.play()
+	var tw = create_tween()
+	tw.tween_property(audio_amb, "volume_db", -6.0, 3.0)
+
+func _on_ambience_finished() -> void:
+	_play_next_ambience_track()
+
+# ============================================================
+# ESTILIZAÇÃƒO E CALIBRAÇÃƒO DINÃ‚MICA DO HUD (VHS OSD)
 # ============================================================
 
 func _setup_hud_styling() -> void:
 	if not hud:
 		return
+	
+	# Garante que o CRTOverlay fique em z_index = 0 e os elementos do HUD em z_index = 20
+	# para que o shader CRT filtre apenas o 3D e todos os textos do HUD fiquem 100% nítidos e limpos
+	var crt = hud.get_node_or_null("CRTOverlay") as CanvasItem
+	if crt:
+		crt.z_index = 0
+	if objective_panel:
+		objective_panel.z_index = 20
+	if timecard_panel:
+		timecard_panel.z_index = 20
+	if interact_hint:
+		interact_hint.z_index = 20
 	
 	# 1. Configura Timecard (Canto inferior esquerdo, tamanho 22, cor limpa e sombra)
 	if timecard_panel:
@@ -164,10 +335,8 @@ func _setup_hud_styling() -> void:
 		interact_hint.add_theme_constant_override("shadow_offset_y", 2)
 		interact_hint.hide()
 
-
-
 # ============================================================
-# SISTEMA DE PAUSA RETRO VHS / TV AZUL [ESC] EM PORTUGUÊS
+# SISTEMA DE PAUSA RETRO VHS / TV AZUL [ESC] EM PORTUGUÃŠS
 # ============================================================
 
 func _setup_pause_menu() -> void:
@@ -237,7 +406,7 @@ func _setup_pause_menu() -> void:
 		
 		# Botão Retomar
 		var btn_resume = Button.new()
-		btn_resume.text = "→ RETOMAR JOGO"
+		btn_resume.text = "► RETOMAR JOGO"
 		btn_resume.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		btn_resume.process_mode = Node.PROCESS_MODE_ALWAYS
 		if font_retro:
@@ -246,7 +415,11 @@ func _setup_pause_menu() -> void:
 		btn_resume.add_theme_color_override("font_color", Color(1, 1, 1, 1))
 		btn_resume.add_theme_color_override("font_hover_color", Color(1, 0.3, 0.3, 1))
 		btn_resume.flat = true
-		btn_resume.pressed.connect(func(): toggle_pause_menu())
+		btn_resume.mouse_entered.connect(play_sfx_cursor)
+		btn_resume.pressed.connect(func():
+			play_sfx_cancel()
+			toggle_pause_menu()
+		)
 		vbox.add_child(btn_resume)
 		
 		# Volume Master
@@ -295,7 +468,9 @@ func _setup_pause_menu() -> void:
 		check_fs.add_theme_font_size_override("font_size", 15)
 		check_fs.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9, 1))
 		check_fs.button_pressed = (DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN)
+		check_fs.mouse_entered.connect(play_sfx_cursor)
 		check_fs.toggled.connect(func(b: bool):
+			play_sfx_select()
 			if b:
 				DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 			else:
@@ -305,7 +480,7 @@ func _setup_pause_menu() -> void:
 		
 		# Menu Principal
 		var btn_main = Button.new()
-		btn_main.text = "→ MENU PRINCIPAL"
+		btn_main.text = "► MENU PRINCIPAL"
 		btn_main.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		btn_main.process_mode = Node.PROCESS_MODE_ALWAYS
 		if font_retro:
@@ -314,7 +489,11 @@ func _setup_pause_menu() -> void:
 		btn_main.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85, 1))
 		btn_main.add_theme_color_override("font_hover_color", Color(1, 0.3, 0.3, 1))
 		btn_main.flat = true
-		btn_main.pressed.connect(_on_main_menu_pressed)
+		btn_main.mouse_entered.connect(play_sfx_cursor)
+		btn_main.pressed.connect(func():
+			play_sfx_select()
+			_on_main_menu_pressed()
+		)
 		vbox.add_child(btn_main)
 		
 		hud.add_child(pause_menu_control)
@@ -334,6 +513,7 @@ func _toggle_pause() -> void:
 	pause_menu_control.visible = is_paused
 	get_tree().paused = is_paused
 	if is_paused:
+		play_sfx_cursor()
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	else:
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -344,7 +524,7 @@ func _on_main_menu_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/ui/title_screen.tscn")
 
 # ============================================================
-# HUD / TIMECARD / OBJETIVOS - ESTÉTICA VHS RETRÔ PROFISSIONAL
+# HUD / TIMECARD / OBJETIVOS - ESTÉTICA VHS RETRÃ” PROFISSIONAL
 # ============================================================
 
 func _show_timecard(local_text: String, hora_text: String, duration: float = 6.0) -> void:
@@ -387,6 +567,10 @@ func _set_objective(text: String, transition: bool = true) -> void:
 	objective_panel.modulate.a = 1.0
 	objective_panel.show()
 	
+	# Som de objetivo aparecendo (PICK UP OBJECT)
+	if is_instance_valid(audio_obj_appear):
+		audio_obj_appear.play()
+	
 	# Resize Smooth para o Modo Destaque (Tamanho 100% normal)
 	var tw_grow = create_tween().set_parallel(true)
 	tw_grow.tween_property(objective_panel, "scale", Vector2(1.0, 1.0), 0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
@@ -397,7 +581,7 @@ func _set_objective(text: String, transition: bool = true) -> void:
 		_start_objective_idle_shrink(my_token)
 		return
 	
-	# Efeito Profissional de Digitação VHS / Typewriter (espaço elegante e natural de 1 linha)
+	# Efeito Profissional de Digitação VHS / Typewriter
 	var current_text = objective_label.text
 	if current_text != "" and current_text != "OBJETIVO:" and current_text != "OBJETIVO:\n":
 		var newline_pos = current_text.find("\n")
@@ -414,15 +598,26 @@ func _set_objective(text: String, transition: bool = true) -> void:
 	objective_label.text = "OBJETIVO:\n"
 	await get_tree().create_timer(0.15).timeout
 	
+	# Inicia som de máquina de escrever durante a digitação
+	if is_instance_valid(audio_typewriter):
+		audio_typewriter.pitch_scale = randf_range(0.96, 1.04)
+		audio_typewriter.play()
+	
 	# Digita novo conteúdo caractere por caractere
 	var target_body = clean_text.to_upper()
 	var typed = ""
 	for i in range(target_body.length()):
 		if my_token != _objective_typing_token:
+			if is_instance_valid(audio_typewriter):
+				audio_typewriter.stop()
 			return
 		typed += target_body[i]
 		objective_label.text = "OBJETIVO:\n" + typed
 		await get_tree().create_timer(0.03).timeout
+	
+	# Para o som da máquina de escrever ao terminar a digitação
+	if is_instance_valid(audio_typewriter):
+		audio_typewriter.stop()
 	
 	# Inicia contagem de 10 segundos para encolher suavemente se não houver novas mudanças
 	_start_objective_idle_shrink(my_token)
@@ -452,7 +647,7 @@ func hide_interact_hint() -> void:
 	interact_hint.hide()
 
 # ============================================================
-# SISTEMA DE VEGETAÇÃO, VENTO E POEIRA REALISTA
+# SISTEMA DE VEGETAÇÃƒO E VENTO REALISTA
 # ============================================================
 
 func _aplicar_vento_automatico_em_todas_arvores() -> void:
@@ -563,7 +758,7 @@ func _setup_wind_particles() -> void:
 		leaves_particles.position = Vector3(0.0, 5.0, 0.0)
 
 # ============================================================
-# CONTROLADOR DE RAJADAS DINÂMICAS DE VENTO (Espaçadas e Raras)
+# CONTROLADOR DE RAJADAS DINÃ‚MICAS DE VENTO (Espaçadas e Raras)
 # ============================================================
 
 func _start_dynamic_wind_system() -> void:
@@ -617,7 +812,7 @@ func _trigger_wind_gust() -> void:
 		tw_back.tween_property(_wind_leaves_mat, "initial_velocity_max", 16.0, gust_duration * 0.6)
 
 # ============================================================
-# BOOT VHS - ESTÉTICA AUTÊNTICA VHS / OSD
+# BOOT VHS - ESTÉTICA AUTÃŠNTICA VHS / OSD & CAR DOOR OPEN
 # ============================================================
 
 func _play_vhs_intro_sequence() -> void:
@@ -627,6 +822,16 @@ func _play_vhs_intro_sequence() -> void:
 	if fade_rect:
 		fade_rect.color = Color(0, 0, 0, 1)
 		fade_rect.show()
+	
+	# Som da Alice abrindo a porta e saindo do carro na escuridão
+	if ResourceLoader.exists("res://assets/audio/things/CarDoorOpen.mp3"):
+		var sfx_door := AudioStreamPlayer.new()
+		sfx_door.stream = load("res://assets/audio/things/CarDoorOpen.mp3")
+		sfx_door.volume_db = -1.0
+		add_child(sfx_door)
+		sfx_door.play()
+		sfx_door.finished.connect(sfx_door.queue_free)
+		await get_tree().create_timer(1.2).timeout
 	
 	var vhs_overlay := ColorRect.new()
 	vhs_overlay.name = "VHSIntroOverlay"
@@ -642,9 +847,9 @@ func _play_vhs_intro_sequence() -> void:
 	vhs_overlay.material = sm
 	hud.add_child(vhs_overlay)
 	
-	# ▶ PLAY Amarelo Retrô VCR (z_index 50 para ficar puro acima de qualquer overlay)
+	# ► PLAY Amarelo Retrô VCR (z_index 50 para ficar puro acima de qualquer overlay)
 	var vcr_label := Label.new()
-	vcr_label.text = "▶ PLAY   SP   17:52:31"
+	vcr_label.text = "► PLAY   SP   17:52:31"
 	vcr_label.position = Vector2(36, 28)
 	vcr_label.z_index = 50
 	if font_retro:
@@ -689,7 +894,7 @@ func _play_vhs_intro_sequence() -> void:
 	for sec in range(31, 37):
 		if is_instance_valid(vcr_label):
 			var sec_str = "%02d" % sec
-			vcr_label.text = "▶ PLAY   SP   17:52:" + sec_str
+			vcr_label.text = "► PLAY   SP   17:52:" + sec_str
 		await get_tree().create_timer(1.0).timeout
 	
 	# 4. Fade out 100% SINCRONIZADO do PLAY e do TIMECARD ao mesmo tempo
