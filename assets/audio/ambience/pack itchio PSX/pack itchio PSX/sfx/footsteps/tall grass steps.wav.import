@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://c556ridhanyty"
+path="res://.godot/imported/tall grass steps.wav-3bc1d3d07dc67ea467edb9687d427122.sample"
+
+[deps]
+
+source_file="res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/footsteps/tall grass steps.wav"
+dest_files=["res://.godot/imported/tall grass steps.wav-3bc1d3d07dc67ea467edb9687d427122.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://bug35jxm27g2w"
+path="res://.godot/imported/open door store.wav-c184a54d3b885ddb49ee0454d95ce20f.sample"
+
+[deps]
+
+source_file="res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/Creepy Events Sounds/open door store.wav"
+dest_files=["res://.godot/imported/open door store.wav-c184a54d3b885ddb49ee0454d95ce20f.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

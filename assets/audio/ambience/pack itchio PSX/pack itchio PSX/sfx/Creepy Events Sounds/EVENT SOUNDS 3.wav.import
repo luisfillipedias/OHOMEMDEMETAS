@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://b62cgo7gakf5k"
+path="res://.godot/imported/EVENT SOUNDS 3.wav-8a44e931af287fac71328c44a1b95ee6.sample"
+
+[deps]
+
+source_file="res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/Creepy Events Sounds/EVENT SOUNDS 3.wav"
+dest_files=["res://.godot/imported/EVENT SOUNDS 3.wav-8a44e931af287fac71328c44a1b95ee6.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

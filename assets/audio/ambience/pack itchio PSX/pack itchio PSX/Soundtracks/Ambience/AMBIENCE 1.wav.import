@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://detimk6ymqsgt"
+path="res://.godot/imported/AMBIENCE 1.wav-61ca701ef785d49c6a2c51a77822333b.sample"
+
+[deps]
+
+source_file="res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/Soundtracks/Ambience/AMBIENCE 1.wav"
+dest_files=["res://.godot/imported/AMBIENCE 1.wav-61ca701ef785d49c6a2c51a77822333b.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

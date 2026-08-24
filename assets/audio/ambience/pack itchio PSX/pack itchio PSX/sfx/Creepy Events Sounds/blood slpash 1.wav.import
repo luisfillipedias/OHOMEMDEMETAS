@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://bpnp83qpsis65"
+path="res://.godot/imported/blood slpash 1.wav-2d72a44046c5fbf9f99b2c11fc78929b.sample"
+
+[deps]
+
+source_file="res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/Creepy Events Sounds/blood slpash 1.wav"
+dest_files=["res://.godot/imported/blood slpash 1.wav-2d72a44046c5fbf9f99b2c11fc78929b.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

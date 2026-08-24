@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://d1k5pl7qf6ml0"
+path="res://.godot/imported/CLOSE MENU 1.wav-107b53ac0312a33f3ffca817732afee1.sample"
+
+[deps]
+
+source_file="res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/UI retro PSX/CLOSE MENU 1.wav"
+dest_files=["res://.godot/imported/CLOSE MENU 1.wav-107b53ac0312a33f3ffca817732afee1.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

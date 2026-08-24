@@ -47,7 +47,6 @@ var _objective_typing_token: int = 0
 # Referências para Rajadas Dinâmicas de Vento
 var _tree_materials: Array[ShaderMaterial] = []
 var _wind_leaves_mat: ParticleProcessMaterial = null
-var _ground_dust_mat: ParticleProcessMaterial = null
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -97,7 +96,6 @@ func _ready() -> void:
 func _setup_hud_styling() -> void:
 	if not hud:
 		return
-	hud.layer = 15
 	
 	# 1. Configura Timecard (Canto inferior esquerdo, tamanho 22, cor limpa e sombra)
 	if timecard_panel:
@@ -166,10 +164,7 @@ func _setup_hud_styling() -> void:
 		interact_hint.add_theme_constant_override("shadow_offset_y", 2)
 		interact_hint.hide()
 
-	# 4. Configura CRTOverlay (Coloca z_index = -1 atrás do texto)
-	var crt = hud.get_node_or_null("CRTOverlay")
-	if crt:
-		crt.z_index = -1
+
 
 # ============================================================
 # SISTEMA DE PAUSA RETRO VHS / TV AZUL [ESC] EM PORTUGUÊS
@@ -525,10 +520,8 @@ func _setup_extra_wind_audio() -> void:
 			audio_wind_extra.play()
 		)
 
-var _ground_dust_particles: GPUParticles3D = null
-
 func _setup_wind_particles() -> void:
-	# 1. Partículas de Folhas Voando no Vento (ambiente contínuo orgânico)
+	# Partículas de Folhas Voando no Vento (Vento laranja / outono original)
 	var leaves_particles := GPUParticles3D.new()
 	leaves_particles.name = "WindLeavesParticles"
 	leaves_particles.amount = 90
@@ -562,93 +555,12 @@ func _setup_wind_particles() -> void:
 	quad.material = quad_mat
 	leaves_particles.draw_pass_1 = quad
 	
-	# 2. Partículas de Poeira Rasteira (Orgânica, Coesa e Focada - Disparada nas Rajadas)
-	_ground_dust_particles = GPUParticles3D.new()
-	_ground_dust_particles.name = "GroundDustParticles"
-	_ground_dust_particles.amount = 18
-	_ground_dust_particles.lifetime = 2.8
-	_ground_dust_particles.one_shot = true
-	_ground_dust_particles.emitting = false
-	_ground_dust_particles.explosiveness = 0.08 # Nasce escalonada ao longo do tempo
-	_ground_dust_particles.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	_ground_dust_particles.visibility_aabb = AABB(Vector3(-15, -2, -15), Vector3(30, 8, 30))
-	
-	# Curva de Fade In / Fade Out Suave over Lifetime
-	var color_grad := Gradient.new()
-	color_grad.add_point(0.0, Color(0.60, 0.56, 0.50, 0.0))
-	color_grad.add_point(0.22, Color(0.60, 0.56, 0.50, 0.11))
-	color_grad.add_point(0.68, Color(0.60, 0.56, 0.50, 0.06))
-	color_grad.add_point(1.0, Color(0.60, 0.56, 0.50, 0.0))
-	var color_ramp_tex := GradientTexture1D.new()
-	color_ramp_tex.gradient = color_grad
-	
-	# Curva de Escala: Expande suavemente conforme sobe
-	var scale_curve := Curve.new()
-	scale_curve.add_point(Vector2(0.0, 0.35))
-	scale_curve.add_point(Vector2(0.35, 1.0))
-	scale_curve.add_point(Vector2(1.0, 1.45))
-	var scale_tex := CurveTexture.new()
-	scale_tex.curve = scale_curve
-	
-	var dmat := ParticleProcessMaterial.new()
-	dmat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
-	dmat.emission_box_extents = Vector3(1.2, 0.04, 1.2) # Área pequena e coesa perto dos pés
-	dmat.direction = Vector3(1.0, 0.45, 0.35).normalized() # Deriva com o vento subindo suavemente
-	dmat.spread = 22.0
-	dmat.initial_velocity_min = 0.5
-	dmat.initial_velocity_max = 1.3 # Velocidade lenta de fumaça/poeira
-	dmat.gravity = Vector3(0.08, 0.16, 0.03) # Flutua no ar
-	dmat.damping_min = 2.5
-	dmat.damping_max = 4.0 # Desacelera no ar
-	dmat.scale_min = 0.35
-	dmat.scale_max = 0.70
-	dmat.color_ramp = color_ramp_tex
-	dmat.scale_curve = scale_tex
-	
-	# Turbulência orgânica para ondulação natural de poeira
-	dmat.turbulence_enabled = true
-	dmat.turbulence_noise_strength = 0.40
-	dmat.turbulence_noise_scale = 2.0
-	dmat.turbulence_noise_speed = Vector3(0.4, 0.2, 0.4)
-	
-	_ground_dust_particles.process_material = dmat
-	_ground_dust_mat = dmat
-	
-	# Textura suave de gradiente radial sem bordas
-	var grad := Gradient.new()
-	grad.add_point(0.0, Color(1, 1, 1, 0.35))
-	grad.add_point(0.35, Color(1, 1, 1, 0.10))
-	grad.add_point(0.60, Color(1, 1, 1, 0.0))
-	grad.add_point(1.0, Color(1, 1, 1, 0.0))
-	var grad_tex := GradientTexture2D.new()
-	grad_tex.gradient = grad
-	grad_tex.fill = GradientTexture2D.FILL_RADIAL
-	grad_tex.fill_from = Vector2(0.5, 0.5)
-	grad_tex.fill_to = Vector2(0.60, 0.5)
-	grad_tex.width = 64
-	grad_tex.height = 64
-	
-	var dust_quad := QuadMesh.new()
-	dust_quad.size = Vector2(0.32, 0.24)
-	var dust_qmat := StandardMaterial3D.new()
-	dust_qmat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	dust_qmat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	dust_qmat.vertex_color_use_as_albedo = true
-	dust_qmat.albedo_texture = grad_tex
-	dust_qmat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
-	dust_quad.material = dust_qmat
-	_ground_dust_particles.draw_pass_1 = dust_quad
-	
 	if player:
 		player.add_child(leaves_particles)
 		leaves_particles.position = Vector3(-10.0, 4.0, -10.0)
-		player.add_child(_ground_dust_particles)
-		_ground_dust_particles.position = Vector3(0.0, 0.04, 0.0) # Rente ao chão nos pés
 	else:
 		add_child(leaves_particles)
 		leaves_particles.position = Vector3(0.0, 5.0, 0.0)
-		add_child(_ground_dust_particles)
-		_ground_dust_particles.position = Vector3(0.0, 0.04, 0.0)
 
 # ============================================================
 # CONTROLADOR DE RAJADAS DINÂMICAS DE VENTO (Espaçadas e Raras)
@@ -668,23 +580,19 @@ func _trigger_wind_gust() -> void:
 	var peak_wind_force = randf_range(0.46, 0.58)
 	var peak_flutter = randf_range(11.0, 14.0)
 	
-	# 1. Dispara o burst único e sutil de poeira na rajada
-	if is_instance_valid(_ground_dust_particles):
-		_ground_dust_particles.restart()
-	
-	# 2. Aumenta balanço das árvores
+	# 1. Aumenta balanço das árvores
 	var tw = create_tween().set_parallel(true)
 	for sm in _tree_materials:
 		if is_instance_valid(sm):
 			tw.tween_property(sm, "shader_parameter/forca_rajada", peak_wind_force, gust_duration * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 			tw.tween_property(sm, "shader_parameter/velocidade_flutter", peak_flutter, gust_duration * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	
-	# 3. Som do vento ruge na rajada
+	# 2. Som do vento ruge na rajada
 	if is_instance_valid(audio_wind_extra):
 		tw.tween_property(audio_wind_extra, "volume_db", -1.5, gust_duration * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tw.tween_property(audio_wind_extra, "pitch_scale", 1.10, gust_duration * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	
-	# 4. Folhas aceleram no pico da rajada
+	# 3. Folhas de vento aceleram no pico da rajada
 	if _wind_leaves_mat:
 		tw.tween_property(_wind_leaves_mat, "initial_velocity_min", 14.0, gust_duration * 0.3)
 		tw.tween_property(_wind_leaves_mat, "initial_velocity_max", 22.0, gust_duration * 0.3)

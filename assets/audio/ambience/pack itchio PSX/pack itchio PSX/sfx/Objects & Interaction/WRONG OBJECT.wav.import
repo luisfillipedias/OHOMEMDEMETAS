@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://os5pvgu46r3p"
+path="res://.godot/imported/WRONG OBJECT.wav-d4d2e43ca1f41daf1c50556b3b4d4a8d.sample"
+
+[deps]
+
+source_file="res://assets/audio/ambience/pack itchio PSX/pack itchio PSX/sfx/Objects & Interaction/WRONG OBJECT.wav"
+dest_files=["res://.godot/imported/WRONG OBJECT.wav-d4d2e43ca1f41daf1c50556b3b4d4a8d.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2
