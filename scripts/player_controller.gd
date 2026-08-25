@@ -2,7 +2,7 @@ extends CharacterBody3D
 
 # ============================================================
 # PLAYER CONTROLLER -- 1a Pessoa com sistema de passos por
-#                      deslocamento físico real contínuo
+#                      deslocamento físico real contínuo & Zoom
 # ============================================================
 
 const WALK_SPEED := 3.2
@@ -15,12 +15,19 @@ const STEP_DISTANCE: float = 1.25 # Metros entre cada passo (1.25m = cadência h
 const BOB_VERTICAL_AMP: float = 0.022
 const BOB_HORIZONTAL_AMP: float = 0.010
 
+# Mecânica de Zoom (Estilo Fears to Fathom - Segurar Botão Direito)
+@export_group("Zoom / Foco")
+@export var zoom_fov: float = 38.0
+@export var zoom_speed: float = 9.5
+
 @onready var camera_mount: Node3D = $CameraMount
 @onready var camera: Camera3D = $CameraMount/Camera3D
 @onready var interact_ray: RayCast3D = $CameraMount/Camera3D/InteractRay
 
 var is_frozen: bool = false
 var camera_base_y: float = 0.65
+var default_fov: float = 72.0
+var is_zooming: bool = false
 
 # Head bobbing fase contínua (sem dupla suavização)
 var _bob_phase: float = 0.0
@@ -42,6 +49,7 @@ func _ready() -> void:
 	add_to_group("player")
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	camera_base_y = camera_mount.position.y
+	default_fov = camera.fov
 	floor_snap_length = 0.4
 	floor_max_angle = deg_to_rad(50.0)
 	
@@ -87,8 +95,11 @@ func _input(event: InputEvent) -> void:
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	
 	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
-		rotate_y(-event.relative.x * MOUSE_SENS)
-		camera_mount.rotate_x(-event.relative.y * MOUSE_SENS)
+		# Sensibilidade ajustada proporcionalmente ao FOV atual (zoom mais suave e estável)
+		var fov_ratio: float = camera.fov / default_fov if default_fov > 0.0 else 1.0
+		var current_sens: float = MOUSE_SENS * clamp(fov_ratio, 0.45, 1.0)
+		rotate_y(-event.relative.x * current_sens)
+		camera_mount.rotate_x(-event.relative.y * current_sens)
 		camera_mount.rotation.x = clamp(camera_mount.rotation.x, -1.2, 1.2)
 		
 	if event.is_action_pressed("throw_item") or (event is InputEventKey and event.pressed and event.keycode == KEY_G):
@@ -101,6 +112,8 @@ func _physics_process(delta: float) -> void:
 
 	if not is_on_floor():
 		velocity.y -= GRAVITY * delta
+
+	_process_zoom(delta)
 
 	var dir: Vector3 = Vector3.ZERO
 	var fwd: Vector3 = -global_transform.basis.z
@@ -119,8 +132,9 @@ func _physics_process(delta: float) -> void:
 
 	if is_moving:
 		dir = dir.normalized()
-		velocity.x = dir.x * WALK_SPEED
-		velocity.z = dir.z * WALK_SPEED
+		var move_speed: float = WALK_SPEED * (0.85 if is_zooming else 1.0)
+		velocity.x = dir.x * move_speed
+		velocity.z = dir.z * move_speed
 		_handle_step_assist(dir)
 	else:
 		velocity.x = lerp(velocity.x, 0.0, delta * 12.0)
@@ -130,21 +144,34 @@ func _physics_process(delta: float) -> void:
 	_process_footsteps_and_headbob(delta, is_moving)
 	_check_interaction()
 
+func _process_zoom(delta: float) -> void:
+	var chapter = get_tree().get_first_node_in_group("chapter")
+	var is_paused: bool = (chapter and "is_paused" in chapter and chapter.is_paused) or get_tree().paused
+	
+	if not is_frozen and not is_paused and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
+		is_zooming = Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)
+	else:
+		is_zooming = false
+
+	var target_fov: float = zoom_fov if is_zooming else default_fov
+	camera.fov = lerp(camera.fov, target_fov, delta * zoom_speed)
+
 func _process_footsteps_and_headbob(delta: float, is_moving: bool) -> void:
 	var horiz_speed: float = Vector2(velocity.x, velocity.z).length()
 	var on_ground: bool = is_on_floor()
 	var moving: bool = on_ground and horiz_speed > 0.1
 
-	# Suaviza APENAS a amplitude (fade in/out do bob), nunca a curva do passo em si
-	var target_blend: float = 1.0 if moving else 0.0
+	# Suaviza amplitude do bobbing (durante zoom reduz sutilmente para manter foco tenso)
+	var bob_scale: float = 0.55 if is_zooming else 1.0
+	var target_blend: float = (1.0 * bob_scale) if moving else 0.0
 	_bob_blend = lerp(_bob_blend, target_blend, delta * 8.0)
 
 	if moving:
 		_idle_time = 0.0
-		# Fase avanca continuamente proporcional a distancia real percorrida
+		# Fase avança continuamente proporcional à distância real percorrida
 		_bob_phase += horiz_speed * delta * BOB_FREQUENCY
 
-		# Dispara passo exatamente 1x por meia-volta de fase (cada pisada), sem duplicar e sem lag
+		# Dispara passo exatamente 1x por meia-volta de fase
 		var phase_id: int = int(_bob_phase / PI)
 		if phase_id != _last_step_phase_id:
 			_last_step_phase_id = phase_id
@@ -152,7 +179,6 @@ func _process_footsteps_and_headbob(delta: float, is_moving: bool) -> void:
 	else:
 		_idle_time += delta
 
-	# Aplica a curva DIRETO, sem lerp por cima -- so a amplitude (_bob_blend) e suavizada
 	var vertical_offset: float = -abs(sin(_bob_phase)) * BOB_VERTICAL_AMP * _bob_blend
 	var horizontal_offset: float = sin(_bob_phase * 0.5) * BOB_HORIZONTAL_AMP * _bob_blend
 	camera_mount.position.y = camera_base_y + vertical_offset
