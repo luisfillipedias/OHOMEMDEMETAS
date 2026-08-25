@@ -1,0 +1,35 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/models/car/psx/Car 03/Car3.obj" id="1_mesh"]
+[ext_resource type="Texture2D" path="res://assets/models/car/psx/Car 03/car3_red.png" id="2_tex"]
+[ext_resource type="AudioStream" path="res://assets/models/car/psx/Sound effects/Car_Engine_Loop_2.ogg" id="3_engine"]
+[ext_resource type="AudioStream" path="res://assets/audio/Car/CarHORN_Buzina.ogg" id="4_horn"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_Car"]
+albedo_texture = ExtResource("2_tex")
+roughness = 0.85
+specular_mode = 2
+texture_filter = 0
+
+[node name="Car_03_red" type="Node3D"]
+
+[node name="Model" type="MeshInstance3D" parent="."]
+mesh = ExtResource("1_mesh")
+surface_material_override/0 = SubResource("Mat_Car")
+
+[node name="EngineAudio" type="AudioStreamPlayer3D" parent="."]
+stream = ExtResource("3_engine")
+autoplay = true
+volume_db = -12.0
+unit_size = 6.0
+max_distance = 32.0
+attenuation_model = 1
+doppler_tracking = 1
+
+[node name="HornAudio" type="AudioStreamPlayer3D" parent="."]
+stream = ExtResource("4_horn")
+volume_db = -4.0
+unit_size = 10.0
+max_distance = 45.0
+attenuation_model = 1
+doppler_tracking = 1

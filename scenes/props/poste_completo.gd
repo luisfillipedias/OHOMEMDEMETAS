@@ -1,42 +1,42 @@
 extends Node3D
 
-@onready var luz_vermelha: OmniLight3D = $OmniLight3D
-@onready var luz_amarela: OmniLight3D = $OmniLight3D2
-@onready var luz_verde: OmniLight3D = $OmniLight3D3
+enum EstadoSemaforo { VERMELHO, AMARELO, VERDE }
+
+@onready var luz_vermelha: OmniLight3D = $street_light2/OmniLight3D if has_node("street_light2/OmniLight3D") else null
+@onready var luz_amarela: OmniLight3D = $street_light2/OmniLight3D2 if has_node("street_light2/OmniLight3D2") else null
+@onready var luz_verde: OmniLight3D = $street_light2/OmniLight3D3 if has_node("street_light2/OmniLight3D3") else null
+
+var estado_atual: EstadoSemaforo = EstadoSemaforo.VERMELHO
+signal mudou_estado(novo_estado: EstadoSemaforo)
 
 func _ready() -> void:
-	# Cores espectrais naturais de sinalização (evita manchas cartunescas no asfalto)
-	if luz_vermelha:
-		luz_vermelha.light_color = Color(0.95, 0.22, 0.18, 1.0)
-	if luz_amarela:
-		luz_amarela.light_color = Color(1.0, 0.65, 0.15, 1.0)
-	if luz_verde:
-		luz_verde.light_color = Color(0.18, 0.92, 0.70, 1.0)
-	
-	# Luz sutil e localizada (a maior parte do brilho vem da lente e do glow, não inundando o quarteirão)
-	for l in [luz_vermelha, luz_amarela, luz_verde]:
-		if l:
-			l.light_energy = 0.45
-			l.omni_range = 3.5
-			l.omni_attenuation = 1.6
-	
-	ciclo_semaforo()
+	add_to_group("semaforos_poste_completo")
+	if luz_vermelha and luz_amarela and luz_verde:
+		luz_vermelha.light_color = Color(1.0, 0.0, 0.0)
+		luz_amarela.light_color = Color(1.0, 0.7, 0.0)
+		luz_verde.light_color = Color(0.0, 1.0, 0.0)
+		_ciclo_semaforo()
 
-func ciclo_semaforo() -> void:
-	while is_instance_valid(self):
-		# Vermelho por 35s
+func _ciclo_semaforo() -> void:
+	while true:
+		_definir_estado(EstadoSemaforo.VERMELHO)
 		ativar_luz(true, false, false)
 		await get_tree().create_timer(35.0).timeout
-		if not is_instance_valid(self): break
 		
-		# Verde por 35s
+		_definir_estado(EstadoSemaforo.VERDE)
 		ativar_luz(false, false, true)
 		await get_tree().create_timer(35.0).timeout
-		if not is_instance_valid(self): break
 		
-		# Amarelo por 4s
+		_definir_estado(EstadoSemaforo.AMARELO)
 		ativar_luz(false, true, false)
 		await get_tree().create_timer(4.0).timeout
+
+func _definir_estado(novo_estado: EstadoSemaforo) -> void:
+	estado_atual = novo_estado
+	mudou_estado.emit(estado_atual)
+
+func is_vermelho() -> bool:
+	return estado_atual == EstadoSemaforo.VERMELHO or estado_atual == EstadoSemaforo.AMARELO
 
 func ativar_luz(vermelho: bool, amarelo: bool, verde: bool) -> void:
 	if luz_vermelha: luz_vermelha.visible = vermelho

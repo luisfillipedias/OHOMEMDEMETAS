@@ -102,6 +102,8 @@
 [ext_resource type="Texture2D" uid="uid://cvw8uoq0ii38u" path="res://assets/models/_caracters/pedestres/faxineiro_1.png" id="98_x3v83"]
 [ext_resource type="PackedScene" uid="uid://c1pcuiaspfeml" path="res://assets/URBAN/Litter/Metal trashcan/metaltrashcan_lid.fbx" id="102_g8ibc"]
 [ext_resource type="Script" uid="uid://b4fphkejexeuf" path="res://scripts/pedestre_rota.gd" id="102_pedrota"]
+[ext_resource type="Script" uid="uid://cwrxji6hun1y5" path="res://scripts/carro_rota.gd" id="Ext_Carro_Rota"]
+[ext_resource type="Script" uid="uid://bdh8gdlq0v3f7" path="res://scripts/controlador_semaforo.gd" id="Ext_Ctrl_Semaforo"]
 
 [sub_resource type="Sky" id="Sky_Night"]
 sky_material = ExtResource("49_skystorm")
@@ -1467,6 +1469,34 @@ emission = Color(1, 0, 0, 1)
 [sub_resource type="BoxMesh" id="BoxMesh_jio4w"]
 size = Vector3(17.67517, 0.99316406, 33.90026)
 
+[sub_resource type="Curve3D" id="Curve3D_cqr8u"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -97.74573, 0.024995416, -75.51135, 0, 0, 0, 0, 0, 0, -101.08788, 0.025003046, -28.22462, 0, 0, 0, 0, 0, 0, -99.92493, 0.025010675, 10.279709, 0, 0, 0, 0, 0, 0, -98.381, 0.17092285, 25.54031, 0, 0, 0, 0, 0, 0, -75.447044, 0.17092094, 27.114958, 0, 0, 0, 0, 0, 0, -38.014732, 0.17092285, 27.849327, 0, 0, 0, 0, 0, 0, -17.243118, 0.17091903, 28.35733, 0, 0, 0, 0, 0, 0, 14.276625, 0.17092285, 27.426968, 0, 0, 0, 0, 0, 0, 40.524406, 0.17091903, 26.429146, 0, 0, 0, 0, 0, 0, 71.824, 0.17091903, 26.363222, 0, 0, 0, 0, 0, 0, 110.806145, 0.17092285, 26.647581, 0, 0, 0, 0, 0, 0, 145.33897, 0.17091522, 28.862541, 0, 0, 0, 0, 0, 0, 187.96436, 0.17091522, 29.155685, 0, 0, 0, 0, 0, 0, 204.37373, 0.17092094, 27.181631, 0, 0, 0, 0, 0, 0, 202.54465, 10.519869, 17.976301),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 15
+
+[sub_resource type="Curve3D" id="Curve3D_g8ibc"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -177.02724, -1.6725563, 0.2603264, 0, 0, 0, 0, 0, 0, -176.1009, -1.6725563, 24.193369, 0, 0, 0, 0, 0, 0, -154.57376, 0.17091903, 22.37859, 0, 0, 0, 0, 0, 0, -90.50417, 0.17092094, 22.764538, 0, 0, 0, 0, 0, 0, -51.342705, 0.17091998, 22.818369, 0, 0, 0, 0, 0, 0, -17.725685, 0.17091712, 22.960003, 0, 0, 0, 0, 0, 0, 7.5765095, 0.17092094, 22.797812, 0, 0, 0, 0, 0, 0, 39.790184, 0.17091903, 22.685314, 0, 0, 0, 0, 0, 0, 71.44593, 0.17091998, 22.813887, 0, 0, 0, 0, 0, 0, 108.17943, 0.17092046, 23.694912, 0, 0, 0, 0, 0, 0, 154.66924, 0.17091998, 25.498322, 0, 0, 0, 0, 0, 0, 202.66197, 0.17091998, 25.949863, 0, 0, 0, 0, 0, 0, 203.15276, -0.6931404, 57.515484, 0, 0, 0, 0, 0, 0, 202.17017, -0.6931375, 70.85809),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 14
+
+[sub_resource type="Curve3D" id="Curve3D_bqwhj"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 203.38673, -0.6931366, 65.671364, 0, 0, 0, 0, 0, 0, 200.93243, 0.17092094, 38.723686, 0, 0, 0, 0, 0, 0, 158.49104, 0.17091903, 35.844288, 0, 0, 0, 0, 0, 0, 104.20593, 0.17091998, 34.2681, 0, 0, 0, 0, 0, 0, 63.27719, 0.17091998, 34.149014, 0, 0, 0, 0, 0, 0, 7.9735756, 0.17091951, 34.192963, 0, 0, 0, 0, 0, 0, -41.820587, 0.17091998, 33.52419, 0, 0, 0, 0, 0, 0, -83.64851, 0.17091975, 34.430836, 0, 0, 0, 0, 0, 0, -118.642105, 0.17091903, 36.27241, 0, 0, 0, 0, 0, 0, -162.89696, 0.17091712, 35.343163, 0, 0, 0, 0, 0, 0, -181.1105, -1.6725563, 37.558857, 0, 0, 0, 0, 0, 0, -182.1566, -1.6725563, 79.23082),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 12
+
+[sub_resource type="Curve3D" id="Curve3D_8rlrd"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 81.94629, 0.025004953, -87.69844, 0, 0, 0, 0, 0, 0, 82.18289, 0.025003046, 14.24556, 0, 0, 0, 0, 0, 0, 86.69527, 0.17092285, 27.560358, 0, 0, 0, 0, 0, 0, 83.3199, 0.17092094, 39.181786, 0, 0, 0, 0, 0, 0, 61.012024, 0.17091998, 36.24392, 0, 0, 0, 0, 0, 0, 35.197765, 0.17091998, 39.03447, 0, 0, 0, 0, 0, 0, -1.0370121, 0.17091998, 38.085342, 0, 0, 0, 0, 0, 0, -6.201195, 0.17091998, 38.728737, 0, 0, 0, 0, 0, 0, -21.077137, 0.17091998, 38.41809, 0, 0, 0, 0, 0, 0, -47.50757, 0.17092094, 37.718903, 0, 0, 0, 0, 0, 0, -62.56337, 0.17091998, 36.157467, 0, 0, 0, 0, 0, 0, -85.83795, 0.17091998, 35.592113, 0, 0, 0, 0, 0, 0, -109.57251, 0.17091903, 35.74087, 0, 0, 0, 0, 0, 0, -109.76505, 0.024999231, 66.76843, 0, 0, 0, 0, 0, 0, -111.02426, 0.024999231, 115.1057),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 15
+
 [node name="Chapter01" type="Node3D" unique_id=220049408]
 script = ExtResource("1_ch01")
 
@@ -1688,6 +1718,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.211136, -0.004080206, 29.7
 material_override = SubResource("StandardMaterial3D_4ecmv")
 use_collision = true
 size = Vector3(378.51038, 0.35, 24.4505)
+
+[node name="AvAmazonasRoad8" type="CSGBox3D" parent="CefetExterior" unique_id=272064551]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -168.00037, -1.8475555, 39.850864)
+material_override = SubResource("StandardMaterial3D_4ecmv")
+use_collision = true
+size = Vector3(34.590973, 0.35, 90.51936)
 
 [node name="AvAmazonasRoad6" type="CSGBox3D" parent="CefetExterior" unique_id=2123112040]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 70.53612, -0.15, -69.68744)
@@ -2592,6 +2628,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.558723, -0.11264363, 26.8
 
 [node name="traffic_light_L" parent="." unique_id=2002902738 instance=ExtResource("48_lv61m")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.050652, 0.025001138, 36.153122)
+script = ExtResource("21_d85ci")
 
 [node name="OmniLight3D" type="OmniLight3D" parent="traffic_light_L" unique_id=379321520]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.201511, 4.7716928, -17.285725)
@@ -7418,6 +7455,25 @@ transform = Transform3D(1, 0, 0, 0, 0.9985004, -0.054744106, 0, 0.054744106, 0.9
 
 [node name="metaltrashcan_lid" parent="." unique_id=1286889844 instance=ExtResource("102_g8ibc")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -77.64723, 0.26167154, 1.5222836)
+
+[node name="ControladorSemaforo" type="Node" parent="." unique_id=208974143]
+script = ExtResource("Ext_Ctrl_Semaforo")
+
+[node name="RotaCarro1" type="Path3D" parent="." unique_id=253392859]
+curve = SubResource("Curve3D_cqr8u")
+script = ExtResource("Ext_Carro_Rota")
+
+[node name="RotaCarro2" type="Path3D" parent="." unique_id=1025562573]
+curve = SubResource("Curve3D_g8ibc")
+script = ExtResource("Ext_Carro_Rota")
+
+[node name="RotaCarroInversa1" type="Path3D" parent="." unique_id=719886813]
+curve = SubResource("Curve3D_bqwhj")
+script = ExtResource("Ext_Carro_Rota")
+
+[node name="RotaCarroInversa2" type="Path3D" parent="." unique_id=1933901650]
+curve = SubResource("Curve3D_8rlrd")
+script = ExtResource("Ext_Carro_Rota")
 
 [editable path="building_03_1"]
 [editable path="building_04_1"]
