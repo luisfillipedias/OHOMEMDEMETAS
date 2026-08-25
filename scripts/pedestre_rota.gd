@@ -10,7 +10,7 @@ extends Path3D
 @export var altura_offset: float = 0.055
 
 @export_group("Comportamento de Olhar")
-@export var permitir_olhar_jogador: bool = false
+@export var permitir_olhar_jogador: bool = true
 @export var distancia_max_olhar: float = 7.5
 @export var angulo_max_olhar_graus: float = 90.0
 @export var angulo_max_cabeca_graus: float = 55.0
@@ -224,7 +224,7 @@ func _orientar_para_frente(follow: PathFollow3D, holder: Node3D) -> void:
 	if direcao.length_squared() < 0.0001:
 		return
 	# Rotação direta por yaw (atan2) — 100% à prova de falhas, sem look_at
-	holder.rotation.y = atan2(-direcao.x, -direcao.z)
+	holder.global_rotation.y = atan2(-direcao.x, -direcao.z)
 
 func _atualizar_olhar_cabeca(p: Dictionary, jogador: Node3D, delta: float) -> void:
 	var skeleton: Skeleton3D = p["skeleton"]

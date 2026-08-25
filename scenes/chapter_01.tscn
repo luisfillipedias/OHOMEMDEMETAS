@@ -6987,11 +6987,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5156226, 0.16509914, 18.583
 curve = SubResource("Curve3D_ypu3b")
 script = ExtResource("102_pedrota")
 
-[node name="PathFollow3D" type="PathFollow3D" parent="RotaPedestre" unique_id=900005144]
-transform = Transform3D(-0.9996285, 0, -0.027206993, 0, 1, 0, 0.027206993, 0, -0.9996285, -93.68164, -0.46984792, -18.385014)
-rotation_mode = 1
-script = ExtResource("99_gix0y")
-
 [node name="RotaPedestreInvertida" type="Path3D" parent="." unique_id=144408749]
 transform = Transform3D(-0.9996, 0, -0.0272, 0, 1, 0, 0.0272, 0, -0.9996, -92.166, -0.304, 0.198)
 curve = SubResource("Curve3D_mv6dm")
