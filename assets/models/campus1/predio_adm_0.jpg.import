@@ -2,11 +2,14 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://pxbiw8ll4d8t"
+uid="uid://k6uyh3x2do3j"
 path.s3tc="res://.godot/imported/predio_adm_0.jpg-44deef2e2750bf06ea37e898095d4de7.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
+}
+generator_parameters={
+"md5": "514ead8c990c286b8491c9cccd749057"
 }
 
 [deps]

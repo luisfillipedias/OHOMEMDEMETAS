@@ -176,6 +176,8 @@ func _process(delta: float) -> void:
 		if not grupo.is_empty():
 			jogador = grupo[0]
 
+	var jog_pos: Vector3 = jogador.global_position if is_instance_valid(jogador) else Vector3.ZERO
+
 	for p in pedestres_ativos:
 		if not is_instance_valid(p["follow"]):
 			continue
@@ -193,8 +195,13 @@ func _process(delta: float) -> void:
 				a3d.volume_db = randf_range(-2.0, +1.0)
 				a3d.play()
 		
+		# Distance Culling: só calcula rotação de cabeça se estiver dentro do raio de alcance
 		if permitir_olhar_jogador and jogador:
-			_atualizar_olhar_cabeca(p, jogador, delta)
+			var holder: Node3D = p.get("holder")
+			if is_instance_valid(holder) and holder.global_position.distance_squared_to(jog_pos) <= 144.0: # 12 metros
+				_atualizar_olhar_cabeca(p, jogador, delta)
+			elif p.get("olhando_atual", 0.0) > 0.001:
+				p["olhando_atual"] = lerp(p["olhando_atual"], 0.0, delta * 4.0)
 
 func _orientar_para_frente(follow: PathFollow3D, holder: Node3D) -> void:
 	if curve == null:

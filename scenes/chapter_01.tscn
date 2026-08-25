@@ -102,22 +102,18 @@ tonemap_mode = 3
 tonemap_exposure = 0.95
 tonemap_white = 3.6
 ssao_enabled = true
-ssao_radius = 1.6
-ssao_intensity = 1.8
+ssao_radius = 1.0
+ssao_intensity = 1.4
 glow_enabled = true
 glow_intensity = 0.22
 glow_bloom = 0.06
 fog_enabled = true
 fog_light_color = Color(0.11, 0.1, 0.15, 1)
-fog_light_energy = 0.32
-fog_density = 0.009
+fog_light_energy = 0.35
+fog_density = 0.011
 fog_aerial_perspective = 0.35
 fog_sky_affect = 0.15
-volumetric_fog_enabled = true
-volumetric_fog_density = 0.012
-volumetric_fog_albedo = Color(0.12, 0.11, 0.16, 1)
-volumetric_fog_anisotropy = 0.35
-volumetric_fog_ambient_inject = 0.25
+volumetric_fog_enabled = false
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape_Player"]
 radius = 0.38
@@ -1706,37 +1702,47 @@ transform = Transform3D(0.03516105, 0, -0.99938166, 0, 1, 0, 0.99938166, 0, 0.03
 
 [node name="concrete_retro_bollard2" parent="CefetExterior" unique_id=1031907158 instance=ExtResource("16_4b8ul")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -23.395407, 3.9149504, -46.579914)
-
+visibility_range_end = 40.0
+visibility_range_end_margin = 6.0
+visibility_range_fade_mode = 0
 [node name="retro_bollard_detailed" parent="CefetExterior" unique_id=1201330837 instance=ExtResource("17_vlj7a")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4137173, 0.095868684, 18.552774)
-
+visibility_range_end = 40.0
+visibility_range_end_margin = 6.0
+visibility_range_fade_mode = 0
 [node name="security_bollard" parent="CefetExterior" unique_id=255916726 instance=ExtResource("18_ocq0d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.417797, 0.09586871, 18.841267)
-
+visibility_range_end = 40.0
+visibility_range_end_margin = 6.0
+visibility_range_fade_mode = 0
 [node name="metaltrashcan_beaten2" parent="CefetExterior" unique_id=1785366767 instance=ExtResource("19_hw3tc")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -99.286026, 0.09407616, 2.2517605)
-
+visibility_range_end = 40.0
+visibility_range_end_margin = 6.0
+visibility_range_fade_mode = 0
 [node name="traffic_light" parent="CefetExterior" unique_id=640603207 instance=ExtResource("20_fl4v4")]
 transform = Transform3D(-0.9993799, 0, 0.0352123, 0, 1, 0, -0.0352123, 0, -0.9993799, -9.213342, 0.025000185, 26.400888)
 script = ExtResource("21_d85ci")
-
+visibility_range_end = 40.0
+visibility_range_end_margin = 6.0
+visibility_range_fade_mode = 0
 [node name="OmniLight3D" type="OmniLight3D" parent="CefetExterior/traffic_light" unique_id=1641230503]
 transform = Transform3D(-0.9993799, -0.0037139466, -0.035015892, 0, 0.9944222, -0.10547299, 0.0352123, -0.10540758, -0.9938055, 10.14577, 4.800094, -14.614477)
 light_color = Color(1, 0.88, 0.65, 1)
 light_energy = 1.8
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="OmniLight3D2" type="OmniLight3D" parent="CefetExterior/traffic_light" unique_id=1371573556]
 transform = Transform3D(-0.9993799, -0.0037139466, -0.035015892, 0, 0.9944222, -0.10547299, 0.0352123, -0.10540758, -0.9938055, 10.147113, 4.440628, -14.576374)
 light_color = Color(1, 0.88, 0.65, 1)
 light_energy = 1.8
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="OmniLight3D3" type="OmniLight3D" parent="CefetExterior/traffic_light" unique_id=445677132]
 transform = Transform3D(-0.9993799, -0.0037139466, -0.035015892, 0, 0.9944222, -0.10547299, 0.0352123, -0.10540758, -0.9938055, 10.146558, 5.229889, -14.592134)
 light_color = Color(1, 0.88, 0.65, 1)
 light_energy = 1.8
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="SmallTree" type="MeshInstance3D" parent="CefetExterior" unique_id=832820314]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.46428, 0.09407663, 11.733887)
@@ -2408,13 +2414,13 @@ transform = Transform3D(17, 0, 0, 0, 16.955248, -1.2327011, 0, 1.2327011, 16.955
 transform = Transform3D(0.05882353, 0, 0, 0, 0.05882353, -2.7939677e-09, 0, 2.3283064e-09, 0.05882353, 0.21205461, -0.004104346, -0.05645342)
 light_color = Color(1, 0.88, 0.65, 1)
 light_energy = 2.641
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="OmniLight3D" type="OmniLight3D" parent="AuxScene4/OmniLight3D" unique_id=419253245]
 transform = Transform3D(1, 0, 0, 0, 1, -2.9802322e-08, 0, 3.7252903e-08, 1, -10.871443, -0.51974154, -0.19025731)
 light_color = Color(1, 0.88, 0.65, 1)
 light_energy = 1.41
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="metalfence_both_sides_no_topbar2" parent="." unique_id=861299821 instance=ExtResource("13_62ahm")]
 transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, -59.52327, -0.7291002, 14.479467)
@@ -2466,41 +2472,59 @@ transform = Transform3D(1, 0, 0, 0, 6, 0, 0, 0, 1, 207.30344, -169.9138, 74.4685
 
 [node name="busstop_bench" parent="." unique_id=444103066 instance=ExtResource("36_rn7kw")]
 transform = Transform3D(0.055911675, 0, -0.9984357, 0, 1, 0, 0.9984357, 0, 0.055911675, -48.082222, 0.03372261, -4.8455124)
-
+visibility_range_end = 40.0
+visibility_range_end_margin = 6.0
+visibility_range_fade_mode = 0
 [node name="busstop_bench_alt" parent="." unique_id=47845318 instance=ExtResource("37_ipmx6")]
 transform = Transform3D(-0.1650004, 0, -0.9862935, 0, 1, 0, 0.9862935, 0, -0.1650004, -37.24624, 0.10279858, -0.36003876)
-
+visibility_range_end = 40.0
+visibility_range_end_margin = 6.0
+visibility_range_fade_mode = 0
 [node name="busstop_graffiti" parent="." unique_id=904205194 instance=ExtResource("38_6qdyw")]
 transform = Transform3D(-0.012399979, 0, -0.9999231, 0, 1, 0, 0.9999231, 0, -0.012399979, -48.258522, 0.102798715, -3.5280247)
-
+visibility_range_end = 40.0
+visibility_range_end_margin = 6.0
+visibility_range_fade_mode = 0
 [node name="busstop_graffiti_round_roof2" parent="." unique_id=2116496594 instance=ExtResource("39_mp37i")]
 transform = Transform3D(0.0929383, 0, -0.99567187, 0, 1, 0, 0.99567187, 0, 0.0929383, -62.5776, 0.024999231, -6.005515)
-
+visibility_range_end = 40.0
+visibility_range_end_margin = 6.0
+visibility_range_fade_mode = 0
 [node name="Traffic_cone_round" parent="." unique_id=246727798 instance=ExtResource("44_yh71n")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45.649685, 0.025000209, 18.21769)
-
+visibility_range_end = 40.0
+visibility_range_end_margin = 6.0
+visibility_range_fade_mode = 0
 [node name="light" parent="." unique_id=1032197673 instance=ExtResource("47_ualm5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.558723, -0.11264363, 26.809744)
-
+visibility_range_end = 40.0
+visibility_range_end_margin = 6.0
+visibility_range_fade_mode = 0
 [node name="traffic_light_L" parent="." unique_id=2002902738 instance=ExtResource("48_lv61m")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.122581, 0.025001138, 36.50821)
-
+visibility_range_end = 40.0
+visibility_range_end_margin = 6.0
+visibility_range_fade_mode = 0
 [node name="OmniLight3D" type="OmniLight3D" parent="traffic_light_L" unique_id=379321520]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.201511, 4.7716928, -17.285725)
 light_color = Color(0.9, 0.1, 0.05, 1)
 light_energy = 1.2
-shadow_enabled = true
+shadow_enabled = false
 omni_range = 6.0
 
-[node name="OmniLight3D2" type="OmniLight3D" parent="traffic_light_L" unique_id=1200009032]
+
+distance_fade_enabled = true
+distance_fade_begin = 20.0
+distance_fade_length = 8.0
+distance_fade_max_distance = 35.0[node name="OmniLight3D2" type="OmniLight3D" parent="traffic_light_L" unique_id=1200009032]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.201511, 5.1960516, -17.285725)
 light_energy = 0.0
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="OmniLight3D3" type="OmniLight3D" parent="traffic_light_L" unique_id=657315321]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.201511, 4.411085, -17.285725)
 light_energy = 0.0
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="PosteCompleto" parent="." unique_id=1776501595 instance=ExtResource("47_q5j18")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.762253, 4.3291945, 16.895699)
@@ -2546,10 +2570,14 @@ script = ExtResource("50_blhwd")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6159096, 0.82571507, -0.50426483)
 light_color = Color(1, 0.88, 0.65, 1)
 light_energy = 1.4
-shadow_enabled = true
+shadow_enabled = false
 omni_range = 16.0
 
-[node name="OmniLight3D2" type="OmniLight3D" parent="PosteCompleto3" unique_id=217045740]
+
+distance_fade_enabled = true
+distance_fade_begin = 20.0
+distance_fade_length = 8.0
+distance_fade_max_distance = 35.0[node name="OmniLight3D2" type="OmniLight3D" parent="PosteCompleto3" unique_id=217045740]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6159096, 0.48213196, -0.50426483)
 light_color = Color(1, 0.88, 0.65, 1)
 light_energy = 0.0
@@ -2584,67 +2612,67 @@ light_color = Color(1, 0.88, 0.65, 1)
 [node name="OmniLight3D2" type="OmniLight3D" parent="OmniLight3D2" unique_id=2140309471]
 transform = Transform3D(0.036663648, -0.06520311, -0.066365145, 0.039116118, 0.075524636, -0.052592386, 0.08441391, -0.006677184, 0.053195, -1.0469785, 0.14767265, -1.8237877)
 light_color = Color(1, 0.88, 0.65, 1)
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="OmniLight3D3" type="OmniLight3D" parent="OmniLight3D2" unique_id=648215779]
 transform = Transform3D(0.98575914, 0, -0.16816345, 0, 1, 0, 0.16816345, 0, 0.98575914, -4.4840384, 0.1557436, -4.175171)
 light_color = Color(1, 0.88, 0.65, 1)
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="OmniLight3D4" type="OmniLight3D" parent="OmniLight3D2" unique_id=2057786596]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.4933085, -3.4506865, -4.0811615)
 light_color = Color(1, 0.88, 0.65, 1)
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="OmniLight3D5" type="OmniLight3D" parent="OmniLight3D2" unique_id=834407807]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.537596, 0.9323797, -5.1256256)
 light_color = Color(1, 0.88, 0.65, 1)
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="OmniLight3D6" type="OmniLight3D" parent="OmniLight3D2" unique_id=1678750329]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.331261, -3.4648342, -5.11187)
 light_color = Color(1, 0.88, 0.65, 1)
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="OmniLight3D7" type="OmniLight3D" parent="OmniLight3D2" unique_id=1811871076]
 transform = Transform3D(0.99756545, 0.06973659, -0.00024007261, -0.06973659, 0.9975418, -0.00687648, -0.00024007261, 0.0068764803, 0.9999764, -8.0464115, -8.09947, -5.372181)
 light_color = Color(1, 0.88, 0.65, 1)
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="OmniLight3D3" type="OmniLight3D" parent="." unique_id=1896259465]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.669802, 18.68778, -48.45558)
 light_color = Color(1, 0.88, 0.65, 1)
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="OmniLight3D3" type="OmniLight3D" parent="OmniLight3D3" unique_id=1867975733]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.161032, 0.7604761, -3.6136818)
 light_color = Color(1, 0.88, 0.65, 1)
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="OmniLight3D4" type="OmniLight3D" parent="." unique_id=1983387443]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.669802, 13.897543, -48.45558)
 light_color = Color(1, 0.88, 0.65, 1)
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="OmniLight3D3" type="OmniLight3D" parent="OmniLight3D4" unique_id=1718686142]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.161032, 0.7604761, -3.6136818)
 light_color = Color(1, 0.88, 0.65, 1)
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="OmniLight3D5" type="OmniLight3D" parent="." unique_id=2132334619]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.669802, 9.728073, -48.45558)
 light_color = Color(1, 0.88, 0.65, 1)
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="OmniLight3D3" type="OmniLight3D" parent="OmniLight3D5" unique_id=396734791]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.161032, 0.7604761, -3.6136818)
 light_color = Color(1, 0.88, 0.65, 1)
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="OmniLight3D6" type="OmniLight3D" parent="." unique_id=371857681]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.669802, 5.4623346, -48.45558)
 light_color = Color(1, 0.88, 0.65, 1)
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="OmniLight3D2" type="OmniLight3D" parent="OmniLight3D6" unique_id=55560681]
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, -8.323511, 3.2711344, -4.2932663)
@@ -2655,22 +2683,22 @@ light_size = 0.1
 [node name="OmniLight3D4" type="OmniLight3D" parent="OmniLight3D6" unique_id=1726788143]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1057673, 0.37286854, -0.8226242)
 light_color = Color(1, 0.88, 0.65, 1)
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="OmniLight3D3" type="OmniLight3D" parent="OmniLight3D6" unique_id=1268907526]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.161032, 0.7604761, -3.6136818)
 light_color = Color(1, 0.88, 0.65, 1)
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="OmniLight3D7" type="OmniLight3D" parent="." unique_id=1477051754]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.669802, 5.4623346, -48.45558)
 light_color = Color(1, 0.88, 0.65, 1)
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="OmniLight3D3" type="OmniLight3D" parent="OmniLight3D7" unique_id=43172208]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.161032, 0.7604761, -3.6136818)
 light_color = Color(1, 0.88, 0.65, 1)
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="Node3D" type="Node3D" parent="." unique_id=1372833276]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.989601, 19.020733, -46.315308)
