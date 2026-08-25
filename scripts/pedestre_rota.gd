@@ -233,22 +233,29 @@ func _atualizar_olhar_cabeca(p: Dictionary, jogador: Node3D, delta: float) -> vo
 	if not is_instance_valid(holder):
 		return
 
-	# Posição global da cabeça do pedestre
+	# Posição global da cabeça do pedestre (varia naturalmente conforme a altura do modelo)
 	var bone_trans_global: Transform3D = skeleton.global_transform * skeleton.get_bone_global_pose(head_idx)
 	var head_pos: Vector3 = bone_trans_global.origin
-	var player_head_pos: Vector3 = jogador.global_position + Vector3(0.0, 1.4, 0.0)
+	
+	# Posição real dos olhos/câmera da personagem (Alice é mais baixinha)
+	var player_target_pos: Vector3
+	var cam: Camera3D = jogador.find_child("Camera3D", true, false) as Camera3D
+	if is_instance_valid(cam):
+		player_target_pos = cam.global_position
+	else:
+		player_target_pos = jogador.global_position + Vector3(0.0, 0.75, 0.0)
 
-	var para_jogador: Vector3 = player_head_pos - head_pos
+	var para_jogador: Vector3 = player_target_pos - head_pos
 	var distancia: float = para_jogador.length()
 
-	# Vetor frente (-Z) e direita (+X) reais do esqueleto no mundo
-	var fwd: Vector3 = -skeleton.global_transform.basis.z
+	# Vetor frente (-Z) e direita (+X) reais de caminhada do pedestre no mundo
+	var fwd: Vector3 = -holder.global_transform.basis.z
 	fwd.y = 0.0
 	if fwd.length_squared() < 0.0001:
 		return
 	fwd = fwd.normalized()
 
-	var right: Vector3 = skeleton.global_transform.basis.x
+	var right: Vector3 = holder.global_transform.basis.x
 	right.y = 0.0
 	if right.length_squared() < 0.0001:
 		return
@@ -281,30 +288,32 @@ func _atualizar_olhar_cabeca(p: Dictionary, jogador: Node3D, delta: float) -> vo
 	if peso < 0.001:
 		return
 
-	# Limita o ângulo de rotação da cabeça (yaw e pitch humanos)
+	# Limita o ângulo de rotação da cabeça (yaw e pitch humanos anatômicos)
 	var yaw_clamped: float = clamp(yaw_rad, deg_to_rad(-angulo_max_cabeca_graus), deg_to_rad(angulo_max_cabeca_graus))
-	var dist_xz: float = max(0.5, Vector2(para_jogador.x, para_jogador.z).length())
-	var pitch_rad: float = clamp(atan2(para_jogador.y, dist_xz), deg_to_rad(-22.0), deg_to_rad(18.0))
+	var dist_xz: float = max(0.4, Vector2(para_jogador.x, para_jogador.z).length())
+	# Permite inclinar para baixo até -38° (para pedestres altos olharem diretamente nos olhos da Alice)
+	var pitch_rad: float = clamp(atan2(para_jogador.y, dist_xz), deg_to_rad(-38.0), deg_to_rad(22.0))
 
-	# Projeta os eixos corporais de Yaw (UP) e Pitch (RIGHT) para o espaço local do osso pai
+	# Projeta os eixos corporais de Yaw (UP) e Pitch (RIGHT) para o espaço local do osso pai.
+	# Ortonormalizamos a base antes da inversão para eliminar qualquer distorção de escala FBX/Mixamo.
 	var parent_idx: int = skeleton.get_bone_parent(head_idx)
 	var basis_parent_inv: Basis
 	if parent_idx != -1:
-		basis_parent_inv = (skeleton.global_transform * skeleton.get_bone_global_pose(parent_idx)).basis.inverse()
+		basis_parent_inv = (skeleton.global_transform * skeleton.get_bone_global_pose(parent_idx)).basis.orthonormalized().inverse()
 	else:
-		basis_parent_inv = skeleton.global_transform.basis.inverse()
+		basis_parent_inv = skeleton.global_transform.basis.orthonormalized().inverse()
 
 	var local_up: Vector3 = basis_parent_inv * Vector3.UP
-	if local_up.length_squared() < 0.0001:
+	if local_up.length_squared() < 0.0001 or not local_up.is_finite():
 		return
 	local_up = local_up.normalized()
 
 	var local_right: Vector3 = basis_parent_inv * right
-	if local_right.length_squared() < 0.0001:
+	if local_right.length_squared() < 0.0001 or not local_right.is_finite():
 		return
 	local_right = local_right.normalized()
 
-	# Rotação para encarar o jogador (sinal corrigido para a regra da mão direita no Godot)
+	# Rotação para encarar o jogador (yaw negativo gira para a direita na regra da mão direita)
 	var q_yaw := Quaternion(local_up, -yaw_clamped)
 	var q_pitch := Quaternion(local_right, pitch_rad)
 	var q_look := q_yaw * q_pitch
@@ -313,6 +322,10 @@ func _atualizar_olhar_cabeca(p: Dictionary, jogador: Node3D, delta: float) -> vo
 	var rot_anim: Quaternion = skeleton.get_bone_pose_rotation(head_idx)
 	var rot_alvo: Quaternion = q_look * rot_anim
 	var rot_final: Quaternion = rot_anim.slerp(rot_alvo, peso)
+
+	# Trava de segurança contra NaNs
+	if not (rot_final.x == rot_final.x and rot_final.y == rot_final.y and rot_final.z == rot_final.z and rot_final.w == rot_final.w):
+		return
 
 	skeleton.set_bone_pose_rotation(head_idx, rot_final)
 
