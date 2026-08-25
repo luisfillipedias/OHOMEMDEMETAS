@@ -12,9 +12,9 @@ extends Path3D
 @export_group("Comportamento de Olhar")
 @export var permitir_olhar_jogador: bool = true
 @export var distancia_max_olhar: float = 7.5
-@export var angulo_max_olhar_graus: float = 90.0
+@export var angulo_max_olhar_graus: float = 85.0
 @export var angulo_max_cabeca_graus: float = 55.0
-@export var velocidade_giro_cabeca: float = 4.0
+@export var velocidade_giro_cabeca: float = 4.5
 
 var timer: Timer
 var pedestres_ativos: Array = []
@@ -32,6 +32,10 @@ var _snds_pedestre: Array[AudioStream] = []
 
 func _ready() -> void:
 	randomize()
+	# process_priority alto garante que _process roda DEPOIS do AnimationPlayer
+	# evitando que a animação de caminhada sobrescreva a rotação da cabeça!
+	process_priority = 100
+
 	# Carrega amostras de passos de alta qualidade (.ogg)
 	for i in range(1, 22):
 		var num_str = "%03d" % i
@@ -112,7 +116,7 @@ func _spawn_pedestre() -> void:
 	var skeleton: Skeleton3D = modelo_inst.find_child("Skeleton3D", true, false) as Skeleton3D
 	var head_bone_idx := -1
 	if skeleton:
-		for nome_possivel in ["mixamorig_Head", "Head", "head", "mixamorig_Neck", "Neck"]:
+		for nome_possivel in ["mixamorig_Head", "Head", "head", "mixamorig_Neck", "Neck", "neck"]:
 			var idx := skeleton.find_bone(nome_possivel)
 			if idx != -1:
 				head_bone_idx = idx
@@ -136,7 +140,6 @@ func _spawn_pedestre() -> void:
 	var duracao = path_len / velocidade_base
 
 	# Intervalo de passos sincronizado com a velocidade real de caminhada (metros/passo)
-	# Um passo a cada ~0.62m caminhado; divide pelo ritmo real de deslocamento
 	var step_interval: float = 0.62 / velocidade_base
 
 	var pedestre_data := {
@@ -147,7 +150,6 @@ func _spawn_pedestre() -> void:
 		"step_interval": step_interval,
 		"skeleton": skeleton,
 		"head_bone_idx": head_bone_idx,
-		"rest_bone_pose": Transform3D() if skeleton == null or head_bone_idx == -1 else skeleton.get_bone_pose(head_bone_idx),
 		"olhando_atual": 0.0,
 		"esta_olhando": false,
 	}
@@ -182,7 +184,7 @@ func _process(delta: float) -> void:
 		# Processa som de passos 3D espacial do pedestre
 		p["step_timer"] += delta
 		if p["step_timer"] >= p["step_interval"]:
-			p["step_timer"] -= p["step_interval"]  # subtrai para manter cadencia sem drift
+			p["step_timer"] -= p["step_interval"]
 			var a3d: AudioStreamPlayer3D = p["audio_3d"]
 			if is_instance_valid(a3d) and not _snds_pedestre.is_empty():
 				var snd = _snds_pedestre[randi() % _snds_pedestre.size()]
@@ -193,11 +195,6 @@ func _process(delta: float) -> void:
 		
 		if permitir_olhar_jogador and jogador:
 			_atualizar_olhar_cabeca(p, jogador, delta)
-		elif p["skeleton"] != null and p["head_bone_idx"] != -1:
-			var sk: Skeleton3D = p["skeleton"]
-			var atual := sk.get_bone_pose(p["head_bone_idx"])
-			var alvo: Transform3D = p["rest_bone_pose"]
-			sk.set_bone_pose_rotation(p["head_bone_idx"], atual.basis.get_rotation_quaternion().slerp(alvo.basis.get_rotation_quaternion(), delta * velocidade_giro_cabeca))
 
 func _orientar_para_frente(follow: PathFollow3D, holder: Node3D) -> void:
 	if curve == null:
@@ -227,31 +224,41 @@ func _orientar_para_frente(follow: PathFollow3D, holder: Node3D) -> void:
 	holder.global_rotation.y = atan2(-direcao.x, -direcao.z)
 
 func _atualizar_olhar_cabeca(p: Dictionary, jogador: Node3D, delta: float) -> void:
-	var skeleton: Skeleton3D = p["skeleton"]
-	var head_idx: int = p["head_bone_idx"]
+	var skeleton: Skeleton3D = p.get("skeleton")
+	var head_idx: int = p.get("head_bone_idx", -1)
 	if skeleton == null or head_idx == -1:
 		return
 
 	var holder: Node3D = p["holder"]
-	var para_jogador: Vector3 = (jogador.global_position + Vector3(0, 1.4, 0)) - (holder.global_position + Vector3(0, 1.4, 0))
+	if not is_instance_valid(holder):
+		return
+
+	# Posição global da cabeça do pedestre
+	var bone_trans_global: Transform3D = skeleton.global_transform * skeleton.get_bone_global_pose(head_idx)
+	var head_pos: Vector3 = bone_trans_global.origin
+	var player_head_pos: Vector3 = jogador.global_position + Vector3(0.0, 1.4, 0.0)
+
+	var para_jogador: Vector3 = player_head_pos - head_pos
 	var distancia: float = para_jogador.length()
 
-	var fwd: Vector3 = -holder.global_transform.basis.z
+	# Vetor frente (-Z) e direita (+X) reais do esqueleto no mundo
+	var fwd: Vector3 = -skeleton.global_transform.basis.z
 	fwd.y = 0.0
-	if fwd.length() < 0.0001:
+	if fwd.length_squared() < 0.0001:
 		return
 	fwd = fwd.normalized()
-	
-	var right: Vector3 = holder.global_transform.basis.x
+
+	var right: Vector3 = skeleton.global_transform.basis.x
 	right.y = 0.0
-	if right.length() < 0.0001:
+	if right.length_squared() < 0.0001:
 		return
 	right = right.normalized()
 
 	var dir_horiz_raw := Vector3(para_jogador.x, 0.0, para_jogador.z)
-	if dir_horiz_raw.length() < 0.0001:
+	if dir_horiz_raw.length_squared() < 0.0001:
 		return
 	var dir_horiz: Vector3 = dir_horiz_raw.normalized()
+
 	var dot_fwd: float = fwd.dot(dir_horiz)
 	var dot_right: float = right.dot(dir_horiz)
 	var yaw_rad: float = atan2(dot_right, dot_fwd)
@@ -260,40 +267,53 @@ func _atualizar_olhar_cabeca(p: Dictionary, jogador: Node3D, delta: float) -> vo
 	# HISTERESE: Zona de atenção estável sem oscilação/flicker na borda
 	var esta_olhando: bool = p.get("esta_olhando", false)
 	if not esta_olhando:
-		if distancia <= 6.0 and angulo_abs_graus <= 75.0:
+		if distancia <= distancia_max_olhar and angulo_abs_graus <= angulo_max_olhar_graus:
 			esta_olhando = true
 	else:
-		if distancia > 8.5 or angulo_abs_graus > 110.0:
+		if distancia > (distancia_max_olhar + 2.0) or angulo_abs_graus > (angulo_max_olhar_graus + 25.0):
 			esta_olhando = false
 	p["esta_olhando"] = esta_olhando
 
 	var alvo_peso: float = 1.0 if esta_olhando else 0.0
-	p["olhando_atual"] = lerp(p["olhando_atual"], alvo_peso, delta * 4.5)
+	p["olhando_atual"] = lerp(p["olhando_atual"], alvo_peso, delta * velocidade_giro_cabeca)
 	var peso: float = p["olhando_atual"]
 
-	var pose_repouso: Transform3D = p["rest_bone_pose"]
-	var rot_repouso: Quaternion = pose_repouso.basis.get_rotation_quaternion()
-
-	if peso < 0.005:
-		skeleton.set_bone_pose_rotation(head_idx, rot_repouso)
+	if peso < 0.001:
 		return
 
-	# Limita o ângulo de rotação da cabeça (humano natural: até 65° yaw, 20° pitch)
-	var yaw_clamped: float = clamp(yaw_rad, deg_to_rad(-65.0), deg_to_rad(65.0))
+	# Limita o ângulo de rotação da cabeça (yaw e pitch humanos)
+	var yaw_clamped: float = clamp(yaw_rad, deg_to_rad(-angulo_max_cabeca_graus), deg_to_rad(angulo_max_cabeca_graus))
 	var dist_xz: float = max(0.5, Vector2(para_jogador.x, para_jogador.z).length())
 	var pitch_rad: float = clamp(atan2(para_jogador.y, dist_xz), deg_to_rad(-22.0), deg_to_rad(18.0))
 
-	# PROJEÇÃO LOCAL DO EIXO VERTICAL DO OSSO (Corrige o pescoço quebrado e funciona em qualquer Rig)
-	var bone_global: Transform3D = skeleton.global_transform * skeleton.get_bone_global_pose(head_idx)
-	var inv_basis: Basis = bone_global.basis.inverse()
-	var local_up: Vector3 = (inv_basis * Vector3.UP).normalized()
-	var local_right: Vector3 = (inv_basis * right).normalized()
+	# Projeta os eixos corporais de Yaw (UP) e Pitch (RIGHT) para o espaço local do osso pai
+	var parent_idx: int = skeleton.get_bone_parent(head_idx)
+	var basis_parent_inv: Basis
+	if parent_idx != -1:
+		basis_parent_inv = (skeleton.global_transform * skeleton.get_bone_global_pose(parent_idx)).basis.inverse()
+	else:
+		basis_parent_inv = skeleton.global_transform.basis.inverse()
 
-	var rot_yaw := Quaternion(local_up, yaw_clamped)
-	var rot_pitch := Quaternion(local_right, -pitch_rad)
-	var rot_olhando: Quaternion = rot_repouso * (rot_pitch * rot_yaw)
+	var local_up: Vector3 = basis_parent_inv * Vector3.UP
+	if local_up.length_squared() < 0.0001:
+		return
+	local_up = local_up.normalized()
 
-	var rot_final: Quaternion = rot_repouso.slerp(rot_olhando, peso)
+	var local_right: Vector3 = basis_parent_inv * right
+	if local_right.length_squared() < 0.0001:
+		return
+	local_right = local_right.normalized()
+
+	# Rotação para encarar o jogador (sinal corrigido para a regra da mão direita no Godot)
+	var q_yaw := Quaternion(local_up, -yaw_clamped)
+	var q_pitch := Quaternion(local_right, pitch_rad)
+	var q_look := q_yaw * q_pitch
+
+	# Obtém a pose animada atual do osso (do frame da animação de caminhada)
+	var rot_anim: Quaternion = skeleton.get_bone_pose_rotation(head_idx)
+	var rot_alvo: Quaternion = q_look * rot_anim
+	var rot_final: Quaternion = rot_anim.slerp(rot_alvo, peso)
+
 	skeleton.set_bone_pose_rotation(head_idx, rot_final)
 
 func _converter_animacao_para_in_place(node: Node) -> void:
