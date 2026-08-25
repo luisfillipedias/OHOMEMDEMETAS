@@ -1,8 +1,8 @@
 [gd_scene format=3]
 
-[ext_resource type="Mesh" uid="uid://cnm2dswbqk57t" path="res://assets/models/car/psx/Car 07/Car7.obj" id="1_mesh"]
-[ext_resource type="Texture2D" uid="uid://blbgboovc8ktt" path="res://assets/models/car/psx/Car 07/car7_black.png" id="2_tex"]
-[ext_resource type="AudioStream" uid="uid://doxc1sstjcumo" path="res://assets/models/car/psx/Sound effects/Car_Engine_Loop.ogg" id="3_engine"]
+[ext_resource type="Mesh" uid="uid://ctvaiy1debx1q" path="res://assets/models/car/psx/Car 08/Car8.obj" id="1_mesh"]
+[ext_resource type="Texture2D" uid="uid://ctxog45dab51s" path="res://assets/models/car/psx/Car 08/Car8_mail.png" id="2_tex"]
+[ext_resource type="AudioStream" uid="uid://b2ihj4vhpbqae" path="res://assets/models/car/psx/Sound effects/Car2_Engine_Loop.ogg" id="3_engine"]
 [ext_resource type="AudioStream" uid="uid://lwq2bnbqcr1d" path="res://assets/audio/Car/CarHORN_Buzina.ogg" id="4_horn"]
 
 [sub_resource type="StandardMaterial3D" id="Mat_Body"]
@@ -37,7 +37,7 @@ height = 0.20
 radial_segments = 8
 rings = 4
 
-[node name="car_07_black" type="Node3D"]
+[node name="car_08_mail" type="Node3D"]
 
 [node name="Model" type="MeshInstance3D" parent="."]
 transform = Transform3D(1.0, 0, 0, 0, 1.0, 0, 0, 0, 1.0, 0, 0, 0)
@@ -65,7 +65,7 @@ doppler_tracking = 1
 max_polyphony = 1
 
 [node name="HeadlightL" type="SpotLight3D" parent="."]
-transform = Transform3D(-1, 0, 0, 0, 0.9903, 0.1392, 0, 0.1392, -0.9903, -0.70, 0.75, 3.00)
+transform = Transform3D(-1, 0, 0, 0, 0.9903, 0.1392, 0, 0.1392, -0.9903, -0.85, 0.85, 3.25)
 light_color = Color(1, 0.96, 0.84, 1)
 light_energy = 3.5
 spot_range = 28.0
@@ -74,7 +74,7 @@ spot_angle_attenuation = 0.5
 shadow_enabled = false
 
 [node name="HeadlightR" type="SpotLight3D" parent="."]
-transform = Transform3D(-1, 0, 0, 0, 0.9903, 0.1392, 0, 0.1392, -0.9903, 0.70, 0.75, 3.00)
+transform = Transform3D(-1, 0, 0, 0, 0.9903, 0.1392, 0, 0.1392, -0.9903, 0.85, 0.85, 3.25)
 light_color = Color(1, 0.96, 0.84, 1)
 light_energy = 3.5
 spot_range = 28.0
@@ -83,31 +83,31 @@ spot_angle_attenuation = 0.5
 shadow_enabled = false
 
 [node name="LensHeadlightL" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.70, 0.75, 2.95)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.85, 0.85, 3.20)
 mesh = SubResource("Mesh_Headlight_Lens")
 
 [node name="LensHeadlightR" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.70, 0.75, 2.95)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.85, 0.85, 3.20)
 mesh = SubResource("Mesh_Headlight_Lens")
 
 [node name="TaillightL" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.70, 0.75, -2.95)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.85, 0.85, -3.85)
 light_color = Color(1, 0.05, 0.05, 1)
 light_energy = 2.0
 omni_range = 3.5
 shadow_enabled = false
 
 [node name="TaillightR" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.70, 0.75, -2.95)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.85, 0.85, -3.85)
 light_color = Color(1, 0.05, 0.05, 1)
 light_energy = 2.0
 omni_range = 3.5
 shadow_enabled = false
 
 [node name="LensTaillightL" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.70, 0.75, -2.90)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.85, 0.85, -3.80)
 mesh = SubResource("Mesh_Taillight_Lens")
 
 [node name="LensTaillightR" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.70, 0.75, -2.90)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.85, 0.85, -3.80)
 mesh = SubResource("Mesh_Taillight_Lens")

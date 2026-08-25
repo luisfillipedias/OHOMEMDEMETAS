@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dixq07f1xg7x1"
-path.s3tc="res://.godot/imported/Texture Black.png-0c73547893a3b77bf5a88f314acf45e0.s3tc.ctex"
+uid="uid://c7e1po26j1xps"
+path.s3tc="res://.godot/imported/black.jpg-25eb7e2d6c107ed281a453a81490c155.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/models/car/psx/Suspicious Car 01/Texture Black.png"
-dest_files=["res://.godot/imported/Texture Black.png-0c73547893a3b77bf5a88f314acf45e0.s3tc.ctex"]
+source_file="res://assets/models/_caracters/cenario/Ternudo/textures/black.jpg"
+dest_files=["res://.godot/imported/black.jpg-25eb7e2d6c107ed281a453a81490c155.s3tc.ctex"]
 
 [params]
 

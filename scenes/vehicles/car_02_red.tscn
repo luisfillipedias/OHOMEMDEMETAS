@@ -1,35 +1,113 @@
 [gd_scene format=3]
 
-[ext_resource type="ArrayMesh" path="res://assets/models/car/psx/Car 02/Car2.obj" id="1_mesh"]
-[ext_resource type="Texture2D" path="res://assets/models/car/psx/Car 02/car2_red.png" id="2_tex"]
-[ext_resource type="AudioStream" path="res://assets/models/car/psx/Sound effects/Car2_Engine_Loop.ogg" id="3_engine"]
-[ext_resource type="AudioStream" path="res://assets/audio/Car/CarHORN_Buzina.ogg" id="4_horn"]
+[ext_resource type="Mesh" uid="uid://cpaje5nd7vxhk" path="res://assets/models/car/psx/Car 02/Car2.obj" id="1_mesh"]
+[ext_resource type="Texture2D" uid="uid://2hua8yerhoo" path="res://assets/models/car/psx/Car 02/car2_red.png" id="2_tex"]
+[ext_resource type="AudioStream" uid="uid://b2ihj4vhpbqae" path="res://assets/models/car/psx/Sound effects/Car2_Engine_Loop.ogg" id="3_engine"]
+[ext_resource type="AudioStream" uid="uid://lwq2bnbqcr1d" path="res://assets/audio/Car/CarHORN_Buzina.ogg" id="4_horn"]
 
-[sub_resource type="StandardMaterial3D" id="Mat_Car"]
+[sub_resource type="StandardMaterial3D" id="Mat_Body"]
 albedo_texture = ExtResource("2_tex")
-roughness = 0.85
+roughness = 0.88
 specular_mode = 2
 texture_filter = 0
 
-[node name="Car_02_red" type="Node3D"]
+[sub_resource type="StandardMaterial3D" id="Mat_Glow_Headlight"]
+albedo_color = Color(1, 0.98, 0.88, 1)
+emission_enabled = true
+emission = Color(1, 0.98, 0.88, 1)
+emission_energy_multiplier = 4.0
+
+[sub_resource type="SphereMesh" id="Mesh_Headlight_Lens"]
+material = SubResource("Mat_Glow_Headlight")
+radius = 0.13
+height = 0.26
+radial_segments = 8
+rings = 4
+
+[sub_resource type="StandardMaterial3D" id="Mat_Glow_Taillight"]
+albedo_color = Color(1, 0.05, 0.05, 1)
+emission_enabled = true
+emission = Color(1, 0.05, 0.05, 1)
+emission_energy_multiplier = 3.5
+
+[sub_resource type="SphereMesh" id="Mesh_Taillight_Lens"]
+material = SubResource("Mat_Glow_Taillight")
+radius = 0.10
+height = 0.20
+radial_segments = 8
+rings = 4
+
+[node name="car_02_red" type="Node3D"]
 
 [node name="Model" type="MeshInstance3D" parent="."]
+transform = Transform3D(1.0, 0, 0, 0, 1.0, 0, 0, 0, 1.0, 0, 0, 0)
 mesh = ExtResource("1_mesh")
-surface_material_override/0 = SubResource("Mat_Car")
+surface_material_override/0 = SubResource("Mat_Body")
 
 [node name="EngineAudio" type="AudioStreamPlayer3D" parent="."]
 stream = ExtResource("3_engine")
 autoplay = true
-volume_db = -12.0
-unit_size = 6.0
-max_distance = 32.0
+volume_db = 0.0
+unit_size = 12.0
+max_distance = 55.0
 attenuation_model = 1
 doppler_tracking = 1
+max_polyphony = 1
 
 [node name="HornAudio" type="AudioStreamPlayer3D" parent="."]
 stream = ExtResource("4_horn")
-volume_db = -4.0
-unit_size = 10.0
-max_distance = 45.0
+autoplay = false
+volume_db = 4.0
+unit_size = 18.0
+max_distance = 70.0
 attenuation_model = 1
 doppler_tracking = 1
+max_polyphony = 1
+
+[node name="HeadlightL" type="SpotLight3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 0.9903, 0.1392, 0, 0.1392, -0.9903, -0.75, 0.70, 3.30)
+light_color = Color(1, 0.96, 0.84, 1)
+light_energy = 3.5
+spot_range = 28.0
+spot_angle = 35.0
+spot_angle_attenuation = 0.5
+shadow_enabled = false
+
+[node name="HeadlightR" type="SpotLight3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 0.9903, 0.1392, 0, 0.1392, -0.9903, 0.75, 0.70, 3.30)
+light_color = Color(1, 0.96, 0.84, 1)
+light_energy = 3.5
+spot_range = 28.0
+spot_angle = 35.0
+spot_angle_attenuation = 0.5
+shadow_enabled = false
+
+[node name="LensHeadlightL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 0.70, 3.25)
+mesh = SubResource("Mesh_Headlight_Lens")
+
+[node name="LensHeadlightR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.75, 0.70, 3.25)
+mesh = SubResource("Mesh_Headlight_Lens")
+
+[node name="TaillightL" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 0.75, -3.35)
+light_color = Color(1, 0.05, 0.05, 1)
+light_energy = 2.0
+omni_range = 3.5
+shadow_enabled = false
+
+[node name="TaillightR" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.75, 0.75, -3.35)
+light_color = Color(1, 0.05, 0.05, 1)
+light_energy = 2.0
+omni_range = 3.5
+shadow_enabled = false
+
+[node name="LensTaillightL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 0.75, -3.30)
+mesh = SubResource("Mesh_Taillight_Lens")
+
+[node name="LensTaillightR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.75, 0.75, -3.30)
+mesh = SubResource("Mesh_Taillight_Lens")

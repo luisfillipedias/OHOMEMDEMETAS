@@ -3,9 +3,10 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://7t2w0ysah8me"
-path="res://.godot/imported/road_side_corner_0.png-8312603e249d9ef51c480475fff43994.ctex"
+path.s3tc="res://.godot/imported/road_side_corner_0.png-8312603e249d9ef51c480475fff43994.s3tc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "9e5814931fe373692c6b84b511158716"
@@ -14,11 +15,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/URBAN/Roads/Road sides/road_side_corner_0.png"
-dest_files=["res://.godot/imported/road_side_corner_0.png-8312603e249d9ef51c480475fff43994.ctex"]
+dest_files=["res://.godot/imported/road_side_corner_0.png-8312603e249d9ef51c480475fff43994.s3tc.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -40,4 +41,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0

@@ -10,8 +10,10 @@ var estado_atual: EstadoSemaforo = EstadoSemaforo.VERMELHO
 signal mudou_estado(novo_estado: EstadoSemaforo)
 
 func _ready() -> void:
-	add_to_group("semaforos_poste_completo")
+	# IMPORTANTE: So entra no grupo de semaforos se REALMENTE tiver as 3 luzes do semaforo!
+	# Os outros 20 postes comuns da rua sao apenas lampadas e NAO param o transito.
 	if luz_vermelha and luz_amarela and luz_verde:
+		add_to_group("semaforos_poste_completo")
 		luz_vermelha.light_color = Color(1.0, 0.0, 0.0)
 		luz_amarela.light_color = Color(1.0, 0.7, 0.0)
 		luz_verde.light_color = Color(0.0, 1.0, 0.0)

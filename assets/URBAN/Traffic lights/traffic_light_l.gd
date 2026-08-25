@@ -5,35 +5,54 @@ extends Node3D
 @onready var luz_verde: OmniLight3D = $OmniLight3D3
 
 func _ready() -> void:
-	# Cores espectrais naturais de sinalização (evita manchas cartunescas no asfalto)
-	luz_vermelha.light_color = Color(0.95, 0.22, 0.18, 1.0)
-	luz_amarela.light_color = Color(1.0, 0.65, 0.15, 1.0)
-	luz_verde.light_color = Color(0.18, 0.92, 0.70, 1.0)
+	luz_vermelha.light_color = Color(1.0, 0.0, 0.0)
+	luz_amarela.light_color = Color(1.0, 0.7, 0.0)
+	luz_verde.light_color = Color(0.0, 1.0, 0.0)
+	_set_energy(luz_vermelha, 1.2, 6.0)
+	_set_energy(luz_amarela, 1.0, 5.0)
+	_set_energy(luz_verde, 1.2, 6.0)
+	add_to_group("semaforo_lado_esquerdo")
 	
-	# Luz sutil e localizada (a maior parte do brilho vem da lente e do glow, não inundando o quarteirão)
-	for l in [luz_vermelha, luz_amarela, luz_verde]:
-		if l:
-			l.light_energy = 0.45
-			l.omni_range = 3.5
-			l.omni_attenuation = 1.6
-	
-	ciclo_semaforo()
+	var ctrl = get_tree().get_first_node_in_group("controladores_semaforo")
+	if ctrl and ctrl.has_signal("mudou_fase"):
+		ctrl.mudou_fase.connect(_on_mudou_fase)
+		_on_mudou_fase(ctrl.fase_atual, ctrl.estado_atual)
+	else:
+		_ciclo_autonomo()
 
-func ciclo_semaforo() -> void:
+func _set_energy(luz: OmniLight3D, e: float, r: float) -> void:
+	if is_instance_valid(luz):
+		luz.light_energy = e
+		luz.omni_range = r
+
+func _on_mudou_fase(fase: int, estado: int) -> void:
+	# Este semáforo (esquerdo/inversas): VERDE na FASE_A, VERMELHO na FASE_B
+	if fase == 0:
+		# FASE_A: inversas andam -> este semáforo fica VERDE
+		match estado:
+			0: ativar_luz(false, false, true)
+			1: ativar_luz(false, true, false)
+			_: ativar_luz(false, false, true)
+	else:
+		# FASE_B: inversas param -> este semáforo fica VERMELHO
+		match estado:
+			0: ativar_luz(true, false, false)
+			1: ativar_luz(false, true, false)
+			_: ativar_luz(true, false, false)
+
+func _ciclo_autonomo() -> void:
+	# Começa verde (oposto ao traffic_light)
 	while true:
-		# Vermelho por 35s
-		ativar_luz(true, false, false)
-		await get_tree().create_timer(35.0).timeout
-		
-		# Verde por 35s
 		ativar_luz(false, false, true)
 		await get_tree().create_timer(35.0).timeout
-		
-		# Amarelo por 4s
+		ativar_luz(false, true, false)
+		await get_tree().create_timer(4.0).timeout
+		ativar_luz(true, false, false)
+		await get_tree().create_timer(35.0).timeout
 		ativar_luz(false, true, false)
 		await get_tree().create_timer(4.0).timeout
 
-func ativar_luz(vermelho: bool, amarelo: bool, verde: bool) -> void:
-	luz_vermelha.visible = vermelho
-	luz_amarela.visible = amarelo
-	luz_verde.visible = verde
+func ativar_luz(v: bool, a: bool, ve: bool) -> void:
+	if is_instance_valid(luz_vermelha): luz_vermelha.visible = v
+	if is_instance_valid(luz_amarela): luz_amarela.visible = a
+	if is_instance_valid(luz_verde): luz_verde.visible = ve
