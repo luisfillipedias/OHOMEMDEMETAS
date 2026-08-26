@@ -2,22 +2,19 @@ extends Node
 class_name ControladorSemaforo
 
 # ============================================================
-# CONTROLADOR DE SEMÁFORO COM FASES ALTERNADAS
-# FASE_A (fase=0): traffic_light = VERMELHO, traffic_light_L = VERDE
-#   -> Rotas diretas (1 e 2) PARAM, Rotas inversas (1 e 2) ANDAM
-# FASE_B (fase=1): traffic_light = VERDE, traffic_light_L = VERMELHO
-#   -> Rotas diretas ANDAM, Rotas inversas PARAM
+# CONTROLADOR DE SEMÁFORO - CICLO REALISTA (Verde -> Amarelo -> Vermelho -> Verde)
+# Não existe amarelo saindo do vermelho. O amarelo é apenas aviso de fechamento.
 # ============================================================
 
-enum EstadoSemaforo { VERMELHO, AMARELO, VERDE }
+enum Estado { VERMELHO = 0, AMARELO = 1, VERDE = 2 }
 
-@export var tempo_fase: float = 35.0
+@export var tempo_verde: float = 20.0
 @export var tempo_amarelo: float = 4.0
 
-var estado_atual: int = EstadoSemaforo.VERMELHO
-var fase_atual: int = 0  # 0=FASE_A (diretas param), 1=FASE_B (inversas param)
+var estado_diretas: int = Estado.VERDE
+var estado_inversas: int = Estado.VERMELHO
 
-signal mudou_fase(fase: int, estado: int)
+signal mudou_estado(estado_diretas: int, estado_inversas: int)
 
 func _ready() -> void:
 	add_to_group("controladores_semaforo")
@@ -25,33 +22,32 @@ func _ready() -> void:
 
 func _iniciar_ciclo() -> void:
 	while true:
-		# FASE A: diretas=VERMELHO, inversas=VERDE
-		fase_atual = 0
-		_emitir(EstadoSemaforo.VERMELHO)
-		await get_tree().create_timer(tempo_fase).timeout
-		_emitir(EstadoSemaforo.AMARELO)
+		# 1. DIRETAS ABERTAS (Verde), INVERSAS FECHADAS (Vermelho)
+		_definir(Estado.VERDE, Estado.VERMELHO)
+		await get_tree().create_timer(tempo_verde).timeout
+
+		# 2. DIRETAS AVISO (Amarelo - vai fechar), INVERSAS CONTINUAM FECHADAS (Vermelho)
+		_definir(Estado.AMARELO, Estado.VERMELHO)
 		await get_tree().create_timer(tempo_amarelo).timeout
 
-		# FASE B: diretas=VERDE, inversas=VERMELHO
-		fase_atual = 1
-		_emitir(EstadoSemaforo.VERDE)
-		await get_tree().create_timer(tempo_fase).timeout
-		_emitir(EstadoSemaforo.AMARELO)
+		# 3. DIRETAS FECHADAS (Vermelho), INVERSAS ABERTAS (Vai direto pro Verde!)
+		_definir(Estado.VERMELHO, Estado.VERDE)
+		await get_tree().create_timer(tempo_verde).timeout
+
+		# 4. DIRETAS CONTINUAM FECHADAS (Vermelho), INVERSAS AVISO (Amarelo - vai fechar)
+		_definir(Estado.VERMELHO, Estado.AMARELO)
 		await get_tree().create_timer(tempo_amarelo).timeout
 
-func _emitir(estado: int) -> void:
-	estado_atual = estado
-	mudou_fase.emit(fase_atual, estado_atual)
+func _definir(d: int, inv: int) -> void:
+	estado_diretas = d
+	estado_inversas = inv
+	mudou_estado.emit(estado_diretas, estado_inversas)
 
 func diretas_devem_parar() -> bool:
-	if fase_atual == 0:
-		return estado_atual == EstadoSemaforo.VERMELHO or estado_atual == EstadoSemaforo.AMARELO
-	return estado_atual == EstadoSemaforo.AMARELO
+	return estado_diretas != Estado.VERDE
 
 func inversas_devem_parar() -> bool:
-	if fase_atual == 1:
-		return estado_atual == EstadoSemaforo.VERMELHO or estado_atual == EstadoSemaforo.AMARELO
-	return estado_atual == EstadoSemaforo.AMARELO
+	return estado_inversas != Estado.VERDE
 
 func is_vermelho() -> bool:
 	return diretas_devem_parar()

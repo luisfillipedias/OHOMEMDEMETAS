@@ -1,35 +1,38 @@
 extends Path3D
 
 # ============================================================
-# CARRO ROTA - VERSÃO FINAL
-# - Ponto de parada exato por índice do ponto da curva
-# - Rotas diretas: chama diretas_devem_parar()
-# - Rotas inversas: chama inversas_devem_parar()
-# - Anti-colisão APENAS dentro da mesma rota (sem deadlock global)
-# - Velocidades orgânicas variadas por carro
+# CARRO ROTA - CONTROLADOR DEFINITIVO DE TRÂNSITO ORGÂNICO
+# - Ciclo correto: Verde -> Amarelo -> Vermelho -> Verde
+# - No AMARELO: quem está perto/rápido acelera/passa, quem está longe freia
+# - Ponto de parada exato pelo índice da curva
+# - Prevenção total de teleporte (flag cruzou_sinal)
+# - Fila com distanciamento seguro e anti-colisão precisa
+# - Variação orgânica por carro (velocidade, aceleração, freio, drift lateral)
+# - Tráfego esporádico e natural
 # ============================================================
 
-## Índice 1-based do ponto de parada (1=primeiro ponto verde da curva)
-## Rota1=7, Rota2=6, RotaInversa1=5, RotaInversa2=5
+## Índice 1-based do ponto de parada na curva (1 = primeiro ponto verde)
+## Rota 1 = 7 | Rota 2 = 6 | Rota Inversa 1 = 5 | Rota Inversa 2 = 5
 @export var numero_ponto_parada: int = 0
 
-@export_group("Velocidade")
+@export_group("Velocidade & Movimento")
 @export var vel_min: float = 8.5      # ~30 km/h
-@export var vel_max: float = 13.5     # ~49 km/h
-@export var aceleracao: float = 7.0
-@export var frenagem: float = 22.0
+@export var vel_max: float = 13.8     # ~50 km/h
+@export var aceleracao_base: float = 7.5
+@export var frenagem_base: float = 22.0
 
-@export_group("Fila")
-## Distância de centro a centro para parada completa (carros ~6.2m → 2m de folga)
-@export var gap_parada: float = 8.5
-## Distância onde começa a desacelerar atrás do carro da frente
-@export var gap_frenagem: float = 20.0
+@export_group("Fila & Segurança")
+## Distância de centro a centro para parada na fila (~6.2m carro + ~2.0m folga)
+@export var gap_parada_base: float = 8.4
+@export var gap_frenagem_base: float = 19.0
 
-@export_group("Spawn")
-@export var intervalo_min: float = 6.0
-@export var intervalo_max: float = 13.0
+@export_group("Spawn Esporádico")
+@export var intervalo_min: float = 10.0
+@export var intervalo_max: float = 24.0
+@export var chance_pular_spawn: float = 0.25 # 25% de chance de intervalo extra (mais esporádico)
 @export var max_carros: int = 3
 
+@export_group("Visual")
 @export var altura_suspensao: float = 0.22
 
 var _carros: Array[Dictionary] = []
@@ -48,12 +51,11 @@ func _ready() -> void:
 	
 	_timer_spawn = Timer.new()
 	_timer_spawn.one_shot = true
-	_timer_spawn.timeout.connect(_spawn_timeout)
+	_timer_spawn.timeout.connect(_on_spawn_timeout)
 	add_child(_timer_spawn)
-	_agendar_spawn(randf_range(1.0, 4.0))
+	_agendar_spawn(randf_range(1.0, 4.5))
 
 func _configurar_ponto_parada() -> void:
-	# Assign default if not set in Inspector
 	if numero_ponto_parada <= 0:
 		var n = name.to_lower()
 		if   "inversa1" in n: numero_ponto_parada = 5
@@ -64,24 +66,27 @@ func _configurar_ponto_parada() -> void:
 	if not curve or numero_ponto_parada <= 0:
 		return
 	
-	var idx = numero_ponto_parada - 1  # 0-based
+	var idx = numero_ponto_parada - 1
 	if idx < curve.point_count:
 		var pt = curve.get_point_position(idx)
 		_ponto_parada_m = curve.get_closest_offset(pt)
-		print("[%s] Ponto de parada: ponto %d -> %.2fm na curva" % [name, numero_ponto_parada, _ponto_parada_m])
+		print("[%s] Ponto de parada: Ponto %d -> %.2fm na curva" % [name, numero_ponto_parada, _ponto_parada_m])
 
 func _agendar_spawn(delay: float = -1.0) -> void:
-	_timer_spawn.start(delay if delay >= 0.0 else randf_range(intervalo_min, intervalo_max))
+	if delay < 0.0:
+		delay = randf_range(intervalo_min, intervalo_max)
+	_timer_spawn.start(delay)
 
-func _spawn_timeout() -> void:
-	_tentar_spawnar()
+func _on_spawn_timeout() -> void:
+	if randf() >= chance_pular_spawn:
+		_tentar_spawnar()
 	_agendar_spawn()
 
 func _tentar_spawnar() -> void:
 	if _carros.size() >= max_carros:
 		return
 	
-	# Não spawna se houver carro perto do início da rota
+	# Não spawna se houver carro perto do início da rota (mínimo 18m)
 	for c in _carros:
 		var fol = c.get("follow") as PathFollow3D
 		if is_instance_valid(fol) and fol.progress < 18.0:
@@ -115,19 +120,17 @@ func _tentar_spawnar() -> void:
 		eng.pitch_scale = randf_range(0.88, 1.12)
 		if not eng.playing: eng.play()
 	
-	# ── Personalidade única por carro (variações orgânicas) ──────────────
-	# Cada carro tem comportamento ligeiramente diferente, como na vida real
-	var p_vel       = randf_range(vel_min, vel_max)          # velocidade de cruzeiro pessoal
-	var p_acel      = aceleracao  * randf_range(0.78, 1.22)  # motoristas mais/menos apressados
-	var p_freio     = frenagem    * randf_range(0.75, 1.25)  # freios mais/menos sensíveis
-	var p_gap_stop  = gap_parada  * randf_range(0.85, 1.20)  # distância pessoal de segurança
-	var p_gap_slow  = gap_frenagem* randf_range(0.80, 1.20)  # onde começa a desacelerar
-	# Offset lateral leve: o carro não fica perfeitamente no centro da faixa
-	var p_lat_drift = randf_range(-0.18, 0.18)               # metros de desvio lateral
-	# Pequeno ruído de velocidade (motor pulsa levemente, não é constante)
-	var p_vel_noise_freq = randf_range(0.4, 1.1)             # frequência do pulso
-	var p_vel_noise_amp  = randf_range(0.0, 0.6)             # amplitude (m/s) do pulso
-	var p_noise_phase    = randf_range(0.0, TAU)             # fase inicial aleatória
+	# ── Personalidade única do motorista/carro ────────────────────────
+	var p_vel       = randf_range(vel_min, vel_max)
+	var p_acel      = aceleracao_base * randf_range(0.80, 1.20)
+	var p_freio     = frenagem_base   * randf_range(0.75, 1.25)
+	var p_gap_stop  = gap_parada_base * randf_range(0.90, 1.15)
+	var p_gap_slow  = gap_frenagem_base * randf_range(0.85, 1.15)
+	var p_lat_drift = randf_range(-0.16, 0.16)
+	var p_vel_noise_freq = randf_range(0.5, 1.0)
+	var p_vel_noise_amp  = randf_range(0.0, 0.5)
+	var p_noise_phase    = randf_range(0.0, TAU)
+	var p_ousadia_amarelo = randf_range(0.8, 1.3) # Fator de ousadia para passar no amarelo
 	
 	var dados := {
 		"follow": follow,
@@ -144,13 +147,15 @@ func _tentar_spawnar() -> void:
 		"vel_noise_freq": p_vel_noise_freq,
 		"vel_noise_amp": p_vel_noise_amp,
 		"noise_phase": p_noise_phase,
+		"ousadia_amarelo": p_ousadia_amarelo,
 		"tempo_parado": 0.0,
+		"tempo_total": 0.0,
 		"ja_buzinou": false,
+		"cruzou_sinal": false, # NUNCA mais será travado ou teleportado após cruzar a faixa
 		"eng": eng,
 		"horn": horn,
 		"dir_frente": Vector3.FORWARD,
 		"ultimo_yaw": 0.0,
-		"tempo_total": 0.0,
 	}
 	
 	_orientar(dados, 0.0)
@@ -161,16 +166,13 @@ func _physics_process(delta: float) -> void:
 	if _carros.is_empty():
 		return
 	
-	# Obtém estado do semáforo UMA VEZ por frame
+	# Obtém estado do semáforo (0=VERMELHO, 1=AMARELO, 2=VERDE)
 	var ctrl = get_tree().get_first_node_in_group("controladores_semaforo")
-	var deve_parar_sinal: bool = false
+	var estado_real: int = 0
 	if ctrl:
-		if _eh_inversa:
-			deve_parar_sinal = ctrl.inversas_devem_parar()
-		else:
-			deve_parar_sinal = ctrl.diretas_devem_parar()
+		estado_real = ctrl.estado_inversas if _eh_inversa else ctrl.estado_diretas
 	
-	# Obstáculos (Player + Pedestres) - coletados uma vez por frame
+	# Obstáculos (Player e Pedestres)
 	var obs_pos: Array[Vector3] = []
 	var player = get_tree().get_first_node_in_group("player")
 	if is_instance_valid(player) and player is Node3D:
@@ -179,7 +181,7 @@ func _physics_process(delta: float) -> void:
 		if is_instance_valid(ped) and ped is Node3D:
 			obs_pos.append(ped.global_position)
 	
-	# Ordena: maior progresso primeiro (= mais à frente na pista)
+	# Ordena: maior progresso primeiro (carro mais avançado na rota)
 	_carros.sort_custom(func(a, b):
 		var pa = (a["follow"] as PathFollow3D).progress if is_instance_valid(a.get("follow")) else 0.0
 		var pb = (b["follow"] as PathFollow3D).progress if is_instance_valid(b.get("follow")) else 0.0
@@ -202,21 +204,44 @@ func _physics_process(delta: float) -> void:
 		var car_pos: Vector3 = holder.global_position
 		var frente: Vector3 = c["dir_frente"]
 		
-		# ── 1. SEMÁFORO: Parada no ponto exato da curva ──────────────────
-		if deve_parar_sinal and _ponto_parada_m > 0.0:
-			if prog <= _ponto_parada_m:
-				var dist = _ponto_parada_m - prog
-				if dist <= 25.0:
-					# Desaceleração progressiva nos últimos 25m
-					var t = clamp(dist / 24.0, 0.0, 1.0)
+		# ── 1. VERIFICAÇÃO DE PASSAGEM PELA FAIXA ─────────────────────────
+		if _ponto_parada_m > 0.0 and not c["cruzou_sinal"] and prog > _ponto_parada_m:
+			# Passou da faixa: liberado para o resto da rota!
+			c["cruzou_sinal"] = true
+		
+		# ── 2. COMPORTAMENTO DO SEMÁFORO (Verde / Amarelo / Vermelho) ─────
+		if _ponto_parada_m > 0.0 and not c["cruzou_sinal"]:
+			var dist = _ponto_parada_m - prog
+			
+			if estado_real == 2: # VERDE
+				# Acelera normalmente no verde
+				vel_alvo = c["vel_cruzeiro"]
+			
+			elif estado_real == 1: # AMARELO (Aviso de fechamento)
+				# Decisão humana: se está a menos de ~12m (ponderado pela ousadia) e em boa velocidade,
+				# dá uma leve acelerada para passar antes do vermelho!
+				var limite_passagem = 11.0 * c.get("ousadia_amarelo", 1.0)
+				if dist <= limite_passagem and c["vel_atual"] > 3.5:
+					# Passa no amarelo acelerando suavemente
+					vel_alvo = c["vel_cruzeiro"] * 1.10
+				else:
+					# Está mais longe: desacelera para parar com segurança
+					if dist <= 24.0:
+						var t = clamp(dist / 22.0, 0.0, 1.0)
+						vel_alvo = min(vel_alvo, c["vel_cruzeiro"] * t * t)
+					if dist <= 0.5:
+						vel_alvo = 0.0
+						follow.progress = _ponto_parada_m
+			
+			elif estado_real == 0: # VERMELHO (Parada obrigatória)
+				if dist <= 24.0:
+					var t = clamp(dist / 22.0, 0.0, 1.0)
 					vel_alvo = min(vel_alvo, c["vel_cruzeiro"] * t * t)
 				if dist <= 0.5:
-					# Chegou — trava duro no ponto
 					vel_alvo = 0.0
 					follow.progress = _ponto_parada_m
 		
-		# ── 2. ANTI-COLISÃO DENTRO DA MESMA ROTA ────────────────────────
-		# Compara só com o carro imediatamente à frente (índice i-1)
+		# ── 3. ANTI-COLISÃO EM FILA NA MESMA ROTA ────────────────────────
 		if i > 0:
 			var cf: Dictionary = _carros[i - 1]
 			var ff = cf.get("follow") as PathFollow3D
@@ -224,14 +249,13 @@ func _physics_process(delta: float) -> void:
 				var gap = ff.progress - prog
 				if gap < c["gap_frenagem"]:
 					if gap <= c["gap_parada"]:
-						# Para completamente e impede ultrapassagem
 						vel_alvo = 0.0
 						follow.progress = min(follow.progress, ff.progress - c["gap_parada"])
 					else:
 						var r = clamp((gap - c["gap_parada"]) / (c["gap_frenagem"] - c["gap_parada"]), 0.0, 1.0)
 						vel_alvo = min(vel_alvo, c["vel_cruzeiro"] * r)
 		
-		# ── 3. PEDESTRES / PLAYER ────────────────────────────────────────
+		# ── 4. PEDESTRES / PLAYER ────────────────────────────────────────
 		for op in obs_pos:
 			var to_op = (op - car_pos)
 			to_op.y = 0.0
@@ -245,8 +269,7 @@ func _physics_process(delta: float) -> void:
 						var r = clamp((dist_op - 4.5) / 6.5, 0.0, 1.0)
 						vel_alvo = min(vel_alvo, c["vel_cruzeiro"] * r)
 		
-		# ── 4. APLICAR VELOCIDADE ────────────────────────────────────────
-		# Ruído orgânico de velocidade: o pé no acelerador nunca é perfeitamente constante
+		# ── 5. APLICAÇÃO DE VELOCIDADE COM RUÍDO ORGÂNICO ────────────────
 		c["tempo_total"] += delta
 		var noise_vel: float = 0.0
 		if vel_alvo > 1.0:
@@ -254,15 +277,14 @@ func _physics_process(delta: float) -> void:
 		var vel_alvo_final: float = max(0.0, vel_alvo + noise_vel)
 		
 		var vel_ant: float = c["vel_atual"]
-		# Freio e aceleração pessoal de cada motorista
 		var taxa = c["freio"] if vel_alvo_final < vel_ant else c["acel"]
 		c["vel_atual"] = move_toward(vel_ant, vel_alvo_final, taxa * delta)
 		var vel: float = c["vel_atual"]
 		
-		# ── 5. BUZINA ────────────────────────────────────────────────────
+		# ── 6. BUZINA ────────────────────────────────────────────────────
 		if vel < 0.15:
 			c["tempo_parado"] += delta
-			if c["tempo_parado"] > 4.0 and not c["ja_buzinou"]:
+			if c["tempo_parado"] > 4.5 and not c["ja_buzinou"]:
 				c["ja_buzinou"] = true
 				if randf() < 0.18:
 					_buzinar(c)
@@ -270,26 +292,25 @@ func _physics_process(delta: float) -> void:
 			c["tempo_parado"] = 0.0
 			c["ja_buzinou"] = false
 		
-		# ── 6. SOM DE MOTOR ──────────────────────────────────────────────
+		# ── 7. SOM DE MOTOR ──────────────────────────────────────────────
 		var eng = c["eng"] as AudioStreamPlayer3D
 		if is_instance_valid(eng):
-			eng.pitch_scale = lerp(0.78, 1.38, clamp(vel / c["vel_cruzeiro"], 0.0, 1.0))
+			eng.pitch_scale = lerp(0.80, 1.35, clamp(vel / c["vel_cruzeiro"], 0.0, 1.0))
 			if not eng.playing: eng.play()
 		
-		# ── 7. AVANÇAR NA ROTA ───────────────────────────────────────────
+		# ── 8. AVANÇO NA ROTA ────────────────────────────────────────────
 		follow.progress += vel * delta
 		
-		# Trava dura: nunca ultrapassa o ponto de parada no vermelho
-		if deve_parar_sinal and _ponto_parada_m > 0.0:
+		# Trava dura: APENAS no sinal VERMELHO (ou amarelo de parada) para quem NÃO cruzou
+		if estado_real == 0 and _ponto_parada_m > 0.0 and not c["cruzou_sinal"]:
 			if follow.progress > _ponto_parada_m:
 				follow.progress = _ponto_parada_m
 		
-		# ── 8. ORIENTAÇÃO + DESVIO LATERAL ORGÂNICO ─────────────────────
+		# ── 9. ORIENTAÇÃO E DESVIO LATERAL ───────────────────────────────
 		_orientar(c, follow.progress)
-		# Aplica leve desvio lateral (carro não fica perfeitamente centrado na faixa)
 		holder.position.x = c["lat_drift"]
 		
-		# ── 9. FIM DA ROTA ───────────────────────────────────────────────
+		# ── 10. FIM DA ROTA ──────────────────────────────────────────────
 		if follow.progress >= (_length - 1.5):
 			para_remover.append(c)
 	
