@@ -1045,11 +1045,16 @@ func _play_opening_sequence() -> void:
 		fade_tw.tween_property(fade_rect, "color:a", 0.0, 0.55)
 		fade_tw.tween_callback(fade_rect.hide)
 	
-	print("[Prologue] Disparando boot VHS, HUD aparece (controle já está livre).")
-	await _play_vhs_intro_sequence()
-	print("[Prologue] VHS acabou. Dirigindo embora.")
+	# O motor NUNCA foi desligado — os pais só arrancam assim que a Alice
+	# sai e fecha a porta. Dispara aqui (sem esperar o VHS) pra já estar
+	# em movimento quando o boot VHS aparecer.
+	print("[Prologue] Alice já saiu, carro (motor ligado o tempo todo) já começa a arrancar.")
 	_set_world_audio_for_car_interior(false)
 	_drive_parents_car_away()
+	
+	print("[Prologue] Disparando boot VHS, HUD aparece (controle já está livre).")
+	await _play_vhs_intro_sequence()
+	print("[Prologue] VHS acabou.")
 	await get_tree().create_timer(1.4).timeout
 	print("[Prologue] Disparando pensamentos da Alice na calçada.")
 	await _play_alice_sidewalk_thoughts()
@@ -1272,9 +1277,11 @@ func _setup_parents_car() -> void:
 	# objeto para o alvo, então para o capô ficar virado para +X, fazemos
 	# look_at mirar para o lado OPOSTO do movimento (-X) => -Z do carro
 	# aponta para -X => +Z do carro (capô) aponta para +X = CORRETO.
-	var street_pos := Vector3(37.8, 0.22, 23.4)
+	# Aproximado do passeio (offsets menores) — parece que os pais acabaram
+	# de deixar a Alice ali, e não que o carro está parado longe da calçada.
+	var street_pos := Vector3(38.6, 0.22, 20.6)
 	if player:
-		street_pos = Vector3(player.global_position.x - 3.6, 0.22, max(21.8, player.global_position.z + 5.8))
+		street_pos = Vector3(player.global_position.x - 1.0, 0.22, max(19.4, player.global_position.z + 3.2))
 	_parents_car.global_position = street_pos
 	_parents_car.look_at(street_pos + Vector3(-1.0, 0.0, 0.0), Vector3.UP)
 	
@@ -1320,20 +1327,19 @@ func _drive_parents_car_away() -> void:
 			paths_paused.append(p.get_path())
 			p.process_mode = Node.PROCESS_MODE_DISABLED
 	
-	var startup_path := "res://assets/models/car/psx/Sound effects/Car_Engine_Start_Up.ogg"
-	if ResourceLoader.exists(startup_path):
-		var sfx := AudioStreamPlayer3D.new()
-		sfx.stream = load(startup_path)
-		sfx.volume_db = -16.0
-		sfx.unit_size = 28.0
-		sfx.max_distance = 120.0
-		_parents_car.add_child(sfx)
-		sfx.play()
-	
+	# O motor NUNCA foi desligado (a Alice desceu com ele ligado), então não
+	# toca som de "arrancar o motor" — só liga a fonte 3D externa do motor,
+	# já que antes ela só era ouvida abafada por dentro do carro.
 	var engine = _parents_car.get_node_or_null("EngineAudio") as AudioStreamPlayer3D
 	if engine:
 		engine.volume_db = -8.0
 		engine.play()
+	
+	for light_name in ["TaillightL", "TaillightR"]:
+		var tl = _parents_car.get_node_or_null(light_name) as OmniLight3D
+		if tl:
+			tl.light_energy = 1.6
+			tl.omni_range = 3.2
 	
 	var accel_path := "res://assets/models/car/psx/Sound effects/Car_Acceleration.ogg"
 	if ResourceLoader.exists(accel_path):
@@ -1343,12 +1349,6 @@ func _drive_parents_car_away() -> void:
 		acc.unit_size = 32.0
 		_parents_car.add_child(acc)
 		acc.play()
-	
-	for light_name in ["TaillightL", "TaillightR"]:
-		var tl = _parents_car.get_node_or_null(light_name) as OmniLight3D
-		if tl:
-			tl.light_energy = 1.6
-			tl.omni_range = 3.2
 	
 	var start_pos: Vector3 = _parents_car.global_position
 	var end_x: float = 145.0
@@ -1375,9 +1375,9 @@ func _drive_parents_car_away() -> void:
 		
 		var speed: float
 		if x_now < phase1_end_x:
-			# Primeira fase: saída lenta, ~18m em 2.6s → ~6.9 m/s (25 km/h)
+			# Primeira fase: saída bem lenta e progressiva, pegando embalo aos poucos
 			var u: float = clamp((x_now - start_pos.x) / max(0.001, phase1_end_x - start_pos.x), 0.0, 1.0)
-			speed = lerp(0.5, 8.0, u)
+			speed = lerp(0.05, 8.0, u)
 		else:
 			# Segunda fase: aceleração suave, 77m totais / 9.1s totais → ~11 m/s médio (40 km/h)
 			var u2: float = clamp((x_now - phase1_end_x) / max(0.001, end_x - phase1_end_x), 0.0, 1.0)

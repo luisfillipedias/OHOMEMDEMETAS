@@ -18,6 +18,7 @@
 [ext_resource type="Texture2D" uid="uid://dc7wyaekm175t" path="res://assets/textures/psx_pack/passeeio.jpg" id="12_lrq20"]
 [ext_resource type="PackedScene" uid="uid://1my4pv0shbam" path="res://assets/URBAN/Fences/metal_fence/metalfence_both_sides_no_topbar.glb" id="13_62ahm"]
 [ext_resource type="PackedScene" uid="uid://mfmjb2cnbxru" path="res://assets/URBAN/Bus stops/busstop.fbx" id="14_kkvtk"]
+[ext_resource type="Texture2D" uid="uid://b2b2b4so3yt5r" path="res://assets/textures/ConcreteFloors0059_1_350.jpg" id="14_pif8r"]
 [ext_resource type="Texture2D" uid="uid://bxjf6vfn5gvmi" path="res://assets/models/trees/Vegetation/Textures/BarkDecidious.png" id="14_sokgg"]
 [ext_resource type="Material" uid="uid://c03bqfv5egvgq" path="res://assets/textures/mat_wood_floor.tres" id="14_wood"]
 [ext_resource type="PackedScene" uid="uid://bjmga4a4m6k4s" path="res://assets/models/city2.glb" id="15_8k4te"]
@@ -178,9 +179,10 @@ albedo_texture = ExtResource("11_hpe86")
 albedo_color = Color(0.40392157, 0.40392157, 0.40392157, 1)
 albedo_texture = ExtResource("11_hpe86")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ihhd3"]
-albedo_texture = ExtResource("12_4ecmv")
-uv1_scale = Vector3(10, 10, 10)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_t5gn1"]
+albedo_color = Color(0.73300546, 0.7330054, 0.7330054, 1)
+albedo_texture = ExtResource("14_pif8r")
+uv1_scale = Vector3(5, 20, 5)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0o7bn"]
 resource_name = "BarkDecidious"
@@ -256,6 +258,10 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_qtljv")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ihhd3"]
+albedo_texture = ExtResource("12_4ecmv")
+uv1_scale = Vector3(10, 10, 10)
 
 [sub_resource type="StandardMaterial3D" id="Mat_DarkCar"]
 albedo_color = Color(0.08, 0.08, 0.09, 1)
@@ -2378,7 +2384,7 @@ size = Vector3(160, 0.02, 0.35)
 
 [node name="CalcadaAmazonas" type="CSGBox3D" parent="CefetExterior" unique_id=1352601008]
 transform = Transform3D(1, 0, 0, 0, 1.6997535, 0, 0, 0, 1, -23.042355, -0.030923367, 11.306395)
-material_override = SubResource("StandardMaterial3D_ihhd3")
+material_override = SubResource("StandardMaterial3D_t5gn1")
 use_collision = true
 size = Vector3(142.66098, 0.25, 16.62088)
 
