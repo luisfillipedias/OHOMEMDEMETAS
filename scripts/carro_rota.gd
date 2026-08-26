@@ -110,7 +110,19 @@ func _tentar_spawnar() -> void:
 	var holder := Node3D.new()
 	holder.position.y = altura_suspensao
 	follow.add_child(holder)
-	
+
+	# Corpo físico para colisão com o player
+	var corpo := AnimatableBody3D.new()
+	corpo.sync_to_physics = true
+	holder.add_child(corpo)
+
+	var colisor := CollisionShape3D.new()
+	var caixa := BoxShape3D.new()
+	caixa.size = Vector3(1.8, 1.4, 4.2)  # tamanho aproximado do carro
+	colisor.shape = caixa
+	colisor.position.y = 0.7  # centraliza a caixa na altura do carro
+	corpo.add_child(colisor)
+
 	var inst: Node3D = (info["cena"] as PackedScene).instantiate()
 	holder.add_child(inst)
 	

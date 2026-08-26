@@ -91,8 +91,22 @@ func _spawn_pedestre() -> void:
 	var holder := Node3D.new()
 	holder.name = "ModelHolder"
 	holder.position.y = altura_offset + 0.045 # Elevação para a sola do sapato não afundar no chão
-	holder.add_child(modelo_inst)
 	follow.add_child(holder)
+
+	# Corpo físico para colisão com o player
+	var corpo := AnimatableBody3D.new()
+	corpo.sync_to_physics = true
+	holder.add_child(corpo)
+
+	var colisor := CollisionShape3D.new()
+	var capsula := CapsuleShape3D.new()
+	capsula.radius = 0.25
+	capsula.height = 1.6
+	colisor.shape = capsula
+	colisor.position.y = 0.8  # centraliza a cápsula na altura de uma pessoa
+	corpo.add_child(colisor)
+
+	holder.add_child(modelo_inst)
 
 	# Áudio 3D posicional de passos com atenuação espacial audível
 	var audio_3d := AudioStreamPlayer3D.new()
@@ -202,6 +216,19 @@ func _process(delta: float) -> void:
 				_atualizar_olhar_cabeca(p, jogador, delta)
 			elif p.get("olhando_atual", 0.0) > 0.001:
 				p["olhando_atual"] = lerp(p["olhando_atual"], 0.0, delta * 4.0)
+
+		# Desvio lateral quando o player está perto
+		var holder: Node3D = p.get("holder")
+		if is_instance_valid(holder) and jogador:
+			var dist := holder.global_position.distance_to(jog_pos)
+			if dist < 2.5:
+				var lateral := holder.global_transform.basis.x  # eixo lateral do pedestre
+				var desvio: float = clamp((2.5 - dist) / 2.5, 0.0, 1.0) * 0.6
+				# decide o lado com base em de que lado o player está
+				var lado: float = sign(lateral.dot(jog_pos - holder.global_position))
+				holder.position.x = lerp(holder.position.x, lado * -desvio, delta * 3.0)
+			else:
+				holder.position.x = lerp(holder.position.x, 0.0, delta * 3.0)
 
 func _orientar_para_frente(follow: PathFollow3D, holder: Node3D) -> void:
 	if curve == null:
