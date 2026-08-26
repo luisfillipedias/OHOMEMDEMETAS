@@ -114,7 +114,7 @@ func _tentar_spawnar() -> void:
 	# Corpo físico para colisão com o player
 	var corpo := AnimatableBody3D.new()
 	corpo.sync_to_physics = true
-	corpo.collision_layer = 4  # mesma layer que o player (mask=4) já enxerga
+	corpo.collision_layer = 1  # layer 1 = a mesma que o player detecta por padrão (mask=1)
 	corpo.collision_mask = 0
 	holder.add_child(corpo)
 
@@ -124,6 +124,8 @@ func _tentar_spawnar() -> void:
 	colisor.shape = caixa
 	colisor.position.y = 0.7  # centraliza a caixa na altura do carro
 	corpo.add_child(colisor)
+
+	print("[CARRO-DEBUG] corpo criado | layer=%d mask=%d | pos_global=%s" % [corpo.collision_layer, corpo.collision_mask, corpo.global_position])
 
 	var inst: Node3D = (info["cena"] as PackedScene).instantiate()
 	holder.add_child(inst)

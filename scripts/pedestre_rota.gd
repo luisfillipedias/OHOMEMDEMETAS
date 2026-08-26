@@ -96,7 +96,7 @@ func _spawn_pedestre() -> void:
 	# Corpo físico para colisão com o player
 	var corpo := AnimatableBody3D.new()
 	corpo.sync_to_physics = true
-	corpo.collision_layer = 4  # mesma layer que o player (mask=4) já enxerga
+	corpo.collision_layer = 1  # layer 1 = a mesma que o player detecta por padrão (mask=1)
 	corpo.collision_mask = 0
 	holder.add_child(corpo)
 
@@ -107,6 +107,8 @@ func _spawn_pedestre() -> void:
 	colisor.shape = capsula
 	colisor.position.y = 0.8  # centraliza a cápsula na altura de uma pessoa
 	corpo.add_child(colisor)
+
+	print("[PEDESTRE-DEBUG] corpo criado | layer=%d mask=%d | pos_global=%s" % [corpo.collision_layer, corpo.collision_mask, corpo.global_position])
 
 	holder.add_child(modelo_inst)
 
