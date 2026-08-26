@@ -113,7 +113,7 @@ func _tentar_spawnar() -> void:
 
 	# Corpo físico para colisão com o player
 	var corpo := AnimatableBody3D.new()
-	corpo.sync_to_physics = true
+	corpo.sync_to_physics = false
 	corpo.collision_layer = 1  # layer 1 = a mesma que o player detecta por padrão (mask=1)
 	corpo.collision_mask = 0
 	holder.add_child(corpo)
@@ -124,8 +124,6 @@ func _tentar_spawnar() -> void:
 	colisor.shape = caixa
 	colisor.position.y = 0.7  # centraliza a caixa na altura do carro
 	corpo.add_child(colisor)
-
-	print("[CARRO-DEBUG] corpo criado | layer=%d mask=%d | pos_global=%s" % [corpo.collision_layer, corpo.collision_mask, corpo.global_position])
 
 	var inst: Node3D = (info["cena"] as PackedScene).instantiate()
 	holder.add_child(inst)
@@ -170,6 +168,7 @@ func _tentar_spawnar() -> void:
 	var dados := {
 		"follow": follow,
 		"holder": holder,
+		"corpo": corpo,
 		"inst": inst,
 		"index": info["index"],
 		"vel_atual": 0.0,
@@ -359,7 +358,12 @@ func _physics_process(delta: float) -> void:
 		# ── 9. ORIENTAÇÃO E DESVIO LATERAL ───────────────────────────────
 		_orientar(c, follow.progress)
 		holder.position.x = c["lat_drift"]
-		
+
+		# Sincroniza corpo físico manualmente
+		var corpo_fisico: AnimatableBody3D = c.get("corpo")
+		if is_instance_valid(corpo_fisico):
+			corpo_fisico.global_transform = holder.global_transform
+
 		# ── 10. FIM DA ROTA ──────────────────────────────────────────────
 		if follow.progress >= (_length - 1.5):
 			para_remover.append(c)
