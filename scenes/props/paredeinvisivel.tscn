@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://croufn36tyhyf"]
+
+[ext_resource type="Script" uid="uid://cn37bkflvcab2" path="res://scripts/invisible_wall.gd" id="1_p6v68"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1iice"]
+size = Vector3(1, 7.3470764, 6.1084595)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_frvqy"]
+size = Vector3(1, 7.3470764, 6.1084595)
+
+[node name="Node3D2" type="Node3D" unique_id=213373791]
+script = ExtResource("1_p6v68")
+mensagem = "(não devo ir ali, é perigoso.)"
+debug_mode = true
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=863152500]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7957993, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1354522260]
+transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 0.22625354, 3.6542685, -0.47692013)
+shape = SubResource("BoxShape3D_1iice")
+
+[node name="Area3D" type="Area3D" parent="." unique_id=336392066]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=2006732341]
+transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 1.5705109, 3.6542685, -0.10879803)
+shape = SubResource("BoxShape3D_frvqy")
+debug_color = Color(0.9965449, 0, 0.19349316, 0.41960785)

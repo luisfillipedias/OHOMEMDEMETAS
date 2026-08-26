@@ -25,8 +25,9 @@ func _ready() -> void:
 	for child in get_children():
 		if child is Area3D:
 			# Configura o Area3D para detectar o jogador
+			# PlayerController está na layer 2, então usamos mask = 3 (cobre layers 1 e 2)
 			child.collision_layer = 0
-			child.collision_mask = 1  # Detecta qualquer coisa na layer 1 (padrão)
+			child.collision_mask = 3  # Detecta layers 1 e 2 (player está na layer 2)
 			child.body_entered.connect(_on_body_entered)
 			if debug_mode:
 				print("[InvisibleWall] Area3D configurado para detectar colisões. Collision mask: ", child.collision_mask)

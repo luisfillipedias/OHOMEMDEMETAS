@@ -72,6 +72,7 @@ var _intro_lock: bool = true
 var _inside_car_audio: bool = false
 var _skip_prologue_hold_time: float = 0.0
 var _is_skipping_prologue: bool = false
+var _prologue_was_skipped: bool = false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -842,6 +843,7 @@ func show_boundary_thought(text: String) -> void:
 	if not dialogue_ui or not dialogue_ui.has_method("start_dialogue"):
 		return
 	if dialogue_ui.has_method("is_active") and dialogue_ui.is_active():
+		print("[BoundaryThought] Diálogo ativo, ignorando mensagem: ", text)
 		return
 	dialogue_ui.start_dialogue([
 		{"speaker": "Alice", "text": text, "thought": true}
@@ -1052,13 +1054,19 @@ func _play_opening_sequence() -> void:
 	
 	# 1 segundo apenas de ambiente do carro parado + tela preta, sem ninguém falando
 	await get_tree().create_timer(1.0).timeout
+	if _prologue_was_skipped: return
+	
 	print("[Prologue] Passou 1s. Disparando diálogo do prólogo.")
 	await _play_prologue_dialogue()
+	if _prologue_was_skipped: return
+	
 	print("[Prologue] Diálogo ACABOU. Esperando 3s de silêncio do motor ligado.")
 	await get_tree().create_timer(3.0).timeout
+	if _prologue_was_skipped: return
 	
 	print("[Prologue] Tocando som de saindo do carro (abrir/fechar porta).")
 	await _play_leaving_car_sfx()
+	if _prologue_was_skipped: return
 	
 	# Fade out da tela preta = Alice está lá fora. LIBERA CONTROLE IMEDIATAMENTE.
 	_intro_lock = false
@@ -1079,8 +1087,12 @@ func _play_opening_sequence() -> void:
 	
 	print("[Prologue] Disparando boot VHS, HUD aparece (controle já está livre).")
 	await _play_vhs_intro_sequence()
+	if _prologue_was_skipped: return
+	
 	print("[Prologue] VHS acabou.")
 	await get_tree().create_timer(1.4).timeout
+	if _prologue_was_skipped: return
+	
 	print("[Prologue] Disparando pensamentos da Alice na calçada.")
 	await _play_alice_sidewalk_thoughts()
 	print("[Prologue] FIM TOTAL DO PRÓLOGO.")
@@ -1088,6 +1100,7 @@ func _play_opening_sequence() -> void:
 func _skip_prologue() -> void:
 	print("[Prologue] SKIP DISPARADO! Pulando todo o prólogo.")
 	_is_skipping_prologue = true
+	_prologue_was_skipped = true  # Flag permanente - nunca volta a false
 	
 	# Para qualquer áudio que esteja tocando
 	if is_instance_valid(_audio_car_idle):

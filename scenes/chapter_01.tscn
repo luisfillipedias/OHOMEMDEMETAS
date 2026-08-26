@@ -109,7 +109,7 @@
 [ext_resource type="PackedScene" path="res://scenes/vehicles/car_03_default.tscn" id="111_pif8r"]
 [ext_resource type="PackedScene" uid="uid://bx04v5ueawyof" path="res://assets/URBAN/Litter/Dumpsters/dumpster_trashpile_1.fbx" id="112_pif8r"]
 [ext_resource type="PackedScene" path="res://scenes/vehicles/car_04_default.tscn" id="112_t5gn1"]
-[ext_resource type="Script" uid="uid://cn37bkflvcab2" path="res://scripts/invisible_wall.gd" id="114_t5gn1"]
+[ext_resource type="PackedScene" uid="uid://croufn36tyhyf" path="res://scenes/props/paredeinvisivel.tscn" id="114_t5gn1"]
 [ext_resource type="Script" uid="uid://cwrxji6hun1y5" path="res://scripts/carro_rota.gd" id="Ext_Carro_Rota"]
 [ext_resource type="Script" uid="uid://bdh8gdlq0v3f7" path="res://scripts/controlador_semaforo.gd" id="Ext_Ctrl_Semaforo"]
 [ext_resource type="Script" uid="uid://d5kf7xra0m2" path="res://scripts/ternudo_sitting.gd" id="Ext_Ternudo_Sitting"]
@@ -2113,12 +2113,6 @@ _data = {
 &"mixamo_com": SubResource("Animation_i8lym")
 }
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_1iice"]
-size = Vector3(1, 7.3470764, 6.1084595)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_frvqy"]
-size = Vector3(1, 7.3470764, 6.1084595)
-
 [node name="Chapter01" type="Node3D" unique_id=220049408]
 script = ExtResource("1_ch01")
 
@@ -2293,7 +2287,7 @@ mouse_filter = 2
 [node name="CelularUI" parent="." unique_id=767186143 instance=ExtResource("4_phone")]
 
 [node name="PlayerController" type="CharacterBody3D" parent="." unique_id=110146387]
-transform = Transform3D(-0.9731582, 0, 0.23013726, 0, 1, 0, -0.23013726, 0, -0.9731582, 34.10767, 1.2546494, 19.926796)
+transform = Transform3D(-0.9731582, 0, 0.23013726, 0, 1, 0, -0.23013726, 0, -0.9731582, 34.735153, 1.2546494, 17.273432)
 collision_layer = 2
 script = ExtResource("2_player")
 
@@ -2315,7 +2309,7 @@ collide_with_areas = true
 [node name="CefetExterior" type="Node3D" parent="." unique_id=920883666]
 
 [node name="PlayerStart" type="Marker3D" parent="CefetExterior" unique_id=1919248078]
-transform = Transform3D(-0.9731582, 0, 0.23013726, 0, 1, 0, -0.23013726, 0, -0.9731582, 34.10767, 1.2546494, 19.926796)
+transform = Transform3D(-0.9731582, 0, 0.23013726, 0, 1, 0, -0.23013726, 0, -0.9731582, 34.735153, 1.2546494, 17.273432)
 
 [node name="CampusGround" type="CSGBox3D" parent="CefetExterior" unique_id=1304485138]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -44.047096, -0.5047486, -27.879177)
@@ -8566,25 +8560,69 @@ autoplay = &"mixamo_com"
 [node name="dumpster_trashpile_1" parent="." unique_id=550023428 instance=ExtResource("112_pif8r")]
 transform = Transform3D(-0.03004282, 0, -0.9995486, 0, 1, 0, 0.9995486, 0, -0.03004282, 17.102142, 1.4678605, 23.258694)
 
-[node name="Node3D2" type="Node3D" parent="." unique_id=1223905879]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 47.88979, 0, 8.058779)
-script = ExtResource("114_t5gn1")
-mensagem = "(não devo ir ali, é perigoso.)"
-debug_mode = true
+[node name="parededetras" parent="." unique_id=213373791 instance=ExtResource("114_t5gn1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 47.88979, 0, 9.606066)
+debug_mode = false
 
-[node name="StaticBody3D" type="StaticBody3D" parent="Node3D2" unique_id=779680765]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7957993, 0, 0)
+[node name="parededarua" parent="." unique_id=270449277 instance=ExtResource("114_t5gn1")]
+transform = Transform3D(-0.0036238802, 0.069462895, -0.99731475, -2.3743972e-11, 0.9975832, 0.0694816, 0.15617158, 0.0016118505, -0.02314217, 40.778572, 0.17092094, 21.479555)
+mensagem = "(não posso atravessar a rua agora.)"
+debug_mode = false
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D2/StaticBody3D" unique_id=591186619]
-transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 0.22625354, 3.6542685, -0.47692013)
-shape = SubResource("BoxShape3D_1iice")
+[node name="Area3D" parent="parededarua" index="1" unique_id=336392066]
+transform = Transform3D(-1.750768, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
-[node name="Area3D" type="Area3D" parent="Node3D2" unique_id=528560225]
+[node name="parededarua2" parent="." unique_id=1650520710 instance=ExtResource("114_t5gn1")]
+transform = Transform3D(0.0006253598, 0.069462895, -0.997499, -0.00012088252, 0.9975832, 0.069435686, 0.04786491, 0.0016118508, 0.013207782, 16.638186, 1.853179, 20.653719)
+mensagem = "(não posso atravessar a rua agora.)"
+debug_mode = false
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D2/Area3D" unique_id=2014728064]
-transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 1.5705109, 3.6542685, -0.10879803)
-shape = SubResource("BoxShape3D_frvqy")
-debug_color = Color(0.9965449, 0, 0.19349316, 0.41960785)
+[node name="Area3D" parent="parededarua2" index="1" unique_id=336392066]
+transform = Transform3D(-1.750768, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="parededarua3" parent="." unique_id=102471575 instance=ExtResource("114_t5gn1")]
+transform = Transform3D(-0.0011104797, 0.069462895, -0.99731475, -7.275958e-12, 0.9975832, 0.0694816, 0.047856264, 0.0016118505, -0.02314217, -7.380349, 3.52573, 20.58445)
+mensagem = "(não posso atravessar a rua agora.)"
+debug_mode = false
+
+[node name="Area3D" parent="parededarua3" index="1" unique_id=336392066]
+transform = Transform3D(-1.750768, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="parededarua4" parent="." unique_id=394560493 instance=ExtResource("114_t5gn1")]
+transform = Transform3D(0.0022160308, 0.069462895, -0.9965098, -0.00023156585, 0.99758315, 0.06931298, 0.047817267, 0.0016118503, 0.046517663, -30.38748, 5.126997, 21.046762)
+mensagem = "(não posso atravessar a rua agora.)"
+debug_mode = false
+
+[node name="Area3D" parent="parededarua4" index="1" unique_id=336392066]
+transform = Transform3D(-1.750768, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="parededarua5" parent="." unique_id=701881888 instance=ExtResource("114_t5gn1")]
+transform = Transform3D(0.0017467658, 0.06946289, -0.9969169, -0.00019892205, 0.9975832, 0.0693572, 0.04783685, 0.0016118488, 0.036690935, -52.752193, 6.6826267, 22.068493)
+mensagem = "(não posso atravessar a rua agora.)"
+debug_mode = false
+
+[node name="Area3D" parent="parededarua5" index="1" unique_id=336392066]
+transform = Transform3D(-1.750768, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="parededarua6" parent="." unique_id=1857251013 instance=ExtResource("114_t5gn1")]
+transform = Transform3D(0.00018982193, 0.06946288, -0.9975766, -9.056167e-05, 0.9975832, 0.06945582, 0.047868684, 0.0016118491, 0.004087303, -75.84789, 8.290428, 22.303135)
+mensagem = "(não posso atravessar a rua agora.)"
+debug_mode = false
+
+[node name="Area3D" parent="parededarua6" index="1" unique_id=336392066]
+transform = Transform3D(-1.750768, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="parededarua7" parent="." unique_id=339173904 instance=ExtResource("114_t5gn1")]
+transform = Transform3D(0.00018982193, 0.06946288, -0.9975766, -9.056167e-05, 0.9975832, 0.06945582, 0.047868684, 0.0016118491, 0.004087303, -98.87433, 9.8940735, 22.12492)
+mensagem = "(não posso atravessar a rua agora.)"
+debug_mode = false
+
+[node name="Area3D" parent="parededarua7" index="1" unique_id=336392066]
+transform = Transform3D(-1.750768, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="parededafrente" parent="." unique_id=1811723071 instance=ExtResource("114_t5gn1")]
+transform = Transform3D(0.8523805, 0, -0.52292204, 0, 1, 0, 0.52292204, 0, 0.8523805, -94.42849, 10.4666815, 11.787284)
+mensagem = "(não tem nada pra fazer ali.)"
 
 [editable path="PosteCompleto3"]
 [editable path="PosteCompleto3/street_light2"]
@@ -8603,3 +8641,12 @@ debug_color = Color(0.9965449, 0, 0.19349316, 0.41960785)
 [editable path="building_08_6"]
 [editable path="Trees10"]
 [editable path="metalfence_both_sides_no_topbar8"]
+[editable path="parededetras"]
+[editable path="parededarua"]
+[editable path="parededarua2"]
+[editable path="parededarua3"]
+[editable path="parededarua4"]
+[editable path="parededarua5"]
+[editable path="parededarua6"]
+[editable path="parededarua7"]
+[editable path="parededafrente"]
