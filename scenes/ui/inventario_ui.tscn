@@ -1,0 +1,331 @@
+[gd_scene load_steps=6 format=3 uid="uid://inventario_ui_vhs"]
+
+[ext_resource type="Script" path="res://scripts/inventario_ui.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://b34hl0r4aa0hr" path="res://assets/fonts/text_font.ttf" id="2_text_font"]
+[ext_resource type="FontFile" uid="uid://d1nqbldw8qhdr" path="res://assets/fonts/screwtop.ttf" id="3_screwtop_font"]
+[ext_resource type="Material" uid="uid://vhsmenumat01" path="res://shaders/mat_vhs_menu.tres" id="4_vhs_mat"]
+
+[sub_resource type="World3D" id="World3D_inv"]
+
+[node name="InventarioUI" type="CanvasLayer"]
+layer = 15
+script = ExtResource("1_script")
+
+[node name="RootControl" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="RootControl"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.02, 0.025, 0.96)
+
+[node name="BorderFrame" type="ReferenceRect" parent="RootControl"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.85, 0.65, 0.15, 0.4)
+border_width = 1.5
+editor_only = false
+
+[node name="CornerTL" type="Label" parent="RootControl"]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 30.0
+offset_right = 72.0
+offset_bottom = 60.0
+theme_override_colors/font_color = Color(0.95, 0.75, 0.18, 0.85)
+theme_override_fonts/font = ExtResource("2_text_font")
+theme_override_font_sizes/font_size = 18
+text = "▲"
+
+[node name="CornerTR" type="Label" parent="RootControl"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -72.0
+offset_top = 30.0
+offset_right = -32.0
+offset_bottom = 60.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.95, 0.75, 0.18, 0.85)
+theme_override_fonts/font = ExtResource("2_text_font")
+theme_override_font_sizes/font_size = 18
+text = "▲"
+horizontal_alignment = 2
+
+[node name="CornerBL" type="Label" parent="RootControl"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = -60.0
+offset_right = 72.0
+offset_bottom = -30.0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.95, 0.75, 0.18, 0.85)
+theme_override_fonts/font = ExtResource("2_text_font")
+theme_override_font_sizes/font_size = 18
+text = "▼"
+
+[node name="CornerBR" type="Label" parent="RootControl"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -72.0
+offset_top = -60.0
+offset_right = -32.0
+offset_bottom = -30.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.95, 0.75, 0.18, 0.85)
+theme_override_fonts/font = ExtResource("2_text_font")
+theme_override_font_sizes/font_size = 18
+text = "▼"
+horizontal_alignment = 2
+
+[node name="HeaderContainer" type="VBoxContainer" parent="RootControl"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 36.0
+offset_bottom = 100.0
+grow_horizontal = 2
+theme_override_constants/separation = 4
+
+[node name="Titulo" type="Label" parent="RootControl/HeaderContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.82, 0.15, 1)
+theme_override_colors/font_shadow_color = Color(0.4, 0.25, 0.02, 0.9)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_fonts/font = ExtResource("2_text_font")
+theme_override_font_sizes/font_size = 28
+text = "INVENTÁRIO"
+horizontal_alignment = 1
+
+[node name="Subtitulo" type="Label" parent="RootControl/HeaderContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.65, 0.65, 0.8)
+theme_override_fonts/font = ExtResource("2_text_font")
+theme_override_font_sizes/font_size = 13
+text = "— ITENS POSSUÍDOS —"
+horizontal_alignment = 1
+
+[node name="ViewportContainer" type="SubViewportContainer" parent="RootControl"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -280.0
+offset_top = -175.0
+offset_right = 280.0
+offset_bottom = 125.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="RootControl/ViewportContainer"]
+own_world_3d = true
+world_3d = SubResource("World3D_inv")
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(560, 300)
+render_target_update_mode = 3
+
+[node name="Camera3D" type="Camera3D" parent="RootControl/ViewportContainer/SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 0.951057, 0.309017, 0, -0.309017, 0.951057, 0, 0.35, 1.95)
+fov = 38.0
+
+[node name="KeyLight" type="DirectionalLight3D" parent="RootControl/ViewportContainer/SubViewport"]
+transform = Transform3D(0.819152, -0.40558, 0.40558, 0, 0.707107, 0.707107, -0.573576, -0.579228, 0.579228, 0, 3, 2)
+light_color = Color(1, 0.97, 0.9, 1)
+light_energy = 2.2
+
+[node name="FillLight" type="OmniLight3D" parent="RootControl/ViewportContainer/SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, -0.5, 1.2)
+light_color = Color(0.5, 0.7, 0.95, 1)
+light_energy = 1.2
+omni_range = 8.0
+
+[node name="BackLight" type="OmniLight3D" parent="RootControl/ViewportContainer/SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -1.5)
+light_color = Color(1, 0.85, 0.5, 1)
+light_energy = 1.0
+omni_range = 6.0
+
+[node name="ItemPivot" type="Node3D" parent="RootControl/ViewportContainer/SubViewport"]
+
+[node name="BtnEsq" type="Button" parent="RootControl"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 60.0
+offset_top = -60.0
+offset_right = 140.0
+offset_bottom = 40.0
+grow_vertical = 2
+flat = true
+
+[node name="LabelEsq" type="Label" parent="RootControl/BtnEsq"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.98, 0.82, 0.15, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_fonts/font = ExtResource("2_text_font")
+theme_override_font_sizes/font_size = 28
+text = "◄ [A]"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BtnDir" type="Button" parent="RootControl"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -140.0
+offset_top = -60.0
+offset_right = -60.0
+offset_bottom = 40.0
+grow_horizontal = 0
+grow_vertical = 2
+flat = true
+
+[node name="LabelDir" type="Label" parent="RootControl/BtnDir"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.98, 0.82, 0.15, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_fonts/font = ExtResource("2_text_font")
+theme_override_font_sizes/font_size = 28
+text = "[D] ►"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="InfoContainer" type="VBoxContainer" parent="RootControl"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 60.0
+offset_top = -215.0
+offset_right = -60.0
+offset_bottom = -75.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="ItemCounter" type="Label" parent="RootControl/InfoContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 0.8)
+theme_override_fonts/font = ExtResource("2_text_font")
+theme_override_font_sizes/font_size = 13
+text = "[ 1 / 1 ]"
+horizontal_alignment = 1
+
+[node name="NomeItem" type="Label" parent="RootControl/InfoContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.82, 0.15, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_fonts/font = ExtResource("3_screwtop_font")
+theme_override_font_sizes/font_size = 22
+text = "CÓPIAS DE DOCUMENTOS"
+horizontal_alignment = 1
+
+[node name="DescricaoItem" type="Label" parent="RootControl/InfoContainer"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.85, 0.85, 0.95)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
+theme_override_fonts/font = ExtResource("2_text_font")
+theme_override_font_sizes/font_size = 14
+text = "Cópias autenticadas dos seus documentos pessoais."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="BottomBar" type="RichTextLabel" parent="RootControl"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -62.0
+offset_bottom = -25.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_fonts/normal_font = ExtResource("2_text_font")
+theme_override_font_sizes/normal_font_size = 14
+bbcode_enabled = true
+text = "[center][color=#e63946]TAB / ESC[/color] - VOLTAR      [color=#ffbe1a]◄ / ►[/color] - NAVEGAR      [color=#ffbe1a]BOTÃO ESQUERDO[/color] - GIRAR ITEM[/center]"
+fit_content = true
+
+[node name="VazioLabel" type="Label" parent="RootControl"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -20.0
+offset_right = 200.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 0.8)
+theme_override_fonts/font = ExtResource("2_text_font")
+theme_override_font_sizes/font_size = 16
+text = "NENHUM ITEM NO INVENTÁRIO"
+horizontal_alignment = 1
+
+[node name="VHSOverlay" type="ColorRect" parent="RootControl"]
+material = ExtResource("4_vhs_mat")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

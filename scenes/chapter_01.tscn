@@ -106,6 +106,9 @@
 [ext_resource type="Texture2D" uid="uid://rohowirgf066" path="res://assets/models/_caracters/cenario/Ternudo/textures/rope.jpg" id="106_hpe86"]
 [ext_resource type="Texture2D" uid="uid://dxmtifv406r63" path="res://assets/models/_caracters/cenario/Ternudo/textures/jeans.jpg" id="107_pj8y8"]
 [ext_resource type="Texture2D" uid="uid://dcmufup0udj11" path="res://assets/models/_caracters/cenario/Ternudo/textures/face.jpg" id="108_qo4fv"]
+[ext_resource type="PackedScene" path="res://scenes/vehicles/car_08_purple.tscn" id="110_hnx7j"]
+[ext_resource type="PackedScene" path="res://scenes/vehicles/car_03_default.tscn" id="111_pif8r"]
+[ext_resource type="PackedScene" path="res://scenes/vehicles/car_04_default.tscn" id="112_t5gn1"]
 [ext_resource type="Script" uid="uid://cwrxji6hun1y5" path="res://scripts/carro_rota.gd" id="Ext_Carro_Rota"]
 [ext_resource type="Script" uid="uid://bdh8gdlq0v3f7" path="res://scripts/controlador_semaforo.gd" id="Ext_Ctrl_Semaforo"]
 [ext_resource type="Script" uid="uid://c6cfywobvlwll" path="res://assets/URBAN/Traffic lights/traffic_light_l.gd" id="TL_L_Script"]
@@ -7066,6 +7069,10 @@ mesh = SubResource("ArrayMesh_owqxx")
 transform = Transform3D(100.00001, 0, 2.2737368e-13, 0, -1.1920929e-05, 99.99999, 1.9073486e-06, -100, -1.192093e-05, 15.955433, -8.431578, 14.374872)
 mesh = SubResource("ArrayMesh_owqxx")
 
+[node name="Tree40" type="MeshInstance3D" parent="Trees10" unique_id=347951539]
+transform = Transform3D(100.00001, 0, 2.2737368e-13, 0, -1.1920929e-05, 99.99999, 1.9073486e-06, -100, -1.192093e-05, 8.569124, -2.5371208, 11.198397)
+mesh = SubResource("ArrayMesh_owqxx")
+
 [node name="Tree27" type="MeshInstance3D" parent="Trees10" unique_id=169273955]
 transform = Transform3D(100.000015, 1.9073486e-06, 2.2737368e-13, 0, -1.1920929e-05, 99.99999, 1.9073486e-06, -100.00001, -1.1920931e-05, 43.437523, 0.6408522, -14.978833)
 mesh = SubResource("ArrayMesh_owqxx")
@@ -7958,7 +7965,7 @@ transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, -89.87058, 0.17092094, 101.87
 transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, -89.87058, 0.17092094, 88.74056)
 
 [node name="tree_rt_90" parent="." unique_id=1815981498 instance=ExtResource("82_qhfjq")]
-transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, -89.87058, 0.17092094, 73.83086)
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, -75.249985, 0.17092094, 59.544563)
 
 [node name="tree_rt_91" parent="." unique_id=1318972663 instance=ExtResource("82_qhfjq")]
 transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, -89.87058, 0.17092094, 111.26263)
@@ -8096,6 +8103,9 @@ mesh = SubResource("BoxMesh_jio4w")
 
 [node name="Car2" parent="." unique_id=1048779300 instance=ExtResource("95_7lvpf")]
 transform = Transform3D(0.045774758, -0.0021798736, -1.9994749, 0.095135525, 1.9977361, 4.656613e-10, 1.9972115, -0.09511057, 0.04582663, 5.7938375, 0.5204411, 44.044586)
+
+[node name="Car3" parent="." unique_id=1872074970 instance=ExtResource("95_7lvpf")]
+transform = Transform3D(1.9988754, -0.002179876, 0.06702987, -0.0010114685, 1.9977361, 0.09513018, -0.067057684, -0.09511058, 1.9966115, 66.934685, -0.18964791, 8.198104)
 
 [node name="Car22" parent="." unique_id=1369384871 instance=ExtResource("96_b6qsx")]
 transform = Transform3D(0.106546156, 0, -1.99716, 0, 2, 0, 1.99716, 0, 0.106546156, 5.5452685, -0.6661133, 52.147625)
@@ -8426,6 +8436,15 @@ skeleton = NodePath("..")
 [node name="AnimationPlayer" type="AnimationPlayer" parent="TernudoSitting" unique_id=1214345129]
 libraries/ = SubResource("AnimationLibrary_1x5tk")
 autoplay = &"mixamo_com"
+
+[node name="car_08_purple" parent="." unique_id=2034584953 instance=ExtResource("110_hnx7j")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -57.63565, 0.010958195, 60.16152)
+
+[node name="car_03_default" parent="." unique_id=1201864914 instance=ExtResource("111_pif8r")]
+transform = Transform3D(0.27879006, 0, 1.9804738, 0, 2, 0, -1.9804738, 0, 0.27879006, -124.757065, 0, 43.189793)
+
+[node name="car_04_default" parent="." unique_id=1266536507 instance=ExtResource("112_t5gn1")]
+transform = Transform3D(-0.062464654, 0, 1.9990243, 0, 2, 0, -1.9990243, 0, -0.062464654, -139.3623, 0.4465599, 43.854458)
 
 [editable path="PosteCompleto3"]
 [editable path="PosteCompleto3/street_light2"]

@@ -1,7 +1,7 @@
 extends CanvasLayer
 
 # ============================================================
-# HUD CONTROLLER — Fears to Fathom Style
+# HUD CONTROLLER – Fears to Fathom Style
 # ============================================================
 
 @onready var timecard_label = $Timecard/TimecardLabel
@@ -19,6 +19,8 @@ extends CanvasLayer
 @onready var progress_bar = $ProgressBarContainer/ProgressBar
 @onready var progress_container = $ProgressBarContainer
 
+var _pickup_popup: CanvasLayer = null
+
 func _ready() -> void:
 	interact_hint.hide()
 	consequence_panel.hide()
@@ -29,11 +31,17 @@ func _ready() -> void:
 	GameState.consequence_triggered.connect(show_consequence)
 	GameState.item_changed.connect(_on_item_changed)
 	
+	# Conectar ao Inventario para mostrar popup ao pegar item
+	var inv = get_node_or_null("/root/Inventario")
+	if inv and inv.has_signal("item_adicionado"):
+		inv.item_adicionado.connect(_on_item_adicionado)
+	
 	_fade_in()
 
 # Timecard que aparece no início e some após alguns segundos
 func show_timecard(location_text: String, time_text: String) -> void:
-	timecard_label.text = location_text + "\n" + time_text
+	timecard_label.text = location_text + "
+" + time_text
 	timecard_container.modulate.a = 0.0
 	timecard_container.show()
 	
@@ -47,7 +55,8 @@ func show_timecard(location_text: String, time_text: String) -> void:
 func set_objective(text: String) -> void:
 	var formatted: String = text.to_upper().strip_edges()
 	if not formatted.begins_with("OBJETIVO:"):
-		formatted = "OBJETIVO:\n" + formatted
+		formatted = "OBJETIVO:
+" + formatted
 	objective_label.text = formatted
 	objective_panel.modulate.a = 0.0
 	objective_panel.show()
@@ -94,6 +103,15 @@ func _on_item_changed(new_item: String) -> void:
 		item_indicator.show()
 	else:
 		item_indicator.hide()
+
+func _on_item_adicionado(dados: Dictionary) -> void:
+	if not is_instance_valid(_pickup_popup):
+		var popup_scene: PackedScene = load("res://scenes/ui/item_pickup_popup.tscn")
+		if popup_scene:
+			_pickup_popup = popup_scene.instantiate()
+			get_tree().root.add_child(_pickup_popup)
+	if is_instance_valid(_pickup_popup) and _pickup_popup.has_method("mostrar"):
+		_pickup_popup.mostrar(dados)
 
 func flash_screen(color: Color = Color(1, 1, 1, 1), duration: float = 0.3) -> void:
 	flash_rect.color = color

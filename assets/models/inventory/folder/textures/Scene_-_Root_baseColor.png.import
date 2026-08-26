@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://j43lubymurv4"
-path.s3tc="res://.godot/imported/Car8_purple.png-f87a727d8f6eb3a733e4ed6ff1b3f2d1.s3tc.ctex"
+uid="uid://l1hp8t3avys"
+path.s3tc="res://.godot/imported/Scene_-_Root_baseColor.png-1a306baa16dd41d7ae03e54eda52869b.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/models/car/psx/Car 08/Car8_purple.png"
-dest_files=["res://.godot/imported/Car8_purple.png-f87a727d8f6eb3a733e4ed6ff1b3f2d1.s3tc.ctex"]
+source_file="res://assets/models/inventory/folder/textures/Scene_-_Root_baseColor.png"
+dest_files=["res://.godot/imported/Scene_-_Root_baseColor.png-1a306baa16dd41d7ae03e54eda52869b.s3tc.ctex"]
 
 [params]
 

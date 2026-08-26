@@ -1,0 +1,11 @@
+Model Information:
+* title:	Folder
+* source:	https://sketchfab.com/3d-models/folder-27a3e4a88c1a44a8a6b267310776a399
+* author:	Kerridge1 (https://sketchfab.com/Kerridge1)
+
+Model License:
+* license type:	CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
+* requirements:	Author must be credited. No commercial use.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Folder" (https://sketchfab.com/3d-models/folder-27a3e4a88c1a44a8a6b267310776a399) by Kerridge1 (https://sketchfab.com/Kerridge1) licensed under CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)

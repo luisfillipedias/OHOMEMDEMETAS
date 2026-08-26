@@ -640,6 +640,10 @@ func _setup_pause_menu() -> void:
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE):
+		# Se o inventário estiver aberto, NÃO abre o menu de pausa! O inventário fecha sozinho.
+		var p = get_node_or_null("PlayerController")
+		if is_instance_valid(p) and "_inventario_aberto" in p and p._inventario_aberto:
+			return
 		_toggle_pause()
 
 func _toggle_pause() -> void:
@@ -1055,4 +1059,11 @@ func _play_vhs_intro_sequence() -> void:
 		vhs_overlay.queue_free()
 	
 	# 5. Após o PLAY e o TIMECARD sumirem juntos, inicia digitação do objetivo no canto superior esquerdo
-	_set_objective("VÁ ATÉ O PRÉDIO\nADMINISTRATIVO E FAÇA\nSUA MATRÍCULA.", true)
+		_set_objective("VÁ ATÉ O PRÉDIO
+ADMINISTRATIVO E FAÇA
+SUA MATRÍCULA.", true)
+	# Dispara o popup do item inicial "Cópias de Documentos" por 10s
+	var inv_node = get_node_or_null("/root/Inventario")
+	if inv_node and inv_node.itens.size() > 0:
+		if hud and hud.has_method("_on_item_adicionado"):
+			hud._on_item_adicionado(inv_node.itens[0])

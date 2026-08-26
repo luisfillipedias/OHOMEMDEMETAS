@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://j43lubymurv4"
-path.s3tc="res://.godot/imported/Car8_purple.png-f87a727d8f6eb3a733e4ed6ff1b3f2d1.s3tc.ctex"
+uid="uid://dpecllw2po04e"
+path.s3tc="res://.godot/imported/Scene_-_Root_normal.png-6a4d109c6d92d48c2607c585856a9186.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/models/car/psx/Car 08/Car8_purple.png"
-dest_files=["res://.godot/imported/Car8_purple.png-f87a727d8f6eb3a733e4ed6ff1b3f2d1.s3tc.ctex"]
+source_file="res://assets/models/inventory/folder/textures/Scene_-_Root_normal.png"
+dest_files=["res://.godot/imported/Scene_-_Root_normal.png-6a4d109c6d92d48c2607c585856a9186.s3tc.ctex"]
 
 [params]
 
@@ -22,12 +22,12 @@ compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
-compress/normal_map=0
+compress/normal_map=1
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
-roughness/mode=0
-roughness/src_normal=""
+roughness/mode=1
+roughness/src_normal="res://assets/models/inventory/folder/textures/Scene_-_Root_normal.png"
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2

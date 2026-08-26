@@ -25,6 +25,8 @@ const BOB_HORIZONTAL_AMP: float = 0.010
 @onready var interact_ray: RayCast3D = $CameraMount/Camera3D/InteractRay
 
 var is_frozen: bool = false
+var _inventario_aberto: bool = false
+var _inventario_ui: CanvasLayer = null
 var camera_base_y: float = 0.65
 var default_fov: float = 72.0
 var is_zooming: bool = false
@@ -107,6 +109,7 @@ func _input(event: InputEvent) -> void:
 			GameManager.set_flag("held_item", "")
 
 func _physics_process(delta: float) -> void:
+
 	if is_frozen:
 		return
 
@@ -254,8 +257,45 @@ func _check_interaction() -> void:
 		if chapter and chapter.has_method("hide_interact_hint"):
 			chapter.hide_interact_hint()
 
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if not (event is InputEventKey): return
+	if event.pressed and not event.echo:
+		if event.keycode == KEY_TAB:
+			if _inventario_aberto:
+				# Fechar se ja aberto: o inventario_ui trata ESC/Tab internamente,
+				# mas aqui garantimos via player
+				var inv = _get_inventario_ui()
+				if is_instance_valid(inv) and inv.has_method("fechar"):
+					inv.fechar()
+			elif not is_frozen:
+				_abrir_inventario()
+			get_viewport().set_input_as_handled()
+
 func freeze() -> void:
 	is_frozen = true
 
 func unfreeze() -> void:
 	is_frozen = false
+
+func _get_inventario_ui() -> CanvasLayer:
+	if not is_instance_valid(_inventario_ui):
+		var scene: PackedScene = load("res://scenes/ui/inventario_ui.tscn")
+		if scene:
+			_inventario_ui = scene.instantiate()
+			get_tree().root.add_child(_inventario_ui)
+			if _inventario_ui.has_signal("fechou"):
+				_inventario_ui.fechou.connect(_on_inventario_fechou)
+	return _inventario_ui
+
+func _on_inventario_fechou() -> void:
+	_inventario_aberto = false
+	is_frozen = false
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+func _abrir_inventario() -> void:
+	_inventario_aberto = true
+	is_frozen = true
+	var inv = _get_inventario_ui()
+	if is_instance_valid(inv) and inv.has_method("abrir"):
+		inv.abrir()

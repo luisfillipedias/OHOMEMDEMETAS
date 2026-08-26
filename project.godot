@@ -21,6 +21,7 @@ PedestreManager="*res://scripts/pedestre_manager.gd"
 CarroManager="*res://autoload/carro_manager.gd"
 GameManager="*res://autoload/game_manager.gd"
 GameState="*res://autoload/game_state.gd"
+Inventario="*res://scripts/inventario.gd"
 
 [display]
 

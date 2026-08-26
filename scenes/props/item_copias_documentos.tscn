@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://copias_doc_item_3d"]
+
+[ext_resource type="PackedScene" uid="uid://baf060lxeplxg" path="res://assets/models/inventory/folder/scene.gltf" id="1_gltf"]
+
+[node name="ItemCopiasDocumentos" type="Node3D"]
+
+[node name="scene" parent="." instance=ExtResource("1_gltf")]
+transform = Transform3D(0.11, 0, 0, 0, 0.11, 0, 0, 0, 0.11, -0.073, -0.028, -0.029)
