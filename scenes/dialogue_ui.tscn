@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://dialogueui0scene"]
 
 [ext_resource type="Script" path="res://scripts/dialogue_system.gd" id="1_diag"]
-[ext_resource type="FontFile" path="res://assets/fonts/text_font.ttf" id="2_font"]
+[ext_resource type="FontFile" path="res://assets/fonts/LEDpixel-Square.otf" id="2_font"]
 
 [node name="DialogueUI" type="CanvasLayer"]
 layer = 80
@@ -51,7 +51,7 @@ theme_override_constants/shadow_offset_x = 3
 theme_override_constants/shadow_offset_y = 3
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 22
-text = "Mãe"
+text = "MÃE"
 horizontal_alignment = 1
 
 [node name="DialogueText" type="Label" parent="DialogueRoot/DialogueBox"]

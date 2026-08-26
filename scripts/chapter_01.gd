@@ -69,13 +69,12 @@ var _parents_car: Node3D = null
 var _audio_car_idle: AudioStreamPlayer = null
 var _audio_car_road: AudioStreamPlayer = null
 var _intro_lock: bool = true
+var _inside_car_audio: bool = false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	add_to_group("chapter")
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-	if player and player.has_method("freeze"):
-		player.freeze()
 	
 	# Auto-salva ao entrar no capítulo 1 para habilitar o botão CONTINUAR no menu
 	if GameManager:
@@ -335,7 +334,7 @@ func _play_next_ambience_crossfade() -> void:
 		incoming.finished.connect(_on_ambience_finished_fallback)
 
 	var duration: float = 6.0
-	var target_base_db: float = -6.0
+	var target_base_db: float = -14.0 if _inside_car_audio else -6.0
 	var target_gain: float = db_to_linear(target_base_db)
 
 	# CROSSFADE DE POTÊNCIA CONSTANTE (EQUAL-POWER: sin² + cos² = 1.0)
@@ -664,8 +663,6 @@ func _input(event: InputEvent) -> void:
 		# Se o inventário estiver aberto, NÃO abre o menu de pausa! O inventário fecha sozinho.
 		var p = get_node_or_null("PlayerController")
 		if is_instance_valid(p) and "_inventario_aberto" in p and p._inventario_aberto:
-			return
-		if _intro_lock:
 			return
 		_toggle_pause()
 
@@ -1015,7 +1012,7 @@ func _update_wind_systems(delta: float) -> void:
 # ============================================================
 
 func _play_opening_sequence() -> void:
-	print("[Prologue] INIT — Ordem: 1s silêncio -> diálogo -> 3s silêncio -> sair do carro -> VHS -> carro ir embora")
+	print("[Prologue] INIT — Ordem: 1s silêncio -> diálogo -> 3s silêncio -> sair do carro -> (libera controle) -> VHS -> carro ir embora")
 	_intro_lock = true
 	if fade_rect:
 		fade_rect.color = Color(0, 0, 0, 1)
@@ -1038,15 +1035,21 @@ func _play_opening_sequence() -> void:
 	print("[Prologue] Tocando som de saindo do carro (abrir/fechar porta).")
 	await _play_leaving_car_sfx()
 	
-	print("[Prologue] Disparando boot VHS, HUD aparece.")
-	await _play_vhs_intro_sequence()
-	print("[Prologue] VHS acabou. Desligando som de carro interior e dirigindo embora.")
-	_set_world_audio_for_car_interior(false)
-	_drive_parents_car_away()
+	# Fade out da tela preta = Alice está lá fora. LIBERA CONTROLE IMEDIATAMENTE.
 	_intro_lock = false
 	if player and player.has_method("unfreeze"):
 		player.unfreeze()
-		print("[Prologue] Alice LIBERADA (unfreeze), controle do jogador.")
+		print("[Prologue] Alice LIBERADA (unfreeze) ANTES do VHS. Câmera e mouse livres.")
+	if fade_rect:
+		var fade_tw := create_tween()
+		fade_tw.tween_property(fade_rect, "color:a", 0.0, 0.55)
+		fade_tw.tween_callback(fade_rect.hide)
+	
+	print("[Prologue] Disparando boot VHS, HUD aparece (controle já está livre).")
+	await _play_vhs_intro_sequence()
+	print("[Prologue] VHS acabou. Dirigindo embora.")
+	_set_world_audio_for_car_interior(false)
+	_drive_parents_car_away()
 	await get_tree().create_timer(1.4).timeout
 	print("[Prologue] Disparando pensamentos da Alice na calçada.")
 	await _play_alice_sidewalk_thoughts()
@@ -1054,21 +1057,25 @@ func _play_opening_sequence() -> void:
 
 func _prologue_lines() -> Array:
 	return [
-		{"speaker": "Mãe", "text": "Você pode ir fazer a matrícula sozinha, Alice?"},
+		{"speaker": "Mãe", "text": "Você pode ir fazer a matrícula agora, Alice?"},
 		{"speaker": "Pai", "text": "Meio que…"},
-		{"speaker": "Pai", "text": "Eu e sua mãe temos que ir buscar seu irmão agora…"},
+		{"speaker": "Pai", "text": "Sua mãe e eu precisamos buscar seu irmão agora…"},
 		{"speaker": "Alice", "text": "Aff…"},
-		{"speaker": "Alice", "text": "Não é possível que vocês vão me deixar fazer isso sozinha nisso…"},
-		{"speaker": "Mãe", "text": "Filha, você já tem que começar a criar responsabilidades..."},
+		{"speaker": "Alice", "text": "Não é possível que vocês me deixem fazer isso sozinha…"},
+		{"speaker": "Mãe", "text": "Filha, você já tem que começar a assumir responsabilidades..."},
 		{"speaker": "Alice", "text": "De novo isso, mãe?"},
-		{"speaker": "Mãe", "text": "A gente vai ter que ir buscar o Bob na escola agora, não tem outra escolha."},
+		{"speaker": "Mãe", "text": "A gente precisa buscar o Bob na escola agora."},
+		{"speaker": "Mãe", "text": "Não tem outra escolha."},
 		{"speaker": "Alice", "text": "Tá bom então, mãe…"},
-		{"speaker": "Alice", "text": "É que tá muito uncanny aqui."},
+		{"speaker": "Alice", "text": "É que tá muito estranho aqui."},
 		{"speaker": "Alice", "text": "Sério, olha isso."},
 		{"speaker": "Alice", "text": "(aponta pra fora)", "thought": true},
-		{"speaker": "Alice", "text": "Tá muito escuro, e tá ventando demais. Por que a gente não faz isso amanhã?"},
-		{"speaker": "Pai", "text": "Coloca essa blusa aqui e desce logo. Quanto mais rápido for, mais rápido termina."},
-		{"speaker": "Pai", "text": "Aí quando você terminar, liga pra gente, que a gente vem te buscar aqui, ok?"},
+		{"speaker": "Alice", "text": "Tá muito escuro e ventando demais, tá totalmente uncanny!"},
+		{"speaker": "Alice", "text": "Por que a gente não faz isso amanhã?"},
+		{"speaker": "Pai", "text": "Coloca essa blusa e desce logo."},
+		{"speaker": "Pai", "text": "Quanto mais rápido for, mais rápido acaba."},
+		{"speaker": "Pai", "text": "Quando você terminar, liga pra gente."},
+		{"speaker": "Pai", "text": "Aí eu passo aqui pra te buscar, ok?"},
 		{"speaker": "Alice", "text": "Tá bom então, eu aviso. Tô descendo…"},
 		{"speaker": "Mãe", "text": "Se cuida, filha!"},
 		{"speaker": "Alice", "text": "Vou me cuidar, mãe. Fica tranquila."},
@@ -1077,7 +1084,10 @@ func _prologue_lines() -> Array:
 		{"speaker": "Alice", "text": "(risada disfarçada)", "thought": true},
 		{"speaker": "Mãe", "text": "Tchau, te amo!"},
 		{"speaker": "Mãe", "text": "A gente se vê daqui a pouquinho!"},
-		{"speaker": "Alice", "text": "Tchau mãe, te amo, até daqui a pouco!"},
+		{"speaker": "Pai", "text": "Tchau, filha. Qualquer coisa, liga."},
+		{"speaker": "Alice", "text": "Tchau, mãe. Te amo."},
+		{"speaker": "Alice", "text": "Tchau, pai. Te amo."},
+		{"speaker": "Alice", "text": "Até daqui a pouco!"},
 	]
 
 func _await_dialogue_with_timeout(timeout_s: float = 300.0) -> void:
@@ -1115,7 +1125,7 @@ func _play_alice_sidewalk_thoughts() -> void:
 	dialogue_ui.start_dialogue([
 		{"speaker": "Alice", "text": "(É rapidinho…)", "thought": true},
 		{"speaker": "Alice", "text": "(só entregar os documentos…)", "thought": true},
-		{"speaker": "Alice", "text": "(documentos é uma palavra engraçada)", "thought": true},
+		{"speaker": "Alice", "text": "('Documentos' é uma palavra engraçada.)", "thought": true},
 	], false)
 	await _await_dialogue_with_timeout(60.0)
 
@@ -1127,16 +1137,17 @@ func _ensure_audio_bus(bus_name: String, cutoff_hz: float = -1.0) -> void:
 		AudioServer.set_bus_name(idx, bus_name)
 		AudioServer.set_bus_send(idx, "Master")
 	if cutoff_hz > 0.0:
-		var has_lp := false
+		var lp_fx: AudioEffectLowPassFilter = null
 		for i in range(AudioServer.get_bus_effect_count(idx)):
-			if AudioServer.get_bus_effect(idx, i) is AudioEffectLowPassFilter:
-				has_lp = true
+			var fx = AudioServer.get_bus_effect(idx, i)
+			if fx is AudioEffectLowPassFilter:
+				lp_fx = fx as AudioEffectLowPassFilter
 				break
-		if not has_lp:
-			var lp := AudioEffectLowPassFilter.new()
-			lp.cutoff_hz = cutoff_hz
-			lp.resonance = 0.35
-			AudioServer.add_bus_effect(idx, lp)
+		if lp_fx == null:
+			lp_fx = AudioEffectLowPassFilter.new()
+			AudioServer.add_bus_effect(idx, lp_fx)
+		lp_fx.cutoff_hz = cutoff_hz
+		lp_fx.resonance = 0.42
 
 func _loop_stream_if_possible(stream: AudioStream) -> void:
 	if stream == null:
@@ -1161,25 +1172,6 @@ func _start_car_interior_ambience() -> void:
 		_audio_car_idle.stream = idle_st
 	add_child(_audio_car_idle)
 	_audio_car_idle.play()
-	
-	_audio_car_road = AudioStreamPlayer.new()
-	_audio_car_road.name = "PrologueRoad"
-	_audio_car_road.bus = "CarInterior"
-	_audio_car_road.volume_db = -18.0
-	var road_paths := [
-		"res://assets/audio/ambience/newambiences/soundescape/CalmCozyCityNight.mp3",
-		"res://assets/audio/ambience/newambiences/soundescape/NightTImeNoSiren.mp3",
-		"res://assets/audio/ambience/newambiences/soundescape/Citystreet_distant_siren.mp3",
-	]
-	for p in road_paths:
-		if ResourceLoader.exists(p):
-			var road_st = load(p) as AudioStream
-			_loop_stream_if_possible(road_st)
-			_audio_car_road.stream = road_st
-			break
-	add_child(_audio_car_road)
-	if _audio_car_road.stream:
-		_audio_car_road.play()
 
 func _fade_out_player(player_node: AudioStreamPlayer, duration: float = 1.2) -> void:
 	if not is_instance_valid(player_node):
@@ -1192,8 +1184,8 @@ func _fade_out_player(player_node: AudioStreamPlayer, duration: float = 1.2) -> 
 		player_node.queue_free()
 
 func _play_leaving_car_sfx() -> void:
-	if is_instance_valid(_audio_car_idle):
-		_fade_out_player(_audio_car_idle, 0.8)
+	# O MOTOR CONTINUA LIGADO! Pais só desligam depois que já foram embora.
+	# Removemos o fade_out do _audio_car_idle aqui; ele só para com o carro.
 	if is_instance_valid(_audio_car_road):
 		_fade_out_player(_audio_car_road, 1.0)
 	
@@ -1223,24 +1215,31 @@ func _play_leaving_car_sfx() -> void:
 	await get_tree().create_timer(0.4).timeout
 
 func _set_world_audio_for_car_interior(inside: bool) -> void:
+	_inside_car_audio = inside
+	# Mundo lá fora: grave abafado, agudos cortados, como se passasse pela lataria.
+	_ensure_audio_bus("WorldOutside", 780.0 if inside else 12000.0)
+	var outside_idx := AudioServer.get_bus_index("WorldOutside")
+	if outside_idx >= 0:
+		AudioServer.set_bus_volume_db(outside_idx, -10.0 if inside else 0.0)
+	var world_bus := "WorldOutside" if inside else "Master"
+	
 	var storm = get_node_or_null("AudioAmbience") as AudioStreamPlayer
 	if storm:
-		storm.volume_db = -80.0 if inside else -6.0
-		if inside:
-			storm.stop()
-		elif not storm.playing:
+		storm.bus = world_bus
+		storm.volume_db = -16.0 if inside else -6.0
+		if not storm.playing:
 			storm.play()
 	if is_instance_valid(audio_amb_a):
-		audio_amb_a.volume_db = -80.0 if inside else audio_amb_a.volume_db
-		if inside:
-			audio_amb_a.stop()
+		audio_amb_a.bus = world_bus
 	if is_instance_valid(audio_amb_b):
-		audio_amb_b.volume_db = -80.0 if inside else audio_amb_b.volume_db
-		if inside:
-			audio_amb_b.stop()
+		audio_amb_b.bus = world_bus
+	if _wind_bus_idx >= 0 and _wind_bus_idx < AudioServer.bus_count:
+		AudioServer.set_bus_send(_wind_bus_idx, "WorldOutside" if inside else "Master")
 	if is_instance_valid(audio_wind):
-		audio_wind.volume_db = -14.0 if inside else 0.0
-	if not inside and not _is_ambience_crossfading and not _ambience_playlist.is_empty():
+		audio_wind.volume_db = -8.0 if inside else 0.0
+		if not audio_wind.playing:
+			audio_wind.play()
+	if not _is_ambience_crossfading and not _ambience_playlist.is_empty():
 		if is_instance_valid(audio_amb_a) and not audio_amb_a.playing and is_instance_valid(audio_amb_b) and not audio_amb_b.playing:
 			_play_next_ambience_crossfade()
 
@@ -1267,14 +1266,36 @@ func _setup_parents_car() -> void:
 	else:
 		add_child(_parents_car)
 	
-	# Alice na calçada (~z 16.5). Carro encostado no passeio, ela acabou de descer.
-	# Frente do mesh é +Z local; look_at aponta o -Z, então miramos o lado oposto
-	# da viagem para o capô ficar na direção do movimento (rua abaixo, -X).
-	var curb_pos := Vector3(37.8, 0.22, 19.15)
+	# Alice na calçada (~z 16.5). Carro PARADO NA FAIXA (não no passeio),
+	# do lado direito da rua, ela acabou de descer. Sentido do tráfego: +X
+	# (rua acima). Capô do mesh aponta para +Z local; look_at aponta -Z do
+	# objeto para o alvo, então para o capô ficar virado para +X, fazemos
+	# look_at mirar para o lado OPOSTO do movimento (-X) => -Z do carro
+	# aponta para -X => +Z do carro (capô) aponta para +X = CORRETO.
+	var street_pos := Vector3(37.8, 0.22, 23.4)
 	if player:
-		curb_pos = Vector3(player.global_position.x - 2.2, 0.22, player.global_position.z + 2.55)
-	_parents_car.global_position = curb_pos
-	_parents_car.look_at(curb_pos + Vector3(1.0, 0.0, 0.0), Vector3.UP)
+		street_pos = Vector3(player.global_position.x - 3.6, 0.22, max(21.8, player.global_position.z + 5.8))
+	_parents_car.global_position = street_pos
+	_parents_car.look_at(street_pos + Vector3(-1.0, 0.0, 0.0), Vector3.UP)
+	
+	# RayCast3D na frente do capô (+Z local) para detectar carros/obstáculos
+	# e frear antes de atravessar.
+	var rc := RayCast3D.new()
+	rc.name = "ParentsCarFrontRay"
+	rc.target_position = Vector3(0.0, 0.6, 7.5)
+	rc.collision_mask = 4294967295
+	rc.debug_shape_custom_color = Color(1, 0.3, 0.3, 1)
+	_parents_car.add_child(rc)
+	rc.enabled = true
+	for cs in _parents_car.find_children("*", "CollisionShape3D", true, false):
+		if cs.has_method("get_shape_owner_rids"):
+			rc.add_exception(cs)
+	for cpoly in _parents_car.find_children("*", "CollisionPolygon3D", true, false):
+		rc.add_exception(cpoly)
+	for co in _parents_car.find_children("*", "CollisionObject3D", true, false):
+		rc.add_exception(co)
+	if _parents_car is CollisionObject3D:
+		rc.add_exception(_parents_car)
 	
 	var engine = _parents_car.get_node_or_null("EngineAudio") as AudioStreamPlayer3D
 	if engine:
@@ -1286,11 +1307,24 @@ func _drive_parents_car_away() -> void:
 	if not is_instance_valid(_parents_car):
 		return
 	
+	# 1) PAUSA TODO O GERENCIADOR DE CARROS para não spawnar nada na nossa rota
+	var cm: Node = get_node_or_null("/root/CarroManager") as Node
+	var cm_old_process_mode: int = Node.PROCESS_MODE_INHERIT
+	if cm:
+		cm_old_process_mode = cm.process_mode
+		cm.process_mode = Node.PROCESS_MODE_DISABLED
+	# Também desativa TODAS as Path3D de rota de carro por garantia
+	var paths_paused: Array[NodePath] = []
+	for p in get_tree().get_nodes_in_group("car_route"):
+		if p and p is Path3D:
+			paths_paused.append(p.get_path())
+			p.process_mode = Node.PROCESS_MODE_DISABLED
+	
 	var startup_path := "res://assets/models/car/psx/Sound effects/Car_Engine_Start_Up.ogg"
 	if ResourceLoader.exists(startup_path):
 		var sfx := AudioStreamPlayer3D.new()
 		sfx.stream = load(startup_path)
-		sfx.volume_db = 4.0
+		sfx.volume_db = -16.0
 		sfx.unit_size = 28.0
 		sfx.max_distance = 120.0
 		_parents_car.add_child(sfx)
@@ -1298,14 +1332,14 @@ func _drive_parents_car_away() -> void:
 	
 	var engine = _parents_car.get_node_or_null("EngineAudio") as AudioStreamPlayer3D
 	if engine:
-		engine.volume_db = 6.0
+		engine.volume_db = -8.0
 		engine.play()
 	
 	var accel_path := "res://assets/models/car/psx/Sound effects/Car_Acceleration.ogg"
 	if ResourceLoader.exists(accel_path):
 		var acc := AudioStreamPlayer3D.new()
 		acc.stream = load(accel_path)
-		acc.volume_db = 2.0
+		acc.volume_db = -12.0
 		acc.unit_size = 32.0
 		_parents_car.add_child(acc)
 		acc.play()
@@ -1316,16 +1350,59 @@ func _drive_parents_car_away() -> void:
 			tl.light_energy = 1.6
 			tl.omni_range = 3.2
 	
-	var start_pos := _parents_car.global_position
-	var end_pos := Vector3(-95.0, start_pos.y, start_pos.z)
-	_parents_car.look_at(start_pos + Vector3(1.0, 0.0, 0.0), Vector3.UP)
-	var car_ref := _parents_car
-	var tw := create_tween()
-	tw.tween_property(car_ref, "global_position", end_pos, 14.0).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-	tw.tween_callback(func():
-		if is_instance_valid(car_ref):
-			car_ref.queue_free()
-	)
+	var start_pos: Vector3 = _parents_car.global_position
+	var end_x: float = 145.0
+	var x_now: float = start_pos.x
+	var phase1_end_x: float = start_pos.x + 18.0
+	var t: float = 0.0
+	var rc = _parents_car.get_node_or_null("ParentsCarFrontRay") as RayCast3D
+	var car_ref: Node3D = _parents_car
+	
+	while is_instance_valid(car_ref) and x_now < end_x:
+		var dt: float = get_process_delta_time()
+		t += dt
+		var blocked: bool = false
+		if rc and rc.enabled:
+			if rc.is_colliding():
+				var col = rc.get_collider()
+				# Freia APENAS se bater em outro carro, CharacterBody3D (Alice), ou RigidBody.
+				# Não freia para chão (StaticBody baixo).
+				if col and (col.is_in_group("carro") or col.name.to_lower().contains("carro") or col.name.to_lower().contains("car") or col is CharacterBody3D or col is RigidBody3D):
+					blocked = true
+		if blocked:
+			await get_tree().process_frame
+			continue
+		
+		var speed: float
+		if x_now < phase1_end_x:
+			# Primeira fase: saída lenta, ~18m em 2.6s → ~6.9 m/s (25 km/h)
+			var u: float = clamp((x_now - start_pos.x) / max(0.001, phase1_end_x - start_pos.x), 0.0, 1.0)
+			speed = lerp(0.5, 8.0, u)
+		else:
+			# Segunda fase: aceleração suave, 77m totais / 9.1s totais → ~11 m/s médio (40 km/h)
+			var u2: float = clamp((x_now - phase1_end_x) / max(0.001, end_x - phase1_end_x), 0.0, 1.0)
+			speed = lerp(8.0, 14.5, u2)
+		
+		# Move em X (frente da rua)
+		var step: float = speed * dt
+		x_now = min(end_x, x_now + step)
+		var new_pos: Vector3 = Vector3(x_now, start_pos.y, start_pos.z)
+		car_ref.global_position = new_pos
+		await get_tree().process_frame
+	
+	# Chegou ao destino, some
+	if is_instance_valid(car_ref):
+		car_ref.queue_free()
+	# Desliga também o som de idle do motor (interior), o carro já foi embora
+	if is_instance_valid(_audio_car_idle):
+		_fade_out_player(_audio_car_idle, 0.9)
+	# Restaura CarroManager e rotas
+	if cm and is_instance_valid(cm):
+		cm.process_mode = cm_old_process_mode
+	for np in paths_paused:
+		var pth := get_node_or_null(np) as Path3D
+		if pth:
+			pth.process_mode = Node.PROCESS_MODE_INHERIT
 
 # ============================================================
 # BOOT VHS - ESTÉTICA AUTÊNTICA VHS / OSD

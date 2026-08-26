@@ -2280,7 +2280,7 @@ mouse_filter = 2
 [node name="CelularUI" parent="." unique_id=767186143 instance=ExtResource("4_phone")]
 
 [node name="PlayerController" type="CharacterBody3D" parent="." unique_id=110146387]
-transform = Transform3D(-0.62970674, 0, 0.77683294, 0, 1, 0, -0.77683294, 0, -0.62970674, 39.75831, 1.2546494, 16.542658)
+transform = Transform3D(-0.9731582, 0, 0.23013726, 0, 1, 0, -0.23013726, 0, -0.9731582, 34.10767, 1.2546494, 19.926796)
 collision_layer = 2
 script = ExtResource("2_player")
 
@@ -2302,7 +2302,7 @@ collide_with_areas = true
 [node name="CefetExterior" type="Node3D" parent="." unique_id=920883666]
 
 [node name="PlayerStart" type="Marker3D" parent="CefetExterior" unique_id=1919248078]
-transform = Transform3D(-0.62970674, 0, 0.77683294, 0, 1, 0, -0.77683294, 0, -0.62970674, 39.75831, 1.2546494, 16.542658)
+transform = Transform3D(-0.9731582, 0, 0.23013726, 0, 1, 0, -0.23013726, 0, -0.9731582, 34.10767, 1.2546494, 19.926796)
 
 [node name="CampusGround" type="CSGBox3D" parent="CefetExterior" unique_id=1304485138]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -44.047096, -0.5047486, -27.879177)
@@ -2412,6 +2412,7 @@ size = Vector3(2.4, 1.4, 4.8)
 
 [node name="ParentsCarTrigger" type="Area3D" parent="CefetExterior" unique_id=1586070272]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.5, 24)
+visible = false
 collision_layer = 4
 collision_mask = 2
 
