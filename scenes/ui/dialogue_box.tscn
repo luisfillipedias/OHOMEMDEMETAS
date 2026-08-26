@@ -3,95 +3,124 @@
 [ext_resource type="Script" path="res://scripts/dialogue_system.gd" id="1_diag"]
 [ext_resource type="FontFile" path="res://assets/fonts/screwtop.ttf" id="2_font"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_SubtitleBG"]
-bg_color = Color(0.04, 0.03, 0.06, 0.88)
+[sub_resource type="StyleBoxFlat" id="StyleBox_DialogueBoxBG"]
+bg_color = Color(0.0, 0.0, 0.0, 0.86)
+border_width_left = 2
 border_width_top = 2
-border_color = Color(0.5, 0.45, 0.7, 0.4)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.36, 0.36, 0.38, 0.85)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
+shadow_color = Color(0, 0, 0, 0.6)
+shadow_size = 4
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_ChoiceBtn"]
 bg_color = Color(0, 0, 0, 0)
 border_width_bottom = 1
-border_color = Color(0.7, 0.7, 0.7, 0.25)
+border_color = Color(0.7, 0.7, 0.7, 0.2)
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_ChoiceBtnHover"]
-bg_color = Color(1, 0.85, 0.3, 0.12)
+bg_color = Color(0.96, 0.86, 0.28, 0.08)
 border_width_bottom = 1
-border_color = Color(1, 0.85, 0.3, 0.8)
+border_color = Color(0.96, 0.86, 0.28, 0.85)
 
 [sub_resource type="Theme" id="Theme_ChoiceButtons"]
 Button/styles/normal = SubResource("StyleBox_ChoiceBtn")
 Button/styles/hover = SubResource("StyleBox_ChoiceBtnHover")
 Button/styles/pressed = SubResource("StyleBox_ChoiceBtnHover")
 Button/styles/focus = SubResource("StyleBox_ChoiceBtn")
-Button/colors/font_color = Color(0.92, 0.92, 0.92, 1)
-Button/colors/font_hover_color = Color(1, 0.88, 0.3, 1)
+Button/colors/font_color = Color(0.92, 0.82, 0.3, 1)
+Button/colors/font_hover_color = Color(1, 0.96, 0.5, 1)
 
 [node name="DialogueBox" type="CanvasLayer"]
 layer = 10
 script = ExtResource("1_diag")
 
-[node name="SubtitleContainer" type="PanelContainer" parent="."]
-visible = false
+[node name="BlackOverlay" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="DialogueRoot" type="Control" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="DialogueBox" type="PanelContainer" parent="DialogueRoot"]
 anchors_preset = 7
 anchor_left = 0.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -210.0
-offset_bottom = 0.0
+offset_top = -230.0
+offset_bottom = -42.0
+offset_left = 70.0
+offset_right = -70.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_styles/panel = SubResource("StyleBox_SubtitleBG")
+theme_override_styles/panel = SubResource("StyleBox_DialogueBoxBG")
 
-[node name="MarginBox" type="MarginContainer" parent="SubtitleContainer"]
+[node name="MarginBox" type="MarginContainer" parent="DialogueRoot/DialogueBox"]
 layout_mode = 2
-theme_override_constants/margin_left = 80
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 80
-theme_override_constants/margin_bottom = 16
+theme_override_constants/margin_left = 42
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 42
+theme_override_constants/margin_bottom = 26
 
-[node name="VBox" type="VBoxContainer" parent="SubtitleContainer/MarginBox"]
+[node name="VBox" type="VBoxContainer" parent="DialogueRoot/DialogueBox/MarginBox"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 10
 
-[node name="SpeakerLabel" type="Label" parent="SubtitleContainer/MarginBox/VBox"]
+[node name="SpeakerLabel" type="Label" parent="DialogueRoot/DialogueBox/MarginBox/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 1.0, 0.5, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
-theme_override_constants/shadow_offset_x = 2
-theme_override_constants/shadow_offset_y = 2
+theme_override_colors/font_color = Color(0.96, 0.86, 0.28, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.95)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
 theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 18
-text = "[ALICE]"
-horizontal_alignment = 1
+theme_override_font_sizes/font_size = 24
+text = "MÃE"
+horizontal_alignment = 0
 uppercase = true
 
-[node name="DialogueText" type="Label" parent="SubtitleContainer/MarginBox/VBox"]
+[node name="DialogueText" type="Label" parent="DialogueRoot/DialogueBox/MarginBox/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.97, 0.97, 0.97, 1)
+theme_override_colors/font_color = Color(0.97, 0.97, 0.98, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.95)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 22
+text = ""
+horizontal_alignment = 0
+autowrap_mode = 3
+uppercase = true
+
+[node name="ChoicesContainer" type="VBoxContainer" parent="DialogueRoot/DialogueBox/MarginBox/VBox"]
+visible = false
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 6
+theme = SubResource("Theme_ChoiceButtons")
+
+[node name="ContinueHint" type="Label" parent="DialogueRoot/DialogueBox/MarginBox/VBox"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.78, 0.80, 0.9)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_constants/shadow_offset_x = 2
 theme_override_constants/shadow_offset_y = 2
 theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 20
-text = ""
-horizontal_alignment = 1
-autowrap_mode = 3
-
-[node name="ChoicesContainer" type="VBoxContainer" parent="SubtitleContainer/MarginBox/VBox"]
-visible = false
-layout_mode = 2
-alignment = 1
-theme_override_constants/separation = 4
-theme = SubResource("Theme_ChoiceButtons")
-
-[node name="ContinueHint" type="Label" parent="SubtitleContainer/MarginBox/VBox"]
-visible = false
-layout_mode = 2
-theme_override_colors/font_color = Color(0.65, 0.65, 0.65, 1)
-theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 14
-text = "â–º [ESPAÃ‡O] / [CLIQUE]"
-horizontal_alignment = 1
+text = "►  [ESPAÇO] / [CLIQUE] / [E]"
+horizontal_alignment = 2

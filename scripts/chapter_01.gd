@@ -65,10 +65,17 @@ var audio_wind: AudioStreamPlayer = null
 var _tree_materials: Array[ShaderMaterial] = []
 var _wind_leaves_mat: ParticleProcessMaterial = null
 
+var _parents_car: Node3D = null
+var _audio_car_idle: AudioStreamPlayer = null
+var _audio_car_road: AudioStreamPlayer = null
+var _intro_lock: bool = true
+
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	add_to_group("chapter")
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	if player and player.has_method("freeze"):
+		player.freeze()
 	
 	# Auto-salva ao entrar no capítulo 1 para habilitar o botão CONTINUAR no menu
 	if GameManager:
@@ -100,8 +107,8 @@ func _ready() -> void:
 	# Inicia sistema de rajadas dinâmicas ocasionais de vento
 	_start_dynamic_wind_system()
 	
-	# Boot VHS (com som de porta do carro na tela preta antes da transição)
-	_play_vhs_intro_sequence()
+	_setup_parents_car()
+	_play_opening_sequence()
 
 # ============================================================
 # SISTEMA DE ÁUDIO CENTRALIZADO (SFX, TYPEWRITER, UI, OBJETIVOS)
@@ -112,8 +119,15 @@ func _setup_audio_system() -> void:
 	audio_typewriter = AudioStreamPlayer.new()
 	audio_typewriter.name = "AudioTypewriter"
 	audio_typewriter.volume_db = -1.0
-	if ResourceLoader.exists("res://assets/audio/menu/typewriter.ogg"):
-		audio_typewriter.stream = load("res://assets/audio/menu/typewriter.ogg")
+	var typing_paths := [
+		"res://assets/audio/menu/Text-typing.ogg",
+		"res://assets/audio/menu/text-typing.ogg",
+		"res://assets/audio/menu/typewriter.ogg",
+	]
+	for p in typing_paths:
+		if ResourceLoader.exists(p):
+			audio_typewriter.stream = load(p) as AudioStream
+			break
 	add_child(audio_typewriter)
 
 	# 2. UI Click / Select
@@ -273,8 +287,11 @@ func _setup_ambience_system() -> void:
 			if stream:
 				_ambience_playlist.append(stream)
 
-	if not _ambience_playlist.is_empty():
-		_play_next_ambience_crossfade()
+	var storm = get_node_or_null("AudioAmbience") as AudioStreamPlayer
+	if storm:
+		storm.autoplay = false
+		storm.stop()
+		storm.volume_db = -80.0
 
 func _get_next_ambience_stream() -> AudioStream:
 	if _ambience_playlist.is_empty():
@@ -648,6 +665,8 @@ func _input(event: InputEvent) -> void:
 		var p = get_node_or_null("PlayerController")
 		if is_instance_valid(p) and "_inventario_aberto" in p and p._inventario_aberto:
 			return
+		if _intro_lock:
+			return
 		_toggle_pause()
 
 func _toggle_pause() -> void:
@@ -992,7 +1011,324 @@ func _update_wind_systems(delta: float) -> void:
 		_wind_leaves_mat.initial_velocity_max = lerp(20.0, 48.0, energy)
 
 # ============================================================
-# BOOT VHS - ESTÉTICA AUTÊNTICA VHS / OSD & CAR DOOR OPEN
+# PRÓLOGO — TELA PRETA / INTERIOR DO CARRO / VHS
+# ============================================================
+
+func _play_opening_sequence() -> void:
+	print("[Prologue] INIT — Ordem: 1s silêncio -> diálogo -> 3s silêncio -> sair do carro -> VHS -> carro ir embora")
+	_intro_lock = true
+	if fade_rect:
+		fade_rect.color = Color(0, 0, 0, 1)
+		fade_rect.show()
+	if objective_panel:
+		objective_panel.hide()
+	if timecard_panel:
+		timecard_panel.hide()
+	
+	_set_world_audio_for_car_interior(true)
+	_start_car_interior_ambience()
+	
+	# 1 segundo apenas de ambiente do carro parado + tela preta, sem ninguém falando
+	await get_tree().create_timer(1.0).timeout
+	print("[Prologue] Passou 1s. Disparando diálogo do prólogo.")
+	await _play_prologue_dialogue()
+	print("[Prologue] Diálogo ACABOU. Esperando 3s de silêncio do motor ligado.")
+	await get_tree().create_timer(3.0).timeout
+	
+	print("[Prologue] Tocando som de saindo do carro (abrir/fechar porta).")
+	await _play_leaving_car_sfx()
+	
+	print("[Prologue] Disparando boot VHS, HUD aparece.")
+	await _play_vhs_intro_sequence()
+	print("[Prologue] VHS acabou. Desligando som de carro interior e dirigindo embora.")
+	_set_world_audio_for_car_interior(false)
+	_drive_parents_car_away()
+	_intro_lock = false
+	if player and player.has_method("unfreeze"):
+		player.unfreeze()
+		print("[Prologue] Alice LIBERADA (unfreeze), controle do jogador.")
+	await get_tree().create_timer(1.4).timeout
+	print("[Prologue] Disparando pensamentos da Alice na calçada.")
+	await _play_alice_sidewalk_thoughts()
+	print("[Prologue] FIM TOTAL DO PRÓLOGO.")
+
+func _prologue_lines() -> Array:
+	return [
+		{"speaker": "Mãe", "text": "Você pode ir fazer a matrícula sozinha, Alice?"},
+		{"speaker": "Pai", "text": "Meio que…"},
+		{"speaker": "Pai", "text": "Eu e sua mãe temos que ir buscar seu irmão agora…"},
+		{"speaker": "Alice", "text": "Aff…"},
+		{"speaker": "Alice", "text": "Não é possível que vocês vão me deixar fazer isso sozinha nisso…"},
+		{"speaker": "Mãe", "text": "Filha, você já tem que começar a criar responsabilidades..."},
+		{"speaker": "Alice", "text": "De novo isso, mãe?"},
+		{"speaker": "Mãe", "text": "A gente vai ter que ir buscar o Bob na escola agora, não tem outra escolha."},
+		{"speaker": "Alice", "text": "Tá bom então, mãe…"},
+		{"speaker": "Alice", "text": "É que tá muito uncanny aqui."},
+		{"speaker": "Alice", "text": "Sério, olha isso."},
+		{"speaker": "Alice", "text": "(aponta pra fora)", "thought": true},
+		{"speaker": "Alice", "text": "Tá muito escuro, e tá ventando demais. Por que a gente não faz isso amanhã?"},
+		{"speaker": "Pai", "text": "Coloca essa blusa aqui e desce logo. Quanto mais rápido for, mais rápido termina."},
+		{"speaker": "Pai", "text": "Aí quando você terminar, liga pra gente, que a gente vem te buscar aqui, ok?"},
+		{"speaker": "Alice", "text": "Tá bom então, eu aviso. Tô descendo…"},
+		{"speaker": "Mãe", "text": "Se cuida, filha!"},
+		{"speaker": "Alice", "text": "Vou me cuidar, mãe. Fica tranquila."},
+		{"speaker": "Pai", "text": "Tá com os documentos?"},
+		{"speaker": "Alice", "text": "Quase tinha esquecido."},
+		{"speaker": "Alice", "text": "(risada disfarçada)", "thought": true},
+		{"speaker": "Mãe", "text": "Tchau, te amo!"},
+		{"speaker": "Mãe", "text": "A gente se vê daqui a pouquinho!"},
+		{"speaker": "Alice", "text": "Tchau mãe, te amo, até daqui a pouco!"},
+	]
+
+func _await_dialogue_with_timeout(timeout_s: float = 300.0) -> void:
+	if not dialogue_ui:
+		return
+	var timed_out := false
+	var finished_emitted := false
+	var timeout_timer = get_tree().create_timer(timeout_s, false)
+	timeout_timer.timeout.connect(func():
+		timed_out = true
+		print("[Prologue] ⚠️ TIMEOUT do diálogo disparado após ", timeout_s, "s — forçando continuação.")
+	)
+	while dialogue_ui and dialogue_ui.has_method("is_active") and dialogue_ui.is_active() and not timed_out:
+		await dialogue_ui.dialogue_finished
+		finished_emitted = true
+		break
+	if timed_out and dialogue_ui and dialogue_ui.has_method("_finish_dialogue"):
+		dialogue_ui._finish_dialogue()
+		finished_emitted = true
+	print("[Prologue] Diálogo terminou. finished_emitted=", finished_emitted, " timeout=", timed_out)
+
+func _play_prologue_dialogue() -> void:
+	if not dialogue_ui or not dialogue_ui.has_method("start_dialogue"):
+		print("[Prologue] ⚠️ DialogueUI não tem start_dialogue! Pulando diálogo.")
+		return
+	print("[Prologue] Chamando dialogue_ui.start_dialogue prologue com black_screen=true")
+	dialogue_ui.start_dialogue(_prologue_lines(), true)
+	await _await_dialogue_with_timeout(300.0)
+
+func _play_alice_sidewalk_thoughts() -> void:
+	if not dialogue_ui or not dialogue_ui.has_method("start_dialogue"):
+		print("[Prologue] ⚠️ DialogueUI não tem start_dialogue! Pulando pensamentos.")
+		return
+	print("[Prologue] Chamando dialogue_ui.start_dialogue pensamentos calçada")
+	dialogue_ui.start_dialogue([
+		{"speaker": "Alice", "text": "(É rapidinho…)", "thought": true},
+		{"speaker": "Alice", "text": "(só entregar os documentos…)", "thought": true},
+		{"speaker": "Alice", "text": "(documentos é uma palavra engraçada)", "thought": true},
+	], false)
+	await _await_dialogue_with_timeout(60.0)
+
+func _ensure_audio_bus(bus_name: String, cutoff_hz: float = -1.0) -> void:
+	var idx := AudioServer.get_bus_index(bus_name)
+	if idx == -1:
+		AudioServer.add_bus()
+		idx = AudioServer.bus_count - 1
+		AudioServer.set_bus_name(idx, bus_name)
+		AudioServer.set_bus_send(idx, "Master")
+	if cutoff_hz > 0.0:
+		var has_lp := false
+		for i in range(AudioServer.get_bus_effect_count(idx)):
+			if AudioServer.get_bus_effect(idx, i) is AudioEffectLowPassFilter:
+				has_lp = true
+				break
+		if not has_lp:
+			var lp := AudioEffectLowPassFilter.new()
+			lp.cutoff_hz = cutoff_hz
+			lp.resonance = 0.35
+			AudioServer.add_bus_effect(idx, lp)
+
+func _loop_stream_if_possible(stream: AudioStream) -> void:
+	if stream == null:
+		return
+	if stream is AudioStreamOggVorbis:
+		(stream as AudioStreamOggVorbis).loop = true
+	elif stream is AudioStreamWAV:
+		(stream as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_FORWARD
+	elif stream is AudioStreamMP3:
+		(stream as AudioStreamMP3).loop = true
+
+func _start_car_interior_ambience() -> void:
+	_ensure_audio_bus("CarInterior", 1400.0)
+	
+	_audio_car_idle = AudioStreamPlayer.new()
+	_audio_car_idle.name = "PrologueCarIdle"
+	_audio_car_idle.volume_db = -11.0
+	var idle_path := "res://assets/models/car/psx/Sound effects/Car_Engine_Loop.ogg"
+	if ResourceLoader.exists(idle_path):
+		var idle_st = load(idle_path) as AudioStream
+		_loop_stream_if_possible(idle_st)
+		_audio_car_idle.stream = idle_st
+	add_child(_audio_car_idle)
+	_audio_car_idle.play()
+	
+	_audio_car_road = AudioStreamPlayer.new()
+	_audio_car_road.name = "PrologueRoad"
+	_audio_car_road.bus = "CarInterior"
+	_audio_car_road.volume_db = -18.0
+	var road_paths := [
+		"res://assets/audio/ambience/newambiences/soundescape/CalmCozyCityNight.mp3",
+		"res://assets/audio/ambience/newambiences/soundescape/NightTImeNoSiren.mp3",
+		"res://assets/audio/ambience/newambiences/soundescape/Citystreet_distant_siren.mp3",
+	]
+	for p in road_paths:
+		if ResourceLoader.exists(p):
+			var road_st = load(p) as AudioStream
+			_loop_stream_if_possible(road_st)
+			_audio_car_road.stream = road_st
+			break
+	add_child(_audio_car_road)
+	if _audio_car_road.stream:
+		_audio_car_road.play()
+
+func _fade_out_player(player_node: AudioStreamPlayer, duration: float = 1.2) -> void:
+	if not is_instance_valid(player_node):
+		return
+	var tw := create_tween()
+	tw.tween_property(player_node, "volume_db", -50.0, duration)
+	await tw.finished
+	if is_instance_valid(player_node):
+		player_node.stop()
+		player_node.queue_free()
+
+func _play_leaving_car_sfx() -> void:
+	if is_instance_valid(_audio_car_idle):
+		_fade_out_player(_audio_car_idle, 0.8)
+	if is_instance_valid(_audio_car_road):
+		_fade_out_player(_audio_car_road, 1.0)
+	
+	var door_path := "res://assets/audio/things/CarDoorOpen.mp3"
+	if not ResourceLoader.exists(door_path):
+		door_path = "res://assets/models/car/psx/Sound effects/Car_Door_Open.ogg"
+	if ResourceLoader.exists(door_path):
+		var sfx_door := AudioStreamPlayer.new()
+		sfx_door.name = "CarDoorAudio"
+		sfx_door.stream = load(door_path)
+		sfx_door.volume_db = 0.0
+		add_child(sfx_door)
+		sfx_door.play()
+		await sfx_door.finished
+		sfx_door.queue_free()
+	
+	var close_path := "res://assets/models/car/psx/Sound effects/Car_Door_Close.ogg"
+	if ResourceLoader.exists(close_path):
+		var sfx_close := AudioStreamPlayer.new()
+		sfx_close.stream = load(close_path)
+		sfx_close.volume_db = -2.0
+		add_child(sfx_close)
+		sfx_close.play()
+		await sfx_close.finished
+		sfx_close.queue_free()
+	
+	await get_tree().create_timer(0.4).timeout
+
+func _set_world_audio_for_car_interior(inside: bool) -> void:
+	var storm = get_node_or_null("AudioAmbience") as AudioStreamPlayer
+	if storm:
+		storm.volume_db = -80.0 if inside else -6.0
+		if inside:
+			storm.stop()
+		elif not storm.playing:
+			storm.play()
+	if is_instance_valid(audio_amb_a):
+		audio_amb_a.volume_db = -80.0 if inside else audio_amb_a.volume_db
+		if inside:
+			audio_amb_a.stop()
+	if is_instance_valid(audio_amb_b):
+		audio_amb_b.volume_db = -80.0 if inside else audio_amb_b.volume_db
+		if inside:
+			audio_amb_b.stop()
+	if is_instance_valid(audio_wind):
+		audio_wind.volume_db = -14.0 if inside else 0.0
+	if not inside and not _is_ambience_crossfading and not _ambience_playlist.is_empty():
+		if is_instance_valid(audio_amb_a) and not audio_amb_a.playing and is_instance_valid(audio_amb_b) and not audio_amb_b.playing:
+			_play_next_ambience_crossfade()
+
+func _setup_parents_car() -> void:
+	var dummy = get_node_or_null("CefetExterior/ParentsCar")
+	if dummy:
+		dummy.visible = false
+		if dummy is CSGShape3D:
+			(dummy as CSGShape3D).use_collision = false
+	
+	var packed: PackedScene = null
+	if ResourceLoader.exists("res://scenes/vehicles/car_01_gray.tscn"):
+		packed = load("res://scenes/vehicles/car_01_gray.tscn") as PackedScene
+	elif ResourceLoader.exists("res://scenes/vehicles/car_01_default.tscn"):
+		packed = load("res://scenes/vehicles/car_01_default.tscn") as PackedScene
+	if packed == null:
+		return
+	
+	_parents_car = packed.instantiate()
+	_parents_car.name = "ParentsCarReal"
+	var exterior = get_node_or_null("CefetExterior")
+	if exterior:
+		exterior.add_child(_parents_car)
+	else:
+		add_child(_parents_car)
+	
+	# Alice na calçada (~z 16.5). Carro encostado no passeio, ela acabou de descer.
+	# Frente do mesh é +Z local; look_at aponta o -Z, então miramos o lado oposto
+	# da viagem para o capô ficar na direção do movimento (rua abaixo, -X).
+	var curb_pos := Vector3(37.8, 0.22, 19.15)
+	if player:
+		curb_pos = Vector3(player.global_position.x - 2.2, 0.22, player.global_position.z + 2.55)
+	_parents_car.global_position = curb_pos
+	_parents_car.look_at(curb_pos + Vector3(1.0, 0.0, 0.0), Vector3.UP)
+	
+	var engine = _parents_car.get_node_or_null("EngineAudio") as AudioStreamPlayer3D
+	if engine:
+		engine.autoplay = false
+		engine.stop()
+		_loop_stream_if_possible(engine.stream)
+
+func _drive_parents_car_away() -> void:
+	if not is_instance_valid(_parents_car):
+		return
+	
+	var startup_path := "res://assets/models/car/psx/Sound effects/Car_Engine_Start_Up.ogg"
+	if ResourceLoader.exists(startup_path):
+		var sfx := AudioStreamPlayer3D.new()
+		sfx.stream = load(startup_path)
+		sfx.volume_db = 4.0
+		sfx.unit_size = 28.0
+		sfx.max_distance = 120.0
+		_parents_car.add_child(sfx)
+		sfx.play()
+	
+	var engine = _parents_car.get_node_or_null("EngineAudio") as AudioStreamPlayer3D
+	if engine:
+		engine.volume_db = 6.0
+		engine.play()
+	
+	var accel_path := "res://assets/models/car/psx/Sound effects/Car_Acceleration.ogg"
+	if ResourceLoader.exists(accel_path):
+		var acc := AudioStreamPlayer3D.new()
+		acc.stream = load(accel_path)
+		acc.volume_db = 2.0
+		acc.unit_size = 32.0
+		_parents_car.add_child(acc)
+		acc.play()
+	
+	for light_name in ["TaillightL", "TaillightR"]:
+		var tl = _parents_car.get_node_or_null(light_name) as OmniLight3D
+		if tl:
+			tl.light_energy = 1.6
+			tl.omni_range = 3.2
+	
+	var start_pos := _parents_car.global_position
+	var end_pos := Vector3(-95.0, start_pos.y, start_pos.z)
+	_parents_car.look_at(start_pos + Vector3(1.0, 0.0, 0.0), Vector3.UP)
+	var car_ref := _parents_car
+	var tw := create_tween()
+	tw.tween_property(car_ref, "global_position", end_pos, 14.0).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	tw.tween_callback(func():
+		if is_instance_valid(car_ref):
+			car_ref.queue_free()
+	)
+
+# ============================================================
+# BOOT VHS - ESTÉTICA AUTÊNTICA VHS / OSD
 # ============================================================
 
 func _play_vhs_intro_sequence() -> void:
@@ -1002,18 +1338,6 @@ func _play_vhs_intro_sequence() -> void:
 	if fade_rect:
 		fade_rect.color = Color(0, 0, 0, 1)
 		fade_rect.show()
-	
-	# Som da Alice abrindo a porta e saindo do carro na escuridão total (toca inteiro antes do boot VHS)
-	if ResourceLoader.exists("res://assets/audio/things/CarDoorOpen.mp3"):
-		var sfx_door := AudioStreamPlayer.new()
-		sfx_door.name = "CarDoorAudio"
-		sfx_door.stream = load("res://assets/audio/things/CarDoorOpen.mp3")
-		sfx_door.volume_db = 0.0
-		add_child(sfx_door)
-		sfx_door.play()
-		await sfx_door.finished
-		sfx_door.queue_free()
-		await get_tree().create_timer(0.4).timeout
 	
 	var vhs_overlay := ColorRect.new()
 	vhs_overlay.name = "VHSIntroOverlay"

@@ -2458,7 +2458,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.417797, 0.09586871, 18.841
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -99.286026, 0.09407616, 2.2517605)
 
 [node name="traffic_light" parent="CefetExterior" unique_id=640603207 instance=ExtResource("20_fl4v4")]
-transform = Transform3D(-0.9993799, 0, 0.0352123, 0, 1, 0, -0.0352123, 0, -0.9993799, -5.8354197, -0.014541537, 16.407217)
+transform = Transform3D(-0.9993799, 0, 0.0352123, 0, 1, 0, -0.0352123, 0, -0.9993799, 2.046626, -0.014541537, 16.684935)
 script = ExtResource("21_d85ci")
 
 [node name="OmniLight3D" type="OmniLight3D" parent="CefetExterior/traffic_light" unique_id=1641230503]

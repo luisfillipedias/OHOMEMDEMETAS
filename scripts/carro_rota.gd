@@ -75,6 +75,10 @@ func _agendar_spawn(delay: float = -1.0) -> void:
 	_timer_spawn.start(delay)
 
 func _on_spawn_timeout() -> void:
+	var chapter = get_tree().get_first_node_in_group("chapter")
+	if chapter and chapter.get("_intro_lock") == true:
+		_agendar_spawn(2.5)
+		return
 	if randf() >= chance_pular_spawn:
 		_tentar_spawnar()
 	_agendar_spawn()
