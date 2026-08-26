@@ -29,24 +29,14 @@ func _ready() -> void:
 			child.collision_layer = 0
 			child.collision_mask = 3  # Detecta layers 1 e 2 (player está na layer 2)
 			child.body_entered.connect(_on_body_entered)
-			if debug_mode:
-				print("[InvisibleWall] Area3D configurado para detectar colisões. Collision mask: ", child.collision_mask)
 
 func _on_body_entered(body: Node3D) -> void:
-	if debug_mode:
-		print("[InvisibleWall] Body entrou: ", body.name, " - É player? ", body.is_in_group("player"))
-	
 	if not body.is_in_group("player"):
 		return
 	var now := Time.get_ticks_msec()
 	if now - _last_trigger_msec < int(cooldown * 1000.0):
-		if debug_mode:
-			print("[InvisibleWall] Cooldown ativo, ignorando")
 		return
 	_last_trigger_msec = now
-
-	if debug_mode:
-		print("[InvisibleWall] Disparando mensagem: ", mensagem)
 
 	var chapter := get_tree().get_first_node_in_group("chapter")
 	if chapter and chapter.has_method("show_boundary_thought"):

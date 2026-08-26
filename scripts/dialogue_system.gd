@@ -389,10 +389,26 @@ func _finish_dialogue() -> void:
 	_dialogue_active = false
 	_stop_typing_sfx()
 	_stop_voice()
+
+	# Fade smooth profissional antes de esconder
 	if root:
-		root.hide()
+		var tw = create_tween()
+		tw.tween_property(root, "modulate:a", 0.0, 0.35)
+		tw.tween_callback(func():
+			if root:
+				root.hide()
+				root.modulate.a = 1.0
+		)
+
 	if black_overlay:
-		black_overlay.hide()
+		var tw2 = create_tween()
+		tw2.tween_property(black_overlay, "color:a", 0.0, 0.35)
+		tw2.tween_callback(func():
+			if black_overlay:
+				black_overlay.hide()
+				black_overlay.color = Color(0, 0, 0, 1)
+		)
+
 	if speaker_label:
 		speaker_label.text = ""
 	if text_label:

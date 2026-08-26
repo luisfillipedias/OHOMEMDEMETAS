@@ -7,7 +7,6 @@ extends CharacterBody3D
 
 const WALK_SPEED := 3.2
 const GRAVITY := 12.0
-var MOUSE_SENS := 0.0018
 const MAX_STEP_HEIGHT := 0.35
 
 # Head Bobbing e Passos Físicos
@@ -99,7 +98,8 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 		# Sensibilidade ajustada proporcionalmente ao FOV atual (zoom mais suave e estável)
 		var fov_ratio: float = camera.fov / default_fov if default_fov > 0.0 else 1.0
-		var current_sens: float = MOUSE_SENS * clamp(fov_ratio, 0.45, 1.0)
+		var base_sens: float = GameState.mouse_sensitivity if GameState else 0.0018
+		var current_sens: float = base_sens * clamp(fov_ratio, 0.45, 1.0)
 		rotate_y(-event.relative.x * current_sens)
 		camera_mount.rotate_x(-event.relative.y * current_sens)
 		camera_mount.rotation.x = clamp(camera_mount.rotation.x, -1.2, 1.2)

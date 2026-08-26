@@ -67,7 +67,6 @@ func _configurar_ponto_parada() -> void:
 	if idx < curve.point_count:
 		var pt = curve.get_point_position(idx)
 		_ponto_parada_m = curve.get_closest_offset(pt)
-		print("[%s] Ponto de parada: Ponto %d -> %.2fm na curva" % [name, numero_ponto_parada, _ponto_parada_m])
 
 func _agendar_spawn(delay: float = -1.0) -> void:
 	if delay < 0.0:

@@ -13,7 +13,7 @@ func _ready() -> void:
 	randomize()
 	carregar_modelos()
 	var count = modelos_pedestres.size()
-	print("PedestreManager: %d modelos carregados no pool." % count)
+
 
 func carregar_modelos() -> void:
 	modelos_pedestres.clear()

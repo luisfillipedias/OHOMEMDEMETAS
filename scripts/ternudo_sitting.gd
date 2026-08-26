@@ -37,12 +37,7 @@ func _ready() -> void:
 			var idx := _skeleton.find_bone(nome_possivel)
 			if idx != -1:
 				_head_bone_idx = idx
-				print("[Sitting] osso olhar: idx=", idx, " nome=", _skeleton.get_bone_name(idx))
 				break
-		if _head_bone_idx == -1:
-			print("[Sitting] ERRO: nenhum osso de cabeça Mixamo encontrado")
-	else:
-		print("[Sitting] ERRO: Skeleton3D nao encontrado")
 
 	_criar_audio_assobio()
 	_timer_assobio = randf_range(intervalo_min_assobio * 0.3, intervalo_max_assobio * 0.5)
@@ -75,7 +70,6 @@ func _criar_audio_assobio() -> void:
 		var stream_assobio = load(caminho_assobio) as AudioStream
 		if stream_assobio:
 			_audio_assobio.stream = stream_assobio
-			print("[Sitting] Assobio CARREGADO com sucesso")
 
 
 func _process(delta: float) -> void:

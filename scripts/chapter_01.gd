@@ -521,11 +521,11 @@ func _setup_pause_menu() -> void:
 		vcr_box.name = "VCRBox"
 		vcr_box.color = Color(0.10, 0.16, 0.58, 0.98)
 		vcr_box.set_anchors_preset(Control.PRESET_CENTER)
-		vcr_box.custom_minimum_size = Vector2(530, 430)
+		vcr_box.custom_minimum_size = Vector2(530, 480)
 		vcr_box.offset_left = -265
-		vcr_box.offset_top = -215
+		vcr_box.offset_top = -240
 		vcr_box.offset_right = 265
-		vcr_box.offset_bottom = 215
+		vcr_box.offset_bottom = 240
 		pause_menu_control.add_child(vcr_box)
 		
 		# Borda branca VCR
@@ -609,7 +609,7 @@ func _setup_pause_menu() -> void:
 		lbl_sfx.add_theme_font_size_override("font_size", 15)
 		lbl_sfx.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9, 1))
 		vbox.add_child(lbl_sfx)
-		
+
 		var slider_sfx = HSlider.new()
 		slider_sfx.min_value = 0.0
 		slider_sfx.max_value = 1.0
@@ -618,7 +618,30 @@ func _setup_pause_menu() -> void:
 		slider_sfx.mouse_entered.connect(play_sfx_cursor)
 		slider_sfx.drag_ended.connect(func(_val): play_sfx_select())
 		vbox.add_child(slider_sfx)
-		
+
+		# Slider Sensibilidade do Mouse
+		var lbl_sens = Label.new()
+		lbl_sens.name = "SensitivityLabel"
+		lbl_sens.text = "SENSIBILIDADE DO MOUSE (%d%%)" % GameState.get_mouse_sensitivity_percent()
+		if font_retro:
+			lbl_sens.add_theme_font_override("font", font_retro)
+		lbl_sens.add_theme_font_size_override("font_size", 15)
+		lbl_sens.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9, 1))
+		vbox.add_child(lbl_sens)
+
+		var slider_sens = HSlider.new()
+		slider_sens.min_value = GameState.MOUSE_SENS_MIN
+		slider_sens.max_value = GameState.MOUSE_SENS_MAX
+		slider_sens.step = 0.0001
+		slider_sens.value = GameState.mouse_sensitivity
+		slider_sens.mouse_entered.connect(play_sfx_cursor)
+		slider_sens.value_changed.connect(func(v: float):
+			GameState.set_mouse_sensitivity(v)
+			lbl_sens.text = "SENSIBILIDADE DO MOUSE (%d%%)" % GameState.get_mouse_sensitivity_percent()
+		)
+		slider_sens.drag_ended.connect(func(_val): play_sfx_select())
+		vbox.add_child(slider_sens)
+
 		# Opção Tela Cheia
 		var check_fs = CheckBox.new()
 		check_fs.text = " TELA CHEIA (FULLSCREEN)"
@@ -636,7 +659,7 @@ func _setup_pause_menu() -> void:
 				DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 		)
 		vbox.add_child(check_fs)
-		
+
 		var sep2 = HSeparator.new()
 		vbox.add_child(sep2)
 		
@@ -843,7 +866,6 @@ func show_boundary_thought(text: String) -> void:
 	if not dialogue_ui or not dialogue_ui.has_method("start_dialogue"):
 		return
 	if dialogue_ui.has_method("is_active") and dialogue_ui.is_active():
-		print("[BoundaryThought] Diálogo ativo, ignorando mensagem: ", text)
 		return
 	dialogue_ui.start_dialogue([
 		{"speaker": "Alice", "text": text, "thought": true}
@@ -1039,7 +1061,6 @@ func _update_wind_systems(delta: float) -> void:
 # ============================================================
 
 func _play_opening_sequence() -> void:
-	print("[Prologue] INIT — Ordem: 1s silêncio -> diálogo -> 3s silêncio -> sair do carro -> (libera controle) -> VHS -> carro ir embora")
 	_intro_lock = true
 	if fade_rect:
 		fade_rect.color = Color(0, 0, 0, 1)
@@ -1055,16 +1076,13 @@ func _play_opening_sequence() -> void:
 	# 1 segundo apenas de ambiente do carro parado + tela preta, sem ninguém falando
 	await get_tree().create_timer(1.0).timeout
 	if _prologue_was_skipped: return
-	
-	print("[Prologue] Passou 1s. Disparando diálogo do prólogo.")
+
 	await _play_prologue_dialogue()
 	if _prologue_was_skipped: return
-	
-	print("[Prologue] Diálogo ACABOU. Esperando 3s de silêncio do motor ligado.")
+
 	await get_tree().create_timer(3.0).timeout
 	if _prologue_was_skipped: return
-	
-	print("[Prologue] Tocando som de saindo do carro (abrir/fechar porta).")
+
 	await _play_leaving_car_sfx()
 	if _prologue_was_skipped: return
 	
@@ -1072,7 +1090,6 @@ func _play_opening_sequence() -> void:
 	_intro_lock = false
 	if player and player.has_method("unfreeze"):
 		player.unfreeze()
-		print("[Prologue] Alice LIBERADA (unfreeze) ANTES do VHS. Câmera e mouse livres.")
 	if fade_rect:
 		var fade_tw := create_tween()
 		fade_tw.tween_property(fade_rect, "color:a", 0.0, 0.55)
@@ -1081,24 +1098,18 @@ func _play_opening_sequence() -> void:
 	# O motor NUNCA foi desligado — os pais só arrancam assim que a Alice
 	# sai e fecha a porta. Dispara aqui (sem esperar o VHS) pra já estar
 	# em movimento quando o boot VHS aparecer.
-	print("[Prologue] Alice já saiu, carro (motor ligado o tempo todo) já começa a arrancar.")
 	_set_world_audio_for_car_interior(false)
 	_drive_parents_car_away()
-	
-	print("[Prologue] Disparando boot VHS, HUD aparece (controle já está livre).")
+
 	await _play_vhs_intro_sequence()
 	if _prologue_was_skipped: return
-	
-	print("[Prologue] VHS acabou.")
+
 	await get_tree().create_timer(1.4).timeout
 	if _prologue_was_skipped: return
-	
-	print("[Prologue] Disparando pensamentos da Alice na calçada.")
+
 	await _play_alice_sidewalk_thoughts()
-	print("[Prologue] FIM TOTAL DO PRÓLOGO.")
 
 func _skip_prologue() -> void:
-	print("[Prologue] SKIP DISPARADO! Pulando todo o prólogo.")
 	_is_skipping_prologue = true
 	_prologue_was_skipped = true  # Flag permanente - nunca volta a false
 	
@@ -1114,8 +1125,7 @@ func _skip_prologue() -> void:
 	_intro_lock = false
 	if player and player.has_method("unfreeze"):
 		player.unfreeze()
-		print("[Prologue] Alice LIBERADA imediatamente (skip).")
-	
+
 	# Remove o carro se existir
 	if is_instance_valid(_parents_car):
 		_parents_car.queue_free()
@@ -1137,8 +1147,7 @@ func _skip_prologue() -> void:
 	
 	# Mostra objetivo diretamente
 	_set_objective("VÁ ATÉ O PRÉDIO\nADMINISTRATIVO E FAÇA\nSUA MATRÍCULA.", false)
-	
-	print("[Prologue] SKIP CONCLUÍDO. Jogo iniciado normalmente.")
+
 	_is_skipping_prologue = false
 
 func _prologue_lines() -> Array:
@@ -1184,7 +1193,6 @@ func _await_dialogue_with_timeout(timeout_s: float = 300.0) -> void:
 	var timeout_timer = get_tree().create_timer(timeout_s, false)
 	timeout_timer.timeout.connect(func():
 		timed_out = true
-		print("[Prologue] ⚠️ TIMEOUT do diálogo disparado após ", timeout_s, "s — forçando continuação.")
 	)
 	while dialogue_ui and dialogue_ui.has_method("is_active") and dialogue_ui.is_active() and not timed_out:
 		await dialogue_ui.dialogue_finished
@@ -1193,21 +1201,16 @@ func _await_dialogue_with_timeout(timeout_s: float = 300.0) -> void:
 	if timed_out and dialogue_ui and dialogue_ui.has_method("_finish_dialogue"):
 		dialogue_ui._finish_dialogue()
 		finished_emitted = true
-	print("[Prologue] Diálogo terminou. finished_emitted=", finished_emitted, " timeout=", timed_out)
 
 func _play_prologue_dialogue() -> void:
 	if not dialogue_ui or not dialogue_ui.has_method("start_dialogue"):
-		print("[Prologue] ⚠️ DialogueUI não tem start_dialogue! Pulando diálogo.")
 		return
-	print("[Prologue] Chamando dialogue_ui.start_dialogue prologue com black_screen=true")
 	dialogue_ui.start_dialogue(_prologue_lines(), true)
 	await _await_dialogue_with_timeout(300.0)
 
 func _play_alice_sidewalk_thoughts() -> void:
 	if not dialogue_ui or not dialogue_ui.has_method("start_dialogue"):
-		print("[Prologue] ⚠️ DialogueUI não tem start_dialogue! Pulando pensamentos.")
 		return
-	print("[Prologue] Chamando dialogue_ui.start_dialogue pensamentos calçada")
 	dialogue_ui.start_dialogue([
 		{"speaker": "Alice", "text": "(É rapidinho…)", "thought": true},
 		{"speaker": "Alice", "text": "(só entregar os documentos…)", "thought": true},

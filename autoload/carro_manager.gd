@@ -15,8 +15,6 @@ var carros_ativos: Array[Dictionary] = []
 func _ready() -> void:
 	randomize()
 	carregar_modelos()
-	var count = modelos_carros.size()
-	print("CarroManager: %d modelos de veículos carregados no pool." % count)
 
 func carregar_modelos() -> void:
 	modelos_carros.clear()

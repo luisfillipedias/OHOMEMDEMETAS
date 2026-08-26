@@ -15,6 +15,8 @@ extends Control
 @onready var master_slider: HSlider = $SettingsPanel/Margin/VBox/MasterSlider
 @onready var sfx_slider: HSlider = $SettingsPanel/Margin/VBox/SFXSlider
 @onready var btn_fullscreen: CheckBox = $SettingsPanel/Margin/VBox/CheckFullscreen
+@onready var sensitivity_label: Label = $SettingsPanel/Margin/VBox/SensitivityLabel
+@onready var sensitivity_slider: HSlider = $SettingsPanel/Margin/VBox/SensitivitySlider
 @onready var vhs_turn_on_overlay: ColorRect = $VHSTurnOnOverlay
 @onready var fade_overlay: ColorRect = $FadeOverlay
 
@@ -88,6 +90,12 @@ func _ready() -> void:
 	
 	btn_fullscreen.toggled.connect(_on_fullscreen_toggled)
 	btn_fullscreen.mouse_entered.connect(play_ui_cursor)
+
+	sensitivity_slider.value = GameState.mouse_sensitivity
+	_update_sensitivity_label(GameState.mouse_sensitivity)
+	sensitivity_slider.value_changed.connect(_on_sensitivity_changed)
+	sensitivity_slider.mouse_entered.connect(play_ui_cursor)
+	sensitivity_slider.drag_ended.connect(func(_val): play_ui_select())
 
 	for i in range(buttons.size()):
 		var idx: int = i
@@ -327,3 +335,10 @@ func _on_fullscreen_toggled(button_pressed: bool) -> void:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	else:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+
+func _on_sensitivity_changed(val: float) -> void:
+	GameState.set_mouse_sensitivity(val)
+	_update_sensitivity_label(val)
+
+func _update_sensitivity_label(val: float) -> void:
+	sensitivity_label.text = "SENSIBILIDADE DO MOUSE (%d%%)" % GameState.get_mouse_sensitivity_percent()
