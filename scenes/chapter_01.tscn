@@ -2117,7 +2117,7 @@ _data = {
 size = Vector3(1, 7.3470764, 6.1084595)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_frvqy"]
-size = Vector3(1.7512207, 12.151794, 10.061035)
+size = Vector3(1, 7.3470764, 6.1084595)
 
 [node name="Chapter01" type="Node3D" unique_id=220049408]
 script = ExtResource("1_ch01")
@@ -8576,13 +8576,13 @@ debug_mode = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7957993, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D2/StaticBody3D" unique_id=591186619]
-transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0.66077805, 3.6542685, 1.179718)
+transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 0.22625354, 3.6542685, -0.47692013)
 shape = SubResource("BoxShape3D_1iice")
 
 [node name="Area3D" type="Area3D" parent="Node3D2" unique_id=528560225]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D2/Area3D" unique_id=2014728064]
-transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 0.9959526, 5.575897, 6.190015)
+transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 1.5705109, 3.6542685, -0.10879803)
 shape = SubResource("BoxShape3D_frvqy")
 debug_color = Color(0.9965449, 0, 0.19349316, 0.41960785)
 

@@ -835,6 +835,19 @@ func hide_interact_hint() -> void:
 	interact_hint.hide()
 
 # ============================================================
+# LIMITES INVISÍVEIS DO MAPA — pensamento contextual da Alice
+# ============================================================
+
+func show_boundary_thought(text: String) -> void:
+	if not dialogue_ui or not dialogue_ui.has_method("start_dialogue"):
+		return
+	if dialogue_ui.has_method("is_active") and dialogue_ui.is_active():
+		return
+	dialogue_ui.start_dialogue([
+		{"speaker": "Alice", "text": text, "thought": true}
+	], false)
+
+# ============================================================
 # SISTEMA DE VEGETAÇÃO E VENTO REALISTA (SHADERS + RAJADAS)
 # ============================================================
 
