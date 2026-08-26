@@ -28,6 +28,7 @@ var clima_manager: ClimaManager = null
 # State Machine Flags
 var doc_pegou: bool = false
 var is_paused: bool = false
+var _docs_popup_com_objetivo: bool = true
 
 var pause_menu_control: Control = null
 var font_retro: Font = null
@@ -423,14 +424,15 @@ func _setup_hud_styling() -> void:
 		timecard_label.add_theme_constant_override("line_spacing", 4)
 
 	# 2. Configura Objective (Canto superior esquerdo, SEM fundo cinza e com pivot no topo-esquerdo)
+	_resolver_refs_objetivo()
 	if objective_panel:
 		var empty_style := StyleBoxEmpty.new()
 		objective_panel.add_theme_stylebox_override("panel", empty_style)
 		objective_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
 		objective_panel.offset_left = 36.0
 		objective_panel.offset_top = 28.0
-		objective_panel.offset_right = 520.0
-		objective_panel.offset_bottom = 220.0
+		objective_panel.offset_right = 420.0
+		objective_panel.offset_bottom = 128.0
 		objective_panel.pivot_offset = Vector2(0, 0)
 		objective_panel.scale = Vector2(1.0, 1.0)
 		objective_panel.modulate.a = 0.0
@@ -438,14 +440,16 @@ func _setup_hud_styling() -> void:
 	if objective_label:
 		objective_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		objective_label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+		objective_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+		objective_label.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 		if font_retro:
 			objective_label.add_theme_font_override("font", font_retro)
 		objective_label.add_theme_font_size_override("font_size", 18)
-		objective_label.add_theme_color_override("font_color", Color(0.92, 0.92, 0.95, 1.0))
+		objective_label.add_theme_color_override("font_color", Color(0.95, 0.95, 0.97, 1.0))
 		objective_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 1.0))
 		objective_label.add_theme_constant_override("shadow_offset_x", 2)
 		objective_label.add_theme_constant_override("shadow_offset_y", 2)
-		objective_label.add_theme_constant_override("line_spacing", 4)
+		objective_label.add_theme_constant_override("line_spacing", 0)
 
 	# 3. Configura InteractHint (Centro inferior, Amarelo retrô VCR)
 	if interact_hint:
@@ -692,6 +696,12 @@ func _show_timecard(local_text: String, hora_text: String, duration: float = 6.0
 
 var _popup_documentos: CanvasLayer = null
 
+func _resolver_refs_objetivo() -> void:
+	if not is_instance_valid(objective_panel) and is_instance_valid(hud):
+		objective_panel = hud.get_node_or_null("ObjectivePanel")
+	if not is_instance_valid(objective_label) and is_instance_valid(hud):
+		objective_label = hud.find_child("ObjectiveLabel", true, false) as Label
+
 func _mostrar_popup_documentos() -> void:
 	var inv = get_node_or_null("/root/Inventario")
 	if not inv or inv.itens.is_empty():
@@ -700,7 +710,7 @@ func _mostrar_popup_documentos() -> void:
 		var popup_scene: PackedScene = load("res://scenes/ui/item_pickup_popup.tscn")
 		if popup_scene:
 			_popup_documentos = popup_scene.instantiate()
-			add_child(_popup_documentos)
+			get_tree().root.add_child(_popup_documentos)
 	if is_instance_valid(_popup_documentos) and _popup_documentos.has_method("mostrar"):
 		_popup_documentos.mostrar(inv.itens[0])
 
@@ -709,6 +719,7 @@ func _esconder_popup_documentos() -> void:
 		_popup_documentos.esconder()
 
 func _set_objective(text: String, transition: bool = true) -> void:
+	_resolver_refs_objetivo()
 	if not objective_panel or not objective_label: return
 	_objective_typing_token += 1
 	var my_token = _objective_typing_token
@@ -720,11 +731,15 @@ func _set_objective(text: String, transition: bool = true) -> void:
 	if font_retro:
 		objective_label.add_theme_font_override("font", font_retro)
 	objective_label.add_theme_font_size_override("font_size", 18)
-	objective_label.add_theme_color_override("font_color", Color(0.92, 0.92, 0.95, 1.0))
+	objective_label.add_theme_color_override("font_color", Color(0.95, 0.95, 0.97, 1.0))
 	objective_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 1.0))
 	objective_label.add_theme_constant_override("shadow_offset_x", 2)
 	objective_label.add_theme_constant_override("shadow_offset_y", 2)
-	objective_label.add_theme_constant_override("line_spacing", 4)
+	objective_label.add_theme_constant_override("line_spacing", 0)
+	objective_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	objective_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	objective_label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+	objective_label.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	objective_panel.pivot_offset = Vector2(0, 0)
 	
 	# Exibe o painel PRIMEIRO — som dispara no mesmo frame que fica visivel
@@ -733,13 +748,20 @@ func _set_objective(text: String, transition: bool = true) -> void:
 	objective_panel.modulate.a = 1.0
 	objective_panel.show()
 	
+	# Popup do item inicial no mesmo instante do objetivo (some junto no shrink de 10s)
+	if _docs_popup_com_objetivo:
+		_docs_popup_com_objetivo = false
+		_mostrar_popup_documentos()
+	
+	# 10s a partir do momento em que objetivo + popup aparecem
+	_start_objective_idle_shrink(my_token)
+	
 	# Som dispara logo apos o painel aparecer
 	if is_instance_valid(audio_obj_appear):
 		audio_obj_appear.play()
 	
 	if not transition:
 		objective_label.text = "OBJETIVO:\n" + clean_text.to_upper()
-		_start_objective_idle_shrink(my_token)
 		return
 	
 	# Efeito Profissional de Digitação VHS / Typewriter IMEDIATO (sem delay de apagar)
@@ -765,9 +787,6 @@ func _set_objective(text: String, transition: bool = true) -> void:
 	# Para o som da máquina de escrever exatamente ao terminar a digitação
 	if is_instance_valid(audio_typewriter):
 		audio_typewriter.stop()
-	
-	# Inicia contagem de 10 segundos para encolher suavemente se não houver novas mudanças
-	_start_objective_idle_shrink(my_token)
 
 func _start_objective_idle_shrink(token: int) -> void:
 	await get_tree().create_timer(10.0).timeout
@@ -1078,11 +1097,6 @@ func _play_vhs_intro_sequence() -> void:
 	if is_instance_valid(vhs_overlay):
 		vhs_overlay.queue_free()
 	
-	# 5. Após o PLAY e o TIMECARD sumirem juntos, inicia digitação do objetivo no canto superior esquerdo
-		_set_objective("VÁ ATÉ O PRÉDIO ADMINISTRATIVO
-E FAÇA SUA MATRÍCULA.", true)
-	# Dispara o popup do item inicial "Cópias de Documentos" por 10s
-	var inv_node = get_node_or_null("/root/Inventario")
-	if inv_node and inv_node.itens.size() > 0:
-		if hud and hud.has_method("_on_item_adicionado"):
-			hud._on_item_adicionado(inv_node.itens[0])
+	# 5. Após o PLAY e o TIMECARD sumirem juntos, inicia digitação do objetivo
+	#    (quebras manuais compactas — sem autowrap espaçando as linhas)
+	_set_objective("VÁ ATÉ O PRÉDIO\nADMINISTRATIVO E FAÇA\nSUA MATRÍCULA.", true)

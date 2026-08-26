@@ -7,7 +7,7 @@ extends CanvasLayer
 @onready var timecard_label = $Timecard/TimecardLabel
 @onready var timecard_container = $Timecard
 @onready var objective_panel = $ObjectivePanel
-@onready var objective_label = $ObjectivePanel/ObjectiveLabel
+@onready var objective_label = find_child("ObjectiveLabel", true, false)
 @onready var interact_hint = $InteractHint
 @onready var consequence_panel = $ConsequencePopup
 @onready var consequence_label = $ConsequencePopup/ConsequenceLabel

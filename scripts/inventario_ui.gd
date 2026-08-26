@@ -25,10 +25,16 @@ var _itens: Array[Dictionary] = []
 var _aberto: bool = false
 
 # Rotação suave e inspeção por mouse
-var _rot_speed: float = 14.0 # Rotação lenta e elegante
+var _rot_speed: float = 10.0
 var _arrastando_mouse: bool = false
-var _rot_manual: Vector3 = Vector3(12.0, 25.0, 0.0)
-var _default_fov: float = 38.0
+var _rot_manual: Vector3 = Vector3(8.0, 25.0, 0.0)
+var _sens_inspecao: float = 0.62
+# Zoom por distância da câmera — intervalo amplo para inspecionar de perto
+var _zoom_dist: float = 2.35
+const ZOOM_NEAR := 0.68
+const ZOOM_FAR := 3.55
+const ZOOM_DEFAULT := 2.35
+const CAM_FOV := 34.0
 
 func _ready() -> void:
 	layer = 15
@@ -48,9 +54,13 @@ func abrir() -> void:
 	_indice = clamp(_indice, 0, max(0, _itens.size() - 1))
 	
 	_arrastando_mouse = false
-	_rot_manual = Vector3(12.0, 25.0, 0.0)
+	_rot_manual = Vector3(8.0, 25.0, 0.0)
+	_zoom_dist = ZOOM_DEFAULT
 	if is_instance_valid(camera_3d):
-		camera_3d.fov = _default_fov
+		camera_3d.fov = CAM_FOV
+		camera_3d.near = 0.04
+		camera_3d.position = Vector3(0.0, 0.0, _zoom_dist)
+		camera_3d.rotation = Vector3.ZERO
 	
 	root_control.modulate.a = 0.0
 	root_control.show()
@@ -93,22 +103,24 @@ func _input(event: InputEvent) -> void:
 			_arrastando_mouse = event.pressed
 			get_viewport().set_input_as_handled()
 		
-		# ── Zoom In / Zoom Out com a Roda do Mouse ───────────────────
+		# ── Zoom In / Zoom Out com a Roda do Mouse (dolly, sem cortar o topo) ──
 		elif event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
+			_zoom_dist = clamp(_zoom_dist - 0.22, ZOOM_NEAR, ZOOM_FAR)
 			if is_instance_valid(camera_3d):
-				camera_3d.fov = clamp(camera_3d.fov - 2.5, 22.0, 52.0)
+				camera_3d.position.z = _zoom_dist
 			get_viewport().set_input_as_handled()
 		
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
+			_zoom_dist = clamp(_zoom_dist + 0.22, ZOOM_NEAR, ZOOM_FAR)
 			if is_instance_valid(camera_3d):
-				camera_3d.fov = clamp(camera_3d.fov + 2.5, 22.0, 52.0)
+				camera_3d.position.z = _zoom_dist
 			get_viewport().set_input_as_handled()
 	
 	# ── 2. Movimento do Mouse: Girar em 3D ────────────────────────────
 	elif event is InputEventMouseMotion and _arrastando_mouse:
-		_rot_manual.y += event.relative.x * 0.45
-		_rot_manual.x += event.relative.y * 0.45
-		_rot_manual.x = clamp(_rot_manual.x, -65.0, 65.0)
+		_rot_manual.y += event.relative.x * _sens_inspecao
+		_rot_manual.x += event.relative.y * _sens_inspecao
+		_rot_manual.x = clamp(_rot_manual.x, -88.0, 88.0)
 		if is_instance_valid(item_pivot):
 			item_pivot.rotation_degrees = _rot_manual
 		get_viewport().set_input_as_handled()
@@ -169,7 +181,7 @@ func _atualizar_display() -> void:
 		if scene:
 			var inst: Node3D = scene.instantiate()
 			item_pivot.add_child(inst)
-			_auto_centralizar_e_escalar(inst, 1.4)
+			_auto_centralizar_e_escalar(inst, 0.82)
 
 func _auto_centralizar_e_escalar(root: Node3D, target_size: float = 1.4) -> void:
 	await get_tree().process_frame
@@ -202,6 +214,7 @@ func _auto_centralizar_e_escalar(root: Node3D, target_size: float = 1.4) -> void
 	
 	var scale_factor = target_size / max_dim
 	root.scale = Vector3.ONE * scale_factor
+	# Centraliza no eixo da câmera (sem tilt) para o zoom não raspar o topo do viewport
 	root.position = -total_aabb.get_center() * scale_factor
 
 func _coletar_meshes(node: Node, lista: Array[MeshInstance3D]) -> void:

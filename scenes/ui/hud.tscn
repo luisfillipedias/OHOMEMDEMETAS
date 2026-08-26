@@ -68,9 +68,12 @@ theme_override_constants/shadow_offset_x = 2
 theme_override_constants/shadow_offset_y = 2
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 15
+theme_override_constants/line_spacing = 0
 text = "OBJETIVO:
-VÁ ATÉ O PRÉDIO ADMINISTRATIVO E FAÇA SUA MATRÍCULA."
-autowrap_mode = 3
+VÁ ATÉ O PRÉDIO
+ADMINISTRATIVO E FAÇA
+SUA MATRÍCULA."
+autowrap_mode = 0
 
 [node name="Timecard" type="Control" parent="."]
 layout_mode = 1
