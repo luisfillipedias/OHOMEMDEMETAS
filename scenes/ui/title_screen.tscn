@@ -165,7 +165,7 @@ bbcode_enabled = true
 text = "[color=#c81818]W A S D[/color]  -  ANDAR
 [color=#c81818]E[/color]  -  INTERAGIR
 [color=#c81818]TAB[/color]  -  ABRIR INVENTÁRIO
-[color=#c81818]G[/color]  -  USAR ITEM
+[color=#c81818]G[/color]  -  JOGAR ITEM
 [color=#c81818]ESC[/color]  -  CONFIGURAÇÕES
 CLIQUE OU [color=#c81818]ESPAÇO[/color]  -  PULAR DIÁLOGOS"
 fit_content = true
@@ -178,13 +178,13 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -260.0
-offset_top = -210.0
-offset_right = 260.0
-offset_bottom = 210.0
+offset_left = -265.0
+offset_top = -215.0
+offset_right = 265.0
+offset_bottom = 215.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.1, 0.16, 0.55, 0.96)
+color = Color(0.1, 0.16, 0.58, 0.98)
 
 [node name="VCRBorder" type="ReferenceRect" parent="SettingsPanel" unique_id=271028746]
 layout_mode = 1
@@ -193,102 +193,85 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-border_color = Color(0.9, 0.9, 0.9, 1)
+border_color = Color(0.92, 0.92, 0.92, 1)
 border_width = 3.0
 editor_only = false
 
-[node name="VBox" type="VBoxContainer" parent="SettingsPanel" unique_id=502128899]
+[node name="Margin" type="MarginContainer" parent="SettingsPanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 28.0
-offset_top = 20.0
-offset_right = -28.0
-offset_bottom = -75.0
+offset_left = 32.0
+offset_top = 24.0
+offset_right = -32.0
+offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 8
 
-[node name="SettingsTitle" type="Label" parent="SettingsPanel/VBox" unique_id=1935571147]
+[node name="VBox" type="VBoxContainer" parent="SettingsPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="SettingsTitle" type="Label" parent="SettingsPanel/Margin/VBox" unique_id=1935571147]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
 theme_override_fonts/font = ExtResource("4_text_font")
-theme_override_font_sizes/font_size = 22
-text = "FUNCTION"
+theme_override_font_sizes/font_size = 24
+text = "CONFIGURAÇÕES"
 horizontal_alignment = 1
 
-[node name="MasterLabel" type="Label" parent="SettingsPanel/VBox" unique_id=849548202]
+[node name="Separator" type="HSeparator" parent="SettingsPanel/Margin/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
+
+[node name="MasterLabel" type="Label" parent="SettingsPanel/Margin/VBox" unique_id=849548202]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_fonts/font = ExtResource("4_text_font")
 theme_override_font_sizes/font_size = 15
-text = "  MASTER VOLUME:"
+text = "VOLUME GERAL"
 
-[node name="MasterSlider" type="HSlider" parent="SettingsPanel/VBox" unique_id=2109852226]
+[node name="MasterSlider" type="HSlider" parent="SettingsPanel/Margin/VBox" unique_id=2109852226]
 layout_mode = 2
 max_value = 1.0
 step = 0.05
 value = 0.8
 
-[node name="SFXLabel" type="Label" parent="SettingsPanel/VBox" unique_id=1982664849]
+[node name="SFXLabel" type="Label" parent="SettingsPanel/Margin/VBox" unique_id=1982664849]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_fonts/font = ExtResource("4_text_font")
 theme_override_font_sizes/font_size = 15
-text = "  SFX VOLUME:"
+text = "VOLUME DE EFEITOS (SFX)"
 
-[node name="SFXSlider" type="HSlider" parent="SettingsPanel/VBox" unique_id=1205673704]
+[node name="SFXSlider" type="HSlider" parent="SettingsPanel/Margin/VBox" unique_id=1205673704]
 layout_mode = 2
 max_value = 1.0
 step = 0.05
 value = 0.9
 
-[node name="CheckFullscreen" type="CheckBox" parent="SettingsPanel/VBox" unique_id=977964476]
+[node name="CheckFullscreen" type="CheckBox" parent="SettingsPanel/Margin/VBox" unique_id=977964476]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_fonts/font = ExtResource("4_text_font")
-theme_override_font_sizes/font_size = 16
-text = "  TELA CHEIA"
+theme_override_font_sizes/font_size = 15
+text = " TELA CHEIA (FULLSCREEN)"
 
-[node name="BtnCloseSettings" type="Button" parent="SettingsPanel/VBox" unique_id=1503102532]
+[node name="Separator2" type="HSeparator" parent="SettingsPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="BtnCloseSettings" type="Button" parent="SettingsPanel/Margin/VBox" unique_id=1503102532]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 0.3, 0.3, 1)
 theme_override_fonts/font = ExtResource("4_text_font")
-theme_override_font_sizes/font_size = 17
-text = "→ VOLTAR"
+theme_override_font_sizes/font_size = 18
+text = "VOLTAR"
 flat = true
 alignment = 0
-
-[node name="VCRFooter" type="ColorRect" parent="SettingsPanel" unique_id=715865413]
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 6.0
-offset_top = -60.0
-offset_right = -6.0
-offset_bottom = -6.0
-grow_horizontal = 2
-grow_vertical = 0
-color = Color(0.92, 0.92, 0.92, 1)
-
-[node name="FooterText" type="Label" parent="SettingsPanel/VCRFooter" unique_id=1074859957]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(0.08, 0.08, 0.12, 1)
-theme_override_constants/line_spacing = 1
-theme_override_fonts/font = ExtResource("4_text_font")
-theme_override_font_sizes/font_size = 14
-text = "SELECT WITH (▲, ▼) AND (OK)
-PRESS (ESC) TO END"
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="VHSOverlay" type="ColorRect" parent="." unique_id=1903792607]
 material = ExtResource("6_vhs")

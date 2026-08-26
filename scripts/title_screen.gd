@@ -11,10 +11,10 @@ extends Control
 @onready var btn_config: Button = $MenuContainer/Options/BtnConfig
 @onready var btn_sair: Button = $MenuContainer/Options/BtnSair
 @onready var settings_panel: ColorRect = $SettingsPanel
-@onready var btn_close_settings: Button = $SettingsPanel/VBox/BtnCloseSettings
-@onready var master_slider: HSlider = $SettingsPanel/VBox/MasterSlider
-@onready var sfx_slider: HSlider = $SettingsPanel/VBox/SFXSlider
-@onready var btn_fullscreen: CheckBox = $SettingsPanel/VBox/CheckFullscreen
+@onready var btn_close_settings: Button = $SettingsPanel/Margin/VBox/BtnCloseSettings
+@onready var master_slider: HSlider = $SettingsPanel/Margin/VBox/MasterSlider
+@onready var sfx_slider: HSlider = $SettingsPanel/Margin/VBox/SFXSlider
+@onready var btn_fullscreen: CheckBox = $SettingsPanel/Margin/VBox/CheckFullscreen
 @onready var vhs_turn_on_overlay: ColorRect = $VHSTurnOnOverlay
 @onready var fade_overlay: ColorRect = $FadeOverlay
 
