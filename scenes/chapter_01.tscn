@@ -2510,17 +2510,17 @@ transform = Transform3D(-0.9993799, 0, 0.0352123, 0, 1, 0, -0.0352123, 0, -0.999
 script = ExtResource("21_d85ci")
 
 [node name="OmniLight3D" type="OmniLight3D" parent="CefetExterior/traffic_light" unique_id=1641230503]
-transform = Transform3D(-0.9993799, -0.0037139466, -0.035015892, 0, 0.9944222, -0.10547299, 0.0352123, -0.10540758, -0.9938055, 10.14577, 4.800094, -14.614477)
+transform = Transform3D(-0.9993799, -0.0037139466, -0.035015892, 0, 0.9944222, -0.10547299, 0.0352123, -0.10540758, -0.9938055, 10.146558, 5.229889, -14.592134)
 light_color = Color(1, 1, 0, 1)
 light_energy = 1.8
 
 [node name="OmniLight3D2" type="OmniLight3D" parent="CefetExterior/traffic_light" unique_id=1371573556]
-transform = Transform3D(-0.9993799, -0.0037139466, -0.035015892, 0, 0.9944222, -0.10547299, 0.0352123, -0.10540758, -0.9938055, 10.147113, 4.440628, -14.576374)
+transform = Transform3D(-0.9993799, -0.0037139466, -0.035015892, 0, 0.9944222, -0.10547299, 0.0352123, -0.10540758, -0.9938055, 10.14577, 4.800094, -14.614477)
 light_color = Color(0, 1, 0, 1)
 light_energy = 1.8
 
 [node name="OmniLight3D3" type="OmniLight3D" parent="CefetExterior/traffic_light" unique_id=445677132]
-transform = Transform3D(-0.9993799, -0.0037139466, -0.035015892, 0, 0.9944222, -0.10547299, 0.0352123, -0.10540758, -0.9938055, 10.146558, 5.229889, -14.592134)
+transform = Transform3D(-0.9993799, -0.0037139466, -0.035015892, 0, 0.9944222, -0.10547299, 0.0352123, -0.10540758, -0.9938055, 10.147113, 4.440628, -14.576374)
 light_color = Color(1, 0, 0, 1)
 light_energy = 1.8
 
@@ -3339,6 +3339,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.605984, -0.021334648, 1.86
 
 [node name="PosteCompleto2" parent="." unique_id=530142891 instance=ExtResource("47_q5j18")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2664566, 4.396843, 17.855408)
+
+[node name="PosteCompleto17" parent="." unique_id=1088395431 instance=ExtResource("47_q5j18")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.118635, 4.396843, 16.678446)
 
 [node name="PosteCompleto5" parent="." unique_id=1045225567 instance=ExtResource("47_q5j18")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40.775192, 4.2838, 17.504671)
