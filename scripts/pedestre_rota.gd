@@ -93,6 +93,8 @@ func _spawn_pedestre() -> void:
 	holder.position.y = altura_offset + 0.045 # Elevação para a sola do sapato não afundar no chão
 	follow.add_child(holder)
 
+	holder.add_child(modelo_inst)
+
 	# Corpo físico para colisão com o player
 	var corpo := AnimatableBody3D.new()
 	corpo.sync_to_physics = false
@@ -102,13 +104,23 @@ func _spawn_pedestre() -> void:
 
 	var colisor := CollisionShape3D.new()
 	var capsula := CapsuleShape3D.new()
-	capsula.radius = 0.25
-	capsula.height = 1.6
-	colisor.shape = capsula
-	colisor.position.y = 0.8  # centraliza a cápsula na altura de uma pessoa
-	corpo.add_child(colisor)
 
-	holder.add_child(modelo_inst)
+	# Mede o AABB real do modelo instanciado pra dimensionar a cápsula corretamente
+	var aabb_local: AABB = _calcular_aabb_pedestre(modelo_inst, holder)
+	if aabb_local.size.length() > 0.1:
+		var altura: float = aabb_local.size.y * 0.95  # ~5% de folga na altura
+		var largura: float = max(aabb_local.size.x, aabb_local.size.z) * 0.5
+		capsula.height = altura
+		capsula.radius = max(0.2, largura * 0.5)  # mínimo de 0.2 de raio
+		colisor.position = aabb_local.get_center()
+	else:
+		# Fallback: usa valores genéricos
+		capsula.radius = 0.25
+		capsula.height = 1.6
+		colisor.position.y = 0.8
+
+	colisor.shape = capsula
+	corpo.add_child(colisor)
 
 	# Áudio 3D posicional de passos com atenuação espacial audível
 	var audio_3d := AudioStreamPlayer3D.new()
@@ -375,6 +387,34 @@ func _atualizar_olhar_cabeca(p: Dictionary, jogador: Node3D, delta: float) -> vo
 		return
 
 	skeleton.set_bone_pose_rotation(head_idx, rot_final)
+
+## Calcula o AABB combinado de todos os MeshInstance3D dentro de "raiz",
+## já convertido para o espaço local de "referencia" (normalmente o holder).
+## Usado pra dimensionar a cápsula de colisão de cada modelo de pedestre
+## automaticamente, já que os modelos têm tamanhos/pivots diferentes.
+func _calcular_aabb_pedestre(raiz: Node3D, referencia: Node3D) -> AABB:
+	var combinado := AABB()
+	var tem_algo := false
+
+	var pilha: Array[Node] = [raiz]
+	while not pilha.is_empty():
+		var atual: Node = pilha.pop_back()
+		if atual is MeshInstance3D:
+			var vi := atual as MeshInstance3D
+			var aabb_mundo: AABB = vi.global_transform * vi.get_aabb()
+			if not tem_algo:
+				combinado = aabb_mundo
+				tem_algo = true
+			else:
+				combinado = combinado.merge(aabb_mundo)
+		for filho in atual.get_children():
+			pilha.append(filho)
+
+	if not tem_algo:
+		return AABB()
+
+	# Converte de espaço mundial para o espaço local de "referencia"
+	return referencia.global_transform.affine_inverse() * combinado
 
 func _converter_animacao_para_in_place(node: Node) -> void:
 	var anim_player = node.find_child("AnimationPlayer", true, false) as AnimationPlayer

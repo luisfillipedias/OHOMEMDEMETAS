@@ -111,6 +111,12 @@ func _tentar_spawnar() -> void:
 	holder.position.y = altura_suspensao
 	follow.add_child(holder)
 
+	# Instancia o modelo do carro primeiro — precisamos medir o tamanho real
+	# dele (cada um dos 21 modelos tem dimensões e "pivot" diferentes) antes
+	# de montar a caixa de colisão, senão ela fica errada pra maioria deles.
+	var inst: Node3D = (info["cena"] as PackedScene).instantiate()
+	holder.add_child(inst)
+
 	# Corpo físico para colisão com o player
 	var corpo := AnimatableBody3D.new()
 	corpo.sync_to_physics = false
@@ -120,13 +126,23 @@ func _tentar_spawnar() -> void:
 
 	var colisor := CollisionShape3D.new()
 	var caixa := BoxShape3D.new()
-	caixa.size = Vector3(1.8, 1.4, 4.2)  # tamanho aproximado do carro
-	colisor.shape = caixa
-	colisor.position.y = 0.7  # centraliza a caixa na altura do carro
-	corpo.add_child(colisor)
 
-	var inst: Node3D = (info["cena"] as PackedScene).instantiate()
-	holder.add_child(inst)
+	# Mede o AABB real do modelo instanciado (soma de todos os MeshInstance3D
+	# dele) e usa isso pra dimensionar/posicionar a caixa — em vez de um
+	# tamanho fixo igual pra todos os 21 modelos de carro.
+	var aabb_local: AABB = _calcular_aabb_veiculo(inst, holder)
+	if aabb_local.size.length() > 0.1:
+		var tamanho: Vector3 = aabb_local.size * 1.05  # ~5% de folga
+		caixa.size = tamanho
+		colisor.position = aabb_local.get_center()
+	else:
+		# Fallback: não deu pra medir (sem MeshInstance3D visível) — usa o
+		# valor genérico de antes.
+		caixa.size = Vector3(1.8, 1.4, 4.2)
+		colisor.position.y = 0.7
+
+	colisor.shape = caixa
+	corpo.add_child(colisor)
 	
 	var eng = inst.get_node_or_null("EngineAudio") as AudioStreamPlayer3D
 	var horn = inst.get_node_or_null("HornAudio") as AudioStreamPlayer3D
@@ -401,6 +417,34 @@ func _buzinar(c: Dictionary) -> void:
 	if is_instance_valid(h) and not h.playing:
 		h.pitch_scale = randf_range(0.92, 1.08)
 		h.play()
+
+## Calcula o AABB combinado de todos os MeshInstance3D dentro de "raiz",
+## já convertido para o espaço local de "referencia" (normalmente o holder).
+## Usado pra dimensionar a caixa de colisão de cada modelo de carro
+## automaticamente, já que os 21 modelos têm tamanhos/pivots diferentes.
+func _calcular_aabb_veiculo(raiz: Node3D, referencia: Node3D) -> AABB:
+	var combinado := AABB()
+	var tem_algo := false
+
+	var pilha: Array[Node] = [raiz]
+	while not pilha.is_empty():
+		var atual: Node = pilha.pop_back()
+		if atual is MeshInstance3D:
+			var vi := atual as MeshInstance3D
+			var aabb_mundo: AABB = vi.global_transform * vi.get_aabb()
+			if not tem_algo:
+				combinado = aabb_mundo
+				tem_algo = true
+			else:
+				combinado = combinado.merge(aabb_mundo)
+		for filho in atual.get_children():
+			pilha.append(filho)
+
+	if not tem_algo:
+		return AABB()
+
+	# Converte de espaço mundial para o espaço local de "referencia"
+	return referencia.global_transform.affine_inverse() * combinado
 
 func _finalizar(c: Dictionary) -> void:
 	_carros.erase(c)
