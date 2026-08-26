@@ -3,7 +3,8 @@ extends CanvasLayer
 # ============================================================
 # INVENTÁRIO UI – Estilo PSX / VHS / Fears to Fathom
 # - Rotação lenta automática
-# - Arraste com Botão Esquerdo do Mouse para inspecionar/girar o item
+# - Arraste com Botão Esquerdo do Mouse para inspecionar/girar o item em 3D
+# - Scroll do mouse para dar Zoom In / Zoom Out suave
 # ============================================================
 
 signal fechou
@@ -15,6 +16,7 @@ signal fechou
 @onready var btn_esq: Button               = $RootControl/BtnEsq
 @onready var btn_dir: Button               = $RootControl/BtnDir
 @onready var viewport_cont: Control        = $RootControl/ViewportContainer
+@onready var camera_3d: Camera3D           = $RootControl/ViewportContainer/SubViewport/Camera3D
 @onready var item_pivot: Node3D            = $RootControl/ViewportContainer/SubViewport/ItemPivot
 @onready var vazio_label: Label            = $RootControl/VazioLabel
 
@@ -23,14 +25,15 @@ var _itens: Array[Dictionary] = []
 var _aberto: bool = false
 
 # Rotação suave e inspeção por mouse
-var _rot_speed: float = 16.0 # Bem mais devagar e suave
+var _rot_speed: float = 14.0 # Rotação lenta e elegante
 var _arrastando_mouse: bool = false
 var _rot_manual: Vector3 = Vector3(12.0, 25.0, 0.0)
+var _default_fov: float = 38.0
 
 func _ready() -> void:
 	layer = 15
 	root_control.hide()
-	set_process_unhandled_input(false)
+	add_to_group("inventario_ui")
 	
 	if is_instance_valid(btn_esq):
 		btn_esq.pressed.connect(func(): _navegar(-1))
@@ -41,12 +44,13 @@ func abrir() -> void:
 	if _aberto:
 		return
 	_aberto = true
-	set_process_unhandled_input(true)
 	_itens = Inventario.get_itens()
 	_indice = clamp(_indice, 0, max(0, _itens.size() - 1))
 	
 	_arrastando_mouse = false
 	_rot_manual = Vector3(12.0, 25.0, 0.0)
+	if is_instance_valid(camera_3d):
+		camera_3d.fov = _default_fov
 	
 	root_control.modulate.a = 0.0
 	root_control.show()
@@ -62,7 +66,6 @@ func fechar() -> void:
 		return
 	_aberto = false
 	_arrastando_mouse = false
-	set_process_unhandled_input(false)
 	
 	var tw = create_tween()
 	tw.tween_property(root_control, "modulate:a", 0.0, 0.20)
@@ -80,18 +83,29 @@ func _process(delta: float) -> void:
 			_rot_manual.y += _rot_speed * delta
 		item_pivot.rotation_degrees = _rot_manual
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if not _aberto:
 		return
 	
-	# ── 1. Interação do Mouse: Arrastar para girar o item 3D ──────────
+	# ── 1. Interação do Mouse: Clique Esquerdo para arrastar ─────────
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			_arrastando_mouse = event.pressed
 			get_viewport().set_input_as_handled()
+		
+		# ── Zoom In / Zoom Out com a Roda do Mouse ───────────────────
+		elif event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
+			if is_instance_valid(camera_3d):
+				camera_3d.fov = clamp(camera_3d.fov - 2.5, 22.0, 52.0)
+			get_viewport().set_input_as_handled()
+		
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
+			if is_instance_valid(camera_3d):
+				camera_3d.fov = clamp(camera_3d.fov + 2.5, 22.0, 52.0)
+			get_viewport().set_input_as_handled()
 	
+	# ── 2. Movimento do Mouse: Girar em 3D ────────────────────────────
 	elif event is InputEventMouseMotion and _arrastando_mouse:
-		# Girar em X (inclinação) e Y (rotação horizontal)
 		_rot_manual.y += event.relative.x * 0.45
 		_rot_manual.x += event.relative.y * 0.45
 		_rot_manual.x = clamp(_rot_manual.x, -65.0, 65.0)
@@ -99,7 +113,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			item_pivot.rotation_degrees = _rot_manual
 		get_viewport().set_input_as_handled()
 	
-	# ── 2. Teclas: Navegação e Fechar ──────────────────────────────────
+	# ── 3. Teclas: Navegação e Fechar ──────────────────────────────────
 	elif event is InputEventKey and event.pressed and not event.echo:
 		match event.keycode:
 			KEY_ESCAPE, KEY_TAB:

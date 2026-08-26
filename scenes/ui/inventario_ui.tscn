@@ -297,7 +297,7 @@ grow_vertical = 0
 theme_override_fonts/normal_font = ExtResource("2_text_font")
 theme_override_font_sizes/normal_font_size = 14
 bbcode_enabled = true
-text = "[center][color=#e63946]TAB / ESC[/color] - VOLTAR      [color=#ffbe1a]◄ / ►[/color] - NAVEGAR      [color=#ffbe1a]BOTÃO ESQUERDO[/color] - GIRAR ITEM[/center]"
+text = "[center][color=#ffbe1a]TAB / ESC[/color] - VOLTAR      [color=#ffbe1a]◄ / ►[/color] - NAVEGAR      [color=#ffbe1a]CLIQUE ESQUERDO[/color] - GIRAR      [color=#ffbe1a]SCROLL[/color] - ZOOM[/center]"
 fit_content = true
 
 [node name="VazioLabel" type="Label" parent="RootControl"]

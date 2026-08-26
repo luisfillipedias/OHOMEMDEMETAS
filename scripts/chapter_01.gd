@@ -689,6 +689,25 @@ func _show_timecard(local_text: String, hora_text: String, duration: float = 6.0
 	tween.tween_property(timecard_panel, "modulate:a", 0.0, 0.8)
 	tween.tween_callback(timecard_panel.hide)
 
+
+var _popup_documentos: CanvasLayer = null
+
+func _mostrar_popup_documentos() -> void:
+	var inv = get_node_or_null("/root/Inventario")
+	if not inv or inv.itens.is_empty():
+		return
+	if not is_instance_valid(_popup_documentos):
+		var popup_scene: PackedScene = load("res://scenes/ui/item_pickup_popup.tscn")
+		if popup_scene:
+			_popup_documentos = popup_scene.instantiate()
+			add_child(_popup_documentos)
+	if is_instance_valid(_popup_documentos) and _popup_documentos.has_method("mostrar"):
+		_popup_documentos.mostrar(inv.itens[0])
+
+func _esconder_popup_documentos() -> void:
+	if is_instance_valid(_popup_documentos) and _popup_documentos.has_method("esconder"):
+		_popup_documentos.esconder()
+
 func _set_objective(text: String, transition: bool = true) -> void:
 	if not objective_panel or not objective_label: return
 	_objective_typing_token += 1
@@ -753,6 +772,7 @@ func _set_objective(text: String, transition: bool = true) -> void:
 func _start_objective_idle_shrink(token: int) -> void:
 	await get_tree().create_timer(10.0).timeout
 	if token == _objective_typing_token and is_instance_valid(objective_panel):
+		_esconder_popup_documentos()
 		# Toca o som quando o objetivo for encolher (Select - 2)
 		play_sfx_objective_shrink()
 		
@@ -1059,9 +1079,8 @@ func _play_vhs_intro_sequence() -> void:
 		vhs_overlay.queue_free()
 	
 	# 5. Após o PLAY e o TIMECARD sumirem juntos, inicia digitação do objetivo no canto superior esquerdo
-		_set_objective("VÁ ATÉ O PRÉDIO
-ADMINISTRATIVO E FAÇA
-SUA MATRÍCULA.", true)
+		_set_objective("VÁ ATÉ O PRÉDIO ADMINISTRATIVO
+E FAÇA SUA MATRÍCULA.", true)
 	# Dispara o popup do item inicial "Cópias de Documentos" por 10s
 	var inv_node = get_node_or_null("/root/Inventario")
 	if inv_node and inv_node.itens.size() > 0:

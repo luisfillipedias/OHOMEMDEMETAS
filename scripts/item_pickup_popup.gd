@@ -1,7 +1,9 @@
 extends CanvasLayer
 
 # ============================================================
-# ITEM PICKUP POPUP – Fears to Fathom Style (10 segundos)
+# ITEM PICKUP POPUP – Fears to Fathom Style
+# - Canto superior direito
+# - Sincronizado com o ciclo de exibição do objetivo
 # ============================================================
 
 @onready var container: Control        = $Container
@@ -10,15 +12,19 @@ extends CanvasLayer
 
 var _mostrando: bool = false
 var _rot_speed: float = 36.0 # Rotação calma e elegante
+var _current_tween: Tween = null
 
 func _ready() -> void:
 	layer = 20
-	container.hide()
+	if is_instance_valid(container):
+		container.hide()
+		container.modulate.a = 0.0
 
 func mostrar(dados: Dictionary) -> void:
-	if _mostrando:
-		container.hide()
 	_mostrando = true
+	
+	if not is_instance_valid(container) or not is_instance_valid(item_pivot) or not is_instance_valid(nome_label):
+		await get_tree().process_frame
 	
 	nome_label.text = dados.get("nome", "ITEM").to_upper()
 	
@@ -35,27 +41,32 @@ func mostrar(dados: Dictionary) -> void:
 			item_pivot.add_child(inst)
 			_auto_centralizar_e_escalar(inst, 1.2)
 	
+	if is_instance_valid(_current_tween):
+		_current_tween.kill()
+	
 	container.modulate.a = 0.0
 	container.scale = Vector2(0.8, 0.8)
 	container.show()
 	
-	var tw = create_tween()
-	tw.set_parallel(true)
-	tw.tween_property(container, "modulate:a", 1.0, 0.4)
-	tw.tween_property(container, "scale", Vector2(1.0, 1.0), 0.4).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	await tw.finished
-	
-	# Fica visível por 10 segundos girando
-	await get_tree().create_timer(10.0).timeout
-	
-	var tw2 = create_tween()
-	tw2.set_parallel(true)
-	tw2.tween_property(container, "modulate:a", 0.0, 0.6)
-	tw2.tween_property(container, "scale", Vector2(0.85, 0.85), 0.6)
-	await tw2.finished
-	
-	container.hide()
+	_current_tween = create_tween().set_parallel(true)
+	_current_tween.tween_property(container, "modulate:a", 1.0, 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_current_tween.tween_property(container, "scale", Vector2(1.0, 1.0), 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+func esconder() -> void:
+	if not _mostrando:
+		return
 	_mostrando = false
+	
+	if is_instance_valid(_current_tween):
+		_current_tween.kill()
+	
+	_current_tween = create_tween().set_parallel(true)
+	_current_tween.tween_property(container, "modulate:a", 0.0, 0.65).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_current_tween.tween_property(container, "scale", Vector2(0.85, 0.85), 0.65).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	await _current_tween.finished
+	
+	if not _mostrando and is_instance_valid(container):
+		container.hide()
 
 func _process(delta: float) -> void:
 	if _mostrando and is_instance_valid(item_pivot):
