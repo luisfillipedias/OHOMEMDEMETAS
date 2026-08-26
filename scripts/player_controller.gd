@@ -22,6 +22,7 @@ const BOB_HORIZONTAL_AMP: float = 0.010
 @onready var camera_mount: Node3D = $CameraMount
 @onready var camera: Camera3D = $CameraMount/Camera3D
 @onready var interact_ray: RayCast3D = $CameraMount/Camera3D/InteractRay
+@onready var collision_shape: CollisionShape3D = $CollisionShape3D
 
 var is_frozen: bool = false
 var _inventario_aberto: bool = false
@@ -29,6 +30,7 @@ var _inventario_ui: CanvasLayer = null
 var camera_base_y: float = 0.65
 var default_fov: float = 72.0
 var is_zooming: bool = false
+var _capsule_half_height: float = 0.875
 
 # Head bobbing fase contínua (sem dupla suavização)
 var _bob_phase: float = 0.0
@@ -53,6 +55,8 @@ func _ready() -> void:
 	default_fov = camera.fov
 	floor_snap_length = 0.4
 	floor_max_angle = deg_to_rad(50.0)
+	if collision_shape and collision_shape.shape is CapsuleShape3D:
+		_capsule_half_height = (collision_shape.shape as CapsuleShape3D).height * 0.5
 	
 	camera.current = true
 	var listener := AudioListener3D.new()
@@ -226,16 +230,48 @@ func _play_footstep_sound() -> void:
 		_audio_footstep.play()
 
 func _handle_step_assist(dir: Vector3) -> void:
-	if not is_on_floor():
+	if not is_on_floor() or not is_on_wall():
 		return
-	if is_on_wall():
-		var space_state := get_world_3d().direct_space_state
-		var step_origin := global_position + Vector3(0, MAX_STEP_HEIGHT, 0)
-		var query := PhysicsRayQueryParameters3D.create(step_origin, step_origin + dir * 0.5)
-		query.exclude = [self]
-		var result := space_state.intersect_ray(query)
-		if result.is_empty():
-			global_position.y += 0.12
+
+	# Origem relativa aos PÉS, não ao centro da cápsula (esse era o bug raiz).
+	var feet_pos: Vector3 = global_position - Vector3(0, _capsule_half_height, 0)
+	var space_state := get_world_3d().direct_space_state
+	var probe_dist: float = 0.45
+
+	# 1) Confirma que HÁ algo bloqueando de fato ao nível dos pés/tornozelos.
+	#    Sem isso, "subir" não faz sentido (pode ser rampa, ladeira, etc).
+	var foot_from := feet_pos + Vector3(0, 0.05, 0)
+	var foot_query := PhysicsRayQueryParameters3D.create(foot_from, foot_from + dir * probe_dist)
+	foot_query.exclude = [self]
+	if space_state.intersect_ray(foot_query).is_empty():
+		return
+
+	# 2) Confirma que o TOPO do possível degrau (MAX_STEP_HEIGHT acima dos pés,
+	#    não do centro do corpo) está livre. Se ainda tem parede ali, não é
+	#    um degrau — é um obstáculo alto de verdade, e não tentamos subir.
+	var top_from := feet_pos + Vector3(0, MAX_STEP_HEIGHT, 0)
+	var top_query := PhysicsRayQueryParameters3D.create(top_from, top_from + dir * probe_dist)
+	top_query.exclude = [self]
+	if not space_state.intersect_ray(top_query).is_empty():
+		return
+
+	# 3) Acha a altura real de pouso (evita sempre somar um valor fixo,
+	#    que tanto pode deixar a Alice flutuando quanto enterrada no chão).
+	var landing_top := feet_pos + dir * probe_dist + Vector3(0, MAX_STEP_HEIGHT, 0)
+	var landing_query := PhysicsRayQueryParameters3D.create(landing_top, landing_top + Vector3(0, -MAX_STEP_HEIGHT - 0.1, 0))
+	landing_query.exclude = [self]
+	var landing_hit := space_state.intersect_ray(landing_query)
+	if landing_hit.is_empty():
+		return # não achou onde pousar (ex: buraco/vão) — não sobe
+
+	var step_up: float = float(landing_hit["position"].y) - feet_pos.y + 0.02
+	step_up = clamp(step_up, 0.0, MAX_STEP_HEIGHT)
+	if step_up > 0.01:
+		# move_and_collide (em vez de mexer em global_position.y direto):
+		# é testado fisicamente, então não atravessa tetos baixos nem
+		# gera overlap que o move_and_slide() do próximo frame precise
+		# "brigar" pra corrigir.
+		move_and_collide(Vector3(0, step_up, 0))
 
 func _check_interaction() -> void:
 	var chapter := get_tree().get_first_node_in_group("chapter")
