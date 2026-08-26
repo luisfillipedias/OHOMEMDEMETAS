@@ -2,11 +2,10 @@ extends Path3D
 
 # ============================================================
 # CARRO ROTA - CONTROLADOR DEFINITIVO DE TRÂNSITO ORGÂNICO
-# - Parada 100% rigorosa no sinal vermelho (sem vazamento)
-# - No AMARELO: motoristas decidem se aceleram ou freiam
-# - No VERDE: fluxo livre e contínuo
-# - Variação orgânica de faróis (intensidade e temperatura de cor)
-# - Tráfego esporádico e natural
+# - Sinal Verde: fluxo 100% livre em velocidade total
+# - Filtro lateral preciso de pedestres (ignora quem está na calçada)
+# - No Vermelho: parada limpa e travada na faixa
+# - No Amarelo: decisão dinâmica de passagem ou frenagem
 # ============================================================
 
 ## Índice 1-based do ponto de parada na curva (1 = primeiro ponto verde)
@@ -16,13 +15,13 @@ extends Path3D
 @export_group("Velocidade & Movimento")
 @export var vel_min: float = 8.5      # ~30 km/h
 @export var vel_max: float = 13.8     # ~50 km/h
-@export var aceleracao_base: float = 7.5
+@export var aceleracao_base: float = 8.5
 @export var frenagem_base: float = 24.0
 
 @export_group("Fila & Segurança")
 ## Distância de centro a centro para parada na fila (~6.2m carro + ~2.2m folga)
 @export var gap_parada_base: float = 8.4
-@export var gap_frenagem_base: float = 19.0
+@export var gap_frenagem_base: float = 18.0
 
 @export_group("Spawn Esporádico")
 @export var intervalo_min: float = 10.0
@@ -124,9 +123,9 @@ func _tentar_spawnar() -> void:
 	var hl_color_choice = randi() % 3
 	var hl_color: Color
 	match hl_color_choice:
-		0: hl_color = Color(1.0, 0.93, 0.78) # Lâmpada halógena quente/vintage
-		1: hl_color = Color(1.0, 0.98, 0.88) # Padrão neutro
-		2: hl_color = Color(0.92, 0.96, 1.0) # Lâmpada moderna/xenon
+		0: hl_color = Color(1.0, 0.93, 0.78)
+		1: hl_color = Color(1.0, 0.98, 0.88)
+		2: hl_color = Color(0.92, 0.96, 1.0)
 	
 	var hl_l = inst.get_node_or_null("HeadlightL") as SpotLight3D
 	var hl_r = inst.get_node_or_null("HeadlightR") as SpotLight3D
@@ -138,13 +137,13 @@ func _tentar_spawnar() -> void:
 	
 	# ── Personalidade única do motorista/carro ────────────────────────
 	var p_vel       = randf_range(vel_min, vel_max)
-	var p_acel      = aceleracao_base * randf_range(0.80, 1.20)
-	var p_freio     = frenagem_base   * randf_range(0.80, 1.20)
+	var p_acel      = aceleracao_base * randf_range(0.85, 1.20)
+	var p_freio     = frenagem_base   * randf_range(0.85, 1.20)
 	var p_gap_stop  = gap_parada_base * randf_range(0.90, 1.15)
 	var p_gap_slow  = gap_frenagem_base * randf_range(0.85, 1.15)
 	var p_lat_drift = randf_range(-0.16, 0.16)
 	var p_vel_noise_freq = randf_range(0.5, 1.0)
-	var p_vel_noise_amp  = randf_range(0.0, 0.5)
+	var p_vel_noise_amp  = randf_range(0.0, 0.4)
 	var p_noise_phase    = randf_range(0.0, TAU)
 	var p_ousadia_amarelo = randf_range(0.85, 1.35)
 	
@@ -178,15 +177,22 @@ func _tentar_spawnar() -> void:
 	_carros.append(dados)
 	cm.registrar_carro_ativo(dados)
 
+func _obter_estado_semaforo() -> int:
+	var grupo = "semaforo_rotas_inversas" if _eh_inversa else "semaforo_rotas_normais"
+	var sem = get_tree().get_first_node_in_group(grupo)
+	if is_instance_valid(sem) and sem.has_method("get_estado"):
+		return sem.get_estado()
+	
+	var ctrl = get_tree().get_first_node_in_group("controladores_semaforo")
+	if ctrl:
+		return ctrl.estado_inversas if _eh_inversa else ctrl.estado_diretas
+	return 2
+
 func _physics_process(delta: float) -> void:
 	if _carros.is_empty():
 		return
 	
-	# Obtém estado do semáforo (0=VERMELHO, 1=AMARELO, 2=VERDE)
-	var ctrl = get_tree().get_first_node_in_group("controladores_semaforo")
-	var estado_real: int = 0
-	if ctrl:
-		estado_real = ctrl.estado_inversas if _eh_inversa else ctrl.estado_diretas
+	var estado_real: int = _obter_estado_semaforo()
 	
 	# Obstáculos (Player e Pedestres)
 	var obs_pos: Array[Vector3] = []
@@ -219,29 +225,28 @@ func _physics_process(delta: float) -> void:
 		var vel_alvo: float = c["vel_cruzeiro"]
 		var car_pos: Vector3 = holder.global_position
 		var frente: Vector3 = c["dir_frente"]
+		var lateral = Vector3(-frente.z, 0.0, frente.x).normalized()
 		
-		# ── 1. REGISTRO DE PASSAGEM LIBERADA (Apenas no Verde ou Amarelo Passante) ──
+		# ── 1. REGISTRO DE PASSAGEM LIBERADA ─────────────────────────────
 		if _ponto_parada_m > 0.0 and not c["cruzou_sinal"]:
 			if estado_real == 2 and prog >= (_ponto_parada_m + 0.5):
 				c["cruzou_sinal"] = true
 		
-		# ── 2. COMPORTAMENTO DO SEMÁFORO ──────────────────────────────────────────
+		# ── 2. COMPORTAMENTO DO SEMÁFORO ──────────────────────────────────
 		if _ponto_parada_m > 0.0 and not c["cruzou_sinal"]:
 			var dist = _ponto_parada_m - prog
 			
 			if estado_real == 2: # VERDE
-				# Sinal totalmente livre: segue em velocidade de cruzeiro
+				# No VERDE: mantém 100% da velocidade de cruzeiro sem frear!
 				vel_alvo = c["vel_cruzeiro"]
 			
-			elif estado_real == 1: # AMARELO (Aviso de fechamento iminente)
+			elif estado_real == 1: # AMARELO
 				var limite_passagem = 12.0 * c.get("ousadia_amarelo", 1.0)
-				# Se estiver próximo e em velocidade suficiente, acelera um pouco e passa
 				if dist <= limite_passagem and c["vel_atual"] > 3.5:
 					vel_alvo = c["vel_cruzeiro"] * 1.12
 					if prog >= (_ponto_parada_m + 0.5):
 						c["cruzou_sinal"] = true
 				else:
-					# Distante: desacelera para parada segura antes da faixa
 					if dist > 0.0:
 						var t = clamp(dist / 22.0, 0.0, 1.0)
 						vel_alvo = min(vel_alvo, c["vel_cruzeiro"] * (t * t))
@@ -250,12 +255,11 @@ func _physics_process(delta: float) -> void:
 						follow.progress = min(follow.progress, _ponto_parada_m)
 						c["vel_atual"] = 0.0
 			
-			elif estado_real == 0: # VERMELHO (Parada Obrigatória)
+			elif estado_real == 0: # VERMELHO
 				if dist > 0.0:
 					var t = clamp(dist / 22.0, 0.0, 1.0)
 					vel_alvo = min(vel_alvo, c["vel_cruzeiro"] * (t * t))
 				
-				# Trava absoluta antes do ponto de parada no vermelho
 				if dist <= 0.3 or prog >= _ponto_parada_m:
 					vel_alvo = 0.0
 					follow.progress = min(follow.progress, _ponto_parada_m)
@@ -276,22 +280,25 @@ func _physics_process(delta: float) -> void:
 						var r = clamp((gap - c["gap_parada"]) / (c["gap_frenagem"] - c["gap_parada"]), 0.0, 1.0)
 						vel_alvo = min(vel_alvo, c["vel_cruzeiro"] * r)
 		
-		# ── 4. PEDESTRES / PLAYER ────────────────────────────────────────
+		# ── 4. PEDESTRES / PLAYER (Com Filtro Lateral de Pista) ───────────
+		# Só freia para pedestres/player se estiverem DIRETAMENTE na pista em frente (< 1.75m lateral)
+		# Ignora pedestres que estão andando tranquilamente na calçada!
 		for op in obs_pos:
 			var to_op = (op - car_pos)
 			to_op.y = 0.0
-			var dist_op = to_op.length()
-			if dist_op < 11.0:
-				var dot = frente.dot(to_op.normalized())
-				if dot > 0.50:
-					if dist_op <= 4.5:
-						vel_alvo = 0.0
-						c["vel_atual"] = 0.0
-					else:
-						var r = clamp((dist_op - 4.5) / 6.5, 0.0, 1.0)
-						vel_alvo = min(vel_alvo, c["vel_cruzeiro"] * r)
+			var dist_frontal = to_op.dot(frente)
+			var dist_lateral = abs(to_op.dot(lateral))
+			
+			# Se estiver à frente (entre 0.5m e 9.5m) e dentro da largura da faixa (< 1.75m lateral)
+			if dist_frontal > 0.5 and dist_frontal < 9.5 and dist_lateral < 1.75:
+				if dist_frontal <= 4.2:
+					vel_alvo = 0.0
+					c["vel_atual"] = 0.0
+				else:
+					var r = clamp((dist_frontal - 4.2) / 5.3, 0.0, 1.0)
+					vel_alvo = min(vel_alvo, c["vel_cruzeiro"] * r)
 		
-		# ── 5. APLICAÇÃO DE VELOCIDADE COM RUÍDO ORGÂNICO ────────────────
+		# ── 5. APLICAÇÃO DE VELOCIDADE ───────────────────────────────────
 		c["tempo_total"] += delta
 		var noise_vel: float = 0.0
 		if vel_alvo > 1.0:

@@ -47,9 +47,9 @@ surface_material_override/0 = SubResource("Mat_Body")
 [node name="EngineAudio" type="AudioStreamPlayer3D" parent="."]
 stream = ExtResource("3_engine")
 autoplay = true
-volume_db = 0.0
-unit_size = 12.0
-max_distance = 55.0
+volume_db = 4.5
+unit_size = 28.0
+max_distance = 160.0
 attenuation_model = 1
 doppler_tracking = 1
 max_polyphony = 1
@@ -57,9 +57,9 @@ max_polyphony = 1
 [node name="HornAudio" type="AudioStreamPlayer3D" parent="."]
 stream = ExtResource("4_horn")
 autoplay = false
-volume_db = 4.0
-unit_size = 18.0
-max_distance = 70.0
+volume_db = 8.0
+unit_size = 45.0
+max_distance = 220.0
 attenuation_model = 1
 doppler_tracking = 1
 max_polyphony = 1

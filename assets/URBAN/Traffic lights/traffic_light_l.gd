@@ -9,6 +9,8 @@ extends Node3D
 @onready var luz_amarela: OmniLight3D  = $OmniLight3D2
 @onready var luz_verde: OmniLight3D    = $OmniLight3D3
 
+var estado_atual: int = 0 # 0=VERMELHO, 1=AMARELO, 2=VERDE (Começa Vermelho)
+
 func _ready() -> void:
 	if is_instance_valid(luz_vermelha):
 		luz_vermelha.light_color = Color(1.0, 0.05, 0.05)
@@ -23,7 +25,7 @@ func _ready() -> void:
 		luz_verde.light_energy = 1.6
 		luz_verde.omni_range = 6.0
 	
-	add_to_group("semaforo_lado_inverso")
+	add_to_group("semaforo_rotas_inversas")
 	
 	var ctrl = get_tree().get_first_node_in_group("controladores_semaforo")
 	if ctrl and ctrl.has_signal("mudou_estado"):
@@ -33,7 +35,8 @@ func _ready() -> void:
 		_ciclo_autonomo()
 
 func _on_mudou_estado(_estado_diretas: int, estado_inversas: int) -> void:
-	match estado_inversas:
+	estado_atual = estado_inversas
+	match estado_atual:
 		0: # VERMELHO (Acende topo)
 			ativar_luz(true, false, false)
 		1: # AMARELO (Acende meio)
@@ -46,13 +49,19 @@ func ativar_luz(vermelho: bool, amarelo: bool, verde: bool) -> void:
 	if is_instance_valid(luz_amarela): luz_amarela.visible = amarelo
 	if is_instance_valid(luz_verde): luz_verde.visible = verde
 
+func get_estado() -> int:
+	return estado_atual
+
+func is_vermelho() -> bool:
+	return estado_atual == 0
+
 func _ciclo_autonomo() -> void:
 	while true:
-		ativar_luz(false, false, true)
+		_on_mudou_estado(2, 0)
 		await get_tree().create_timer(20.0).timeout
-		ativar_luz(false, true, false)
+		_on_mudou_estado(1, 0)
 		await get_tree().create_timer(4.0).timeout
-		ativar_luz(true, false, false)
+		_on_mudou_estado(0, 2)
 		await get_tree().create_timer(20.0).timeout
-		ativar_luz(false, true, false)
+		_on_mudou_estado(0, 1)
 		await get_tree().create_timer(4.0).timeout
