@@ -70,6 +70,8 @@ var _audio_car_idle: AudioStreamPlayer = null
 var _audio_car_road: AudioStreamPlayer = null
 var _intro_lock: bool = true
 var _inside_car_audio: bool = false
+var _skip_prologue_hold_time: float = 0.0
+var _is_skipping_prologue: bool = false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -953,6 +955,16 @@ func _setup_wind_particles() -> void:
 func _process(delta: float) -> void:
 	_update_wind_systems(delta)
 	_monitor_ambience_playback(delta)
+	
+	# Detecta segurar ESPAÇO para pular prólogo
+	if _intro_lock and not _is_skipping_prologue:
+		var space_pressed = Input.is_action_pressed("ui_accept")
+		if space_pressed:
+			_skip_prologue_hold_time += delta
+			if _skip_prologue_hold_time >= 5.0:
+				_skip_prologue()
+		else:
+			_skip_prologue_hold_time = 0.0
 
 func _monitor_ambience_playback(_delta: float) -> void:
 	if _is_ambience_crossfading:
@@ -1059,6 +1071,49 @@ func _play_opening_sequence() -> void:
 	print("[Prologue] Disparando pensamentos da Alice na calçada.")
 	await _play_alice_sidewalk_thoughts()
 	print("[Prologue] FIM TOTAL DO PRÓLOGO.")
+
+func _skip_prologue() -> void:
+	print("[Prologue] SKIP DISPARADO! Pulando todo o prólogo.")
+	_is_skipping_prologue = true
+	
+	# Para qualquer áudio que esteja tocando
+	if is_instance_valid(_audio_car_idle):
+		_audio_car_idle.stop()
+	
+	# Cancela diálogos ativos
+	if dialogue_ui and dialogue_ui.has_method("_finish_dialogue"):
+		dialogue_ui._finish_dialogue()
+	
+	# Configura o estado final do prólogo imediatamente
+	_intro_lock = false
+	if player and player.has_method("unfreeze"):
+		player.unfreeze()
+		print("[Prologue] Alice LIBERADA imediatamente (skip).")
+	
+	# Remove o carro se existir
+	if is_instance_valid(_parents_car):
+		_parents_car.queue_free()
+	
+	# Configura áudio para estado pós-prólogo
+	_set_world_audio_for_car_interior(false)
+	
+	# Mostra tela preta e depois fade out
+	if fade_rect:
+		fade_rect.color = Color(0, 0, 0, 1)
+		fade_rect.show()
+	
+	await get_tree().create_timer(0.5).timeout
+	
+	if fade_rect:
+		var fade_tw := create_tween()
+		fade_tw.tween_property(fade_rect, "color:a", 0.0, 0.8)
+		fade_tw.tween_callback(fade_rect.hide)
+	
+	# Mostra objetivo diretamente
+	_set_objective("VÁ ATÉ O PRÉDIO\nADMINISTRATIVO E FAÇA\nSUA MATRÍCULA.", false)
+	
+	print("[Prologue] SKIP CONCLUÍDO. Jogo iniciado normalmente.")
+	_is_skipping_prologue = false
 
 func _prologue_lines() -> Array:
 	return [

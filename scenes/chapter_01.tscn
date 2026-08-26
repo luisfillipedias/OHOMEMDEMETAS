@@ -109,6 +109,7 @@
 [ext_resource type="PackedScene" path="res://scenes/vehicles/car_03_default.tscn" id="111_pif8r"]
 [ext_resource type="PackedScene" uid="uid://bx04v5ueawyof" path="res://assets/URBAN/Litter/Dumpsters/dumpster_trashpile_1.fbx" id="112_pif8r"]
 [ext_resource type="PackedScene" path="res://scenes/vehicles/car_04_default.tscn" id="112_t5gn1"]
+[ext_resource type="Script" uid="uid://cn37bkflvcab2" path="res://scripts/invisible_wall.gd" id="114_t5gn1"]
 [ext_resource type="Script" uid="uid://cwrxji6hun1y5" path="res://scripts/carro_rota.gd" id="Ext_Carro_Rota"]
 [ext_resource type="Script" uid="uid://bdh8gdlq0v3f7" path="res://scripts/controlador_semaforo.gd" id="Ext_Ctrl_Semaforo"]
 [ext_resource type="Script" uid="uid://d5kf7xra0m2" path="res://scripts/ternudo_sitting.gd" id="Ext_Ternudo_Sitting"]
@@ -2111,6 +2112,12 @@ tracks/28/keys = PackedFloat32Array(0, 1, 0.1411193, -0.03238885, -0.0069356593,
 _data = {
 &"mixamo_com": SubResource("Animation_i8lym")
 }
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1iice"]
+size = Vector3(1, 7.3470764, 6.1084595)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_frvqy"]
+size = Vector3(1.7512207, 12.151794, 10.061035)
 
 [node name="Chapter01" type="Node3D" unique_id=220049408]
 script = ExtResource("1_ch01")
@@ -8558,6 +8565,26 @@ autoplay = &"mixamo_com"
 
 [node name="dumpster_trashpile_1" parent="." unique_id=550023428 instance=ExtResource("112_pif8r")]
 transform = Transform3D(-0.03004282, 0, -0.9995486, 0, 1, 0, 0.9995486, 0, -0.03004282, 17.102142, 1.4678605, 23.258694)
+
+[node name="Node3D2" type="Node3D" parent="." unique_id=1223905879]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 47.88979, 0, 8.058779)
+script = ExtResource("114_t5gn1")
+mensagem = "(não devo ir ali, é perigoso.)"
+debug_mode = true
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Node3D2" unique_id=779680765]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7957993, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D2/StaticBody3D" unique_id=591186619]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0.66077805, 3.6542685, 1.179718)
+shape = SubResource("BoxShape3D_1iice")
+
+[node name="Area3D" type="Area3D" parent="Node3D2" unique_id=528560225]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D2/Area3D" unique_id=2014728064]
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 0.9959526, 5.575897, 6.190015)
+shape = SubResource("BoxShape3D_frvqy")
+debug_color = Color(0.9965449, 0, 0.19349316, 0.41960785)
 
 [editable path="PosteCompleto3"]
 [editable path="PosteCompleto3/street_light2"]
