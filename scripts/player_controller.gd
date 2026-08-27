@@ -243,7 +243,11 @@ func _handle_step_assist(dir: Vector3) -> void:
 	var foot_from := feet_pos + Vector3(0, 0.05, 0)
 	var foot_query := PhysicsRayQueryParameters3D.create(foot_from, foot_from + dir * probe_dist)
 	foot_query.exclude = [self]
-	if space_state.intersect_ray(foot_query).is_empty():
+	var foot_hit := space_state.intersect_ray(foot_query)
+	if foot_hit.is_empty():
+		return
+	var foot_collider := foot_hit.get("collider") as CollisionObject3D
+	if foot_collider == null or foot_collider is AnimatableBody3D or foot_collider is CharacterBody3D or foot_collider is RigidBody3D:
 		return
 
 	# 2) Confirma que o TOPO do possível degrau (MAX_STEP_HEIGHT acima dos pés,

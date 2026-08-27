@@ -60,6 +60,7 @@ func _eixo_direita() -> Vector3:
 func _criar_audio_assobio() -> void:
 	_audio_assobio = AudioStreamPlayer3D.new()
 	_audio_assobio.name = "AssobioAudio"
+	_audio_assobio.bus = "WorldOutside"
 	_audio_assobio.unit_size = assobio_unit_size
 	_audio_assobio.max_distance = assobio_max_distance
 	_audio_assobio.volume_db = volume_assobio_db

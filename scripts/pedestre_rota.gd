@@ -110,15 +110,15 @@ func _spawn_pedestre() -> void:
 	# Mede o AABB real do modelo instanciado pra dimensionar a cápsula corretamente
 	var aabb_local: AABB = _calcular_aabb_pedestre(modelo_inst, holder)
 	if aabb_local.size.length() > 0.1:
-		var altura: float = aabb_local.size.y * 0.95  # ~5% de folga na altura
+		var altura: float = max(aabb_local.size.y * 0.95, 1.75)  # ~5% de folga, com altura mínima humana
 		var largura: float = max(aabb_local.size.x, aabb_local.size.z) * 0.5
 		capsula.height = altura
-		capsula.radius = max(0.2, largura * 0.5)  # mínimo de 0.2 de raio
+		capsula.radius = max(0.28, largura * 0.5)  # mínimo de 0.28 de raio
 		colisor.position = aabb_local.get_center()
 	else:
 		# Fallback: usa valores genéricos
-		capsula.radius = 0.25
-		capsula.height = 1.6
+		capsula.radius = 0.28
+		capsula.height = 1.75
 		colisor.position.y = 0.8
 
 	colisor.shape = capsula
@@ -127,6 +127,7 @@ func _spawn_pedestre() -> void:
 	# Áudio 3D posicional de passos com atenuação espacial audível
 	var audio_3d := AudioStreamPlayer3D.new()
 	audio_3d.name = "FootstepAudio3D"
+	audio_3d.bus = "WorldOutside"
 	audio_3d.unit_size = 8.0
 	audio_3d.max_distance = 32.0
 	audio_3d.volume_db = 0.0

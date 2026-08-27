@@ -1291,6 +1291,7 @@ func _play_leaving_car_sfx() -> void:
 		sfx_door.play()
 		await sfx_door.finished
 		sfx_door.queue_free()
+		_set_world_audio_for_car_interior(false)
 	
 	var close_path := "res://assets/models/car/psx/Sound effects/Car_Door_Close.ogg"
 	if ResourceLoader.exists(close_path):
@@ -1326,7 +1327,7 @@ func _set_world_audio_for_car_interior(inside: bool) -> void:
 	if _wind_bus_idx >= 0 and _wind_bus_idx < AudioServer.bus_count:
 		AudioServer.set_bus_send(_wind_bus_idx, "WorldOutside" if inside else "Master")
 	if is_instance_valid(audio_wind):
-		audio_wind.volume_db = -8.0 if inside else 0.0
+		audio_wind.volume_db = -18.0 if inside else 0.0
 		if not audio_wind.playing:
 			audio_wind.play()
 	if not _is_ambience_crossfading and not _ambience_playlist.is_empty():

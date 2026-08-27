@@ -45,6 +45,7 @@ mesh = ExtResource("1_mesh")
 surface_material_override/0 = SubResource("Mat_Body")
 
 [node name="EngineAudio" type="AudioStreamPlayer3D" parent="."]
+bus = "WorldOutside"
 stream = ExtResource("3_engine")
 autoplay = true
 volume_db = 1.5
@@ -55,6 +56,7 @@ doppler_tracking = 1
 max_polyphony = 1
 
 [node name="HornAudio" type="AudioStreamPlayer3D" parent="."]
+bus = "WorldOutside"
 stream = ExtResource("4_horn")
 autoplay = false
 volume_db = 5.0
