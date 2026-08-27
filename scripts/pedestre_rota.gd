@@ -61,6 +61,9 @@ func _spawn_pedestre() -> void:
 	if not is_instance_valid(PedestreManager):
 		_agendar_proximo()
 		return
+	if not PedestreManager.spawn_liberado:
+		timer.start(0.25)
+		return
 
 	var escolha: Dictionary = PedestreManager.pick_pedestre()
 	if escolha.is_empty():

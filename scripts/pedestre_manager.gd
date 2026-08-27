@@ -10,6 +10,7 @@ var em_uso: Dictionary = {}
 var ultimo_usado_global: int = -1
 var pedestres_ativos_global: Array[Dictionary] = []
 var _proximo_spawn_id: int = 0
+var spawn_liberado: bool = false
 
 func _ready() -> void:
 	randomize()
@@ -88,6 +89,11 @@ func pick_pedestre() -> Dictionary:
 
 func liberar_pedestre(index: int) -> void:
 	em_uso[index] = false
+
+func liberar_spawn_apos(segundos: float = 3.0) -> void:
+	spawn_liberado = false
+	var timer_liberacao := get_tree().create_timer(segundos)
+	timer_liberacao.timeout.connect(func(): spawn_liberado = true)
 
 func gerar_spawn_id() -> int:
 	_proximo_spawn_id += 1

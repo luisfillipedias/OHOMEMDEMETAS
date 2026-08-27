@@ -706,6 +706,7 @@ func _toggle_pause() -> void:
 
 func _on_main_menu_pressed() -> void:
 	get_tree().paused = false
+	_limpar_popups_item()
 	get_tree().change_scene_to_file("res://scenes/ui/title_screen.tscn")
 
 # ============================================================
@@ -759,6 +760,13 @@ func _mostrar_popup_documentos() -> void:
 func _esconder_popup_documentos() -> void:
 	if is_instance_valid(_popup_documentos) and _popup_documentos.has_method("esconder"):
 		_popup_documentos.esconder()
+
+func _limpar_popups_item() -> void:
+	for popup in get_tree().get_nodes_in_group("item_pickup_popup"):
+		if is_instance_valid(popup):
+			if popup.has_method("esconder_imediato"):
+				popup.esconder_imediato()
+			popup.queue_free()
 
 func _set_objective(text: String, transition: bool = true) -> void:
 	_resolver_refs_objetivo()
@@ -1098,7 +1106,8 @@ func _play_opening_sequence() -> void:
 	# O motor NUNCA foi desligado — os pais só arrancam assim que a Alice
 	# sai e fecha a porta. Dispara aqui (sem esperar o VHS) pra já estar
 	# em movimento quando o boot VHS aparecer.
-	_set_world_audio_for_car_interior(false)
+	if is_instance_valid(PedestreManager):
+		PedestreManager.liberar_spawn_apos(3.0)
 	_drive_parents_car_away()
 
 	await _play_vhs_intro_sequence()
@@ -1132,6 +1141,8 @@ func _skip_prologue() -> void:
 	
 	# Configura áudio para estado pós-prólogo
 	_set_world_audio_for_car_interior(false)
+	if is_instance_valid(PedestreManager):
+		PedestreManager.spawn_liberado = true
 	
 	# Mostra tela preta e depois fade out
 	if fade_rect:
@@ -1285,13 +1296,16 @@ func _play_leaving_car_sfx() -> void:
 	if ResourceLoader.exists(door_path):
 		var sfx_door := AudioStreamPlayer.new()
 		sfx_door.name = "CarDoorAudio"
-		sfx_door.stream = load(door_path)
+		var door_stream := load(door_path) as AudioStream
+		sfx_door.stream = door_stream
 		sfx_door.volume_db = 0.0
 		add_child(sfx_door)
 		sfx_door.play()
+		var door_half_duration: float = door_stream.get_length() * 0.5 if door_stream else 0.5
+		await get_tree().create_timer(max(0.05, door_half_duration + 1.5)).timeout
+		_set_world_audio_for_car_interior(false)
 		await sfx_door.finished
 		sfx_door.queue_free()
-		_set_world_audio_for_car_interior(false)
 	
 	var close_path := "res://assets/models/car/psx/Sound effects/Car_Door_Close.ogg"
 	if ResourceLoader.exists(close_path):
@@ -1444,7 +1458,7 @@ func _drive_parents_car_away() -> void:
 	var rc = _parents_car.get_node_or_null("ParentsCarFrontRay") as RayCast3D
 	var car_ref: Node3D = _parents_car
 	
-	while is_instance_valid(car_ref) and x_now < end_x:
+	while is_inside_tree() and is_instance_valid(car_ref) and car_ref.is_inside_tree() and x_now < end_x:
 		var dt: float = get_process_delta_time()
 		t += dt
 		var blocked: bool = false
@@ -1456,6 +1470,8 @@ func _drive_parents_car_away() -> void:
 				if col and (col.is_in_group("carro") or col.name.to_lower().contains("carro") or col.name.to_lower().contains("car") or col is CharacterBody3D or col is RigidBody3D):
 					blocked = true
 		if blocked:
+			if not is_inside_tree():
+				return
 			await get_tree().process_frame
 			continue
 		
@@ -1473,9 +1489,15 @@ func _drive_parents_car_away() -> void:
 		var step: float = speed * dt
 		x_now = min(end_x, x_now + step)
 		var new_pos: Vector3 = Vector3(x_now, start_pos.y, start_pos.z)
+		if not is_inside_tree() or not is_instance_valid(car_ref) or not car_ref.is_inside_tree():
+			return
 		car_ref.global_position = new_pos
+		if not is_inside_tree():
+			return
 		await get_tree().process_frame
 	
+	if not is_inside_tree():
+		return
 	# Chegou ao destino, some
 	if is_instance_valid(car_ref):
 		car_ref.queue_free()
