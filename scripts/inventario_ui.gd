@@ -23,6 +23,11 @@ signal fechou
 var _indice: int = 0
 var _itens: Array[Dictionary] = []
 var _aberto: bool = false
+var _som_abrir: AudioStreamPlayer
+var _som_fechar: AudioStreamPlayer
+
+const SOM_ABRIR_INVENTARIO: AudioStream = preload("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cursor - 4.ogg")
+const SOM_FECHAR_INVENTARIO: AudioStream = preload("res://assets/audio/menu/UI/ogg/JDSherbert - Ultimate UI SFX Pack - Cursor - 3.ogg")
 
 # Rotação suave e inspeção por mouse
 var _rot_speed: float = 10.0
@@ -40,6 +45,14 @@ func _ready() -> void:
 	layer = 15
 	root_control.hide()
 	add_to_group("inventario_ui")
+	_som_abrir = AudioStreamPlayer.new()
+	_som_abrir.stream = SOM_ABRIR_INVENTARIO
+	_som_abrir.volume_db = -4.0
+	add_child(_som_abrir)
+	_som_fechar = AudioStreamPlayer.new()
+	_som_fechar.stream = SOM_FECHAR_INVENTARIO
+	_som_fechar.volume_db = -4.0
+	add_child(_som_fechar)
 	
 	if is_instance_valid(btn_esq):
 		btn_esq.pressed.connect(func(): _navegar(-1))
@@ -50,6 +63,7 @@ func abrir() -> void:
 	if _aberto:
 		return
 	_aberto = true
+	_som_abrir.play()
 	_itens = Inventario.get_itens()
 	_indice = clamp(_indice, 0, max(0, _itens.size() - 1))
 	
@@ -76,6 +90,7 @@ func fechar() -> void:
 		return
 	_aberto = false
 	_arrastando_mouse = false
+	_som_fechar.play()
 	
 	var tw = create_tween()
 	tw.tween_property(root_control, "modulate:a", 0.0, 0.20)
