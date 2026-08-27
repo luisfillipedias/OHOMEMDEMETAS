@@ -118,7 +118,7 @@ func _tentar_spawnar() -> void:
 
 	# Corpo físico para colisão com o player
 	var corpo := AnimatableBody3D.new()
-	corpo.sync_to_physics = true
+	corpo.sync_to_physics = false
 	corpo.collision_layer = 1  # layer 1 = a mesma que o player detecta por padrão (mask=1)
 	corpo.collision_mask = 1
 	holder.add_child(corpo)
@@ -373,6 +373,9 @@ func _physics_process(delta: float) -> void:
 		# ── 9. ORIENTAÇÃO E DESVIO LATERAL ───────────────────────────────
 		_orientar(c, follow.progress)
 		holder.position.x = c["lat_drift"]
+		var corpo: AnimatableBody3D = c.get("corpo")
+		if is_instance_valid(corpo):
+			corpo.global_transform = holder.global_transform
 
 		# ── 10. FIM DA ROTA ──────────────────────────────────────────────
 		if follow.progress >= (_length - 1.5):

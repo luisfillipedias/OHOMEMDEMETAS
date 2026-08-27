@@ -97,7 +97,7 @@ func _spawn_pedestre() -> void:
 
 	# Corpo físico para colisão com o player
 	var corpo := AnimatableBody3D.new()
-	corpo.sync_to_physics = true
+	corpo.sync_to_physics = false
 	corpo.collision_layer = 1  # layer 1 = a mesma que o player detecta por padrão (mask=1)
 	corpo.collision_mask = 1
 	holder.add_child(corpo)
@@ -196,9 +196,13 @@ func _spawn_pedestre() -> void:
 	_agendar_proximo()
 
 func _physics_process(delta: float) -> void:
-	# Com sync_to_physics = true, não precisamos mais sincronizar manualmente
 	if pedestres_ativos.is_empty():
 		return
+	for p in pedestres_ativos:
+		var corpo: AnimatableBody3D = p.get("corpo")
+		var holder: Node3D = p.get("holder")
+		if is_instance_valid(corpo) and is_instance_valid(holder):
+			corpo.global_transform = holder.global_transform
 
 func _process(delta: float) -> void:
 	if pedestres_ativos.is_empty():
