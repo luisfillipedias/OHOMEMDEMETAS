@@ -7,7 +7,7 @@ extends CharacterBody3D
 
 const WALK_SPEED := 3.2
 const GRAVITY := 12.0
-const MAX_STEP_HEIGHT := 0.35
+const MAX_STEP_HEIGHT := 0.40
 
 # Head Bobbing e Passos Físicos
 const STEP_DISTANCE: float = 1.25 # Metros entre cada passo (1.25m = cadência humana natural)
@@ -53,8 +53,10 @@ func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	camera_base_y = camera_mount.position.y
 	default_fov = camera.fov
-	floor_snap_length = 0.4
-	floor_max_angle = deg_to_rad(50.0)
+	floor_snap_length = 0.45
+	floor_max_angle = deg_to_rad(52.0)
+	floor_constant_speed = true
+	floor_stop_on_slope = true
 	if collision_shape and collision_shape.shape is CapsuleShape3D:
 		_capsule_half_height = (collision_shape.shape as CapsuleShape3D).height * 0.5
 	
@@ -230,7 +232,7 @@ func _play_footstep_sound() -> void:
 		_audio_footstep.play()
 
 func _handle_step_assist(dir: Vector3) -> void:
-	if not is_on_floor() or not is_on_wall():
+	if not is_on_floor():
 		return
 
 	# Origem relativa aos PÉS, não ao centro da cápsula (esse era o bug raiz).
