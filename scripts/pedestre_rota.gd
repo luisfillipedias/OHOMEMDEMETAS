@@ -20,6 +20,8 @@ var timer: Timer
 var pedestres_ativos: Array = []
 
 const AMOSTRA_FRENTE_METROS := 0.4
+const RAIO_SEGURANCA_PEDESTRE: float = 0.85
+const RAIO_LIBERACAO_PEDESTRE: float = 1.15
 const CALIBRACAO_FRENTE_GRAUS := {
 	"executivo.tscn": 180.0,
 	"gordola.tscn": 180.0,
@@ -181,17 +183,25 @@ func _spawn_pedestre() -> void:
 		"head_bone_idx": head_bone_idx,
 		"olhando_atual": 0.0,
 		"esta_olhando": false,
+		"spawn_id": PedestreManager.gerar_spawn_id() if is_instance_valid(PedestreManager) else 0,
+		"tween": null,
+		"cedendo_passagem": false,
 	}
 	pedestres_ativos.append(pedestre_data)
 
 	var tw = create_tween()
+	pedestre_data["tween"] = tw
 	tw.tween_property(follow, "progress_ratio", 0.998, duracao)
 	tw.finished.connect(func():
 		pedestres_ativos.erase(pedestre_data)
 		if is_instance_valid(PedestreManager):
 			PedestreManager.liberar_pedestre(index)
+			PedestreManager.desregistrar_pedestre_ativo(pedestre_data)
 		follow.queue_free()
 	)
+
+	if is_instance_valid(PedestreManager):
+		PedestreManager.registrar_pedestre_ativo(pedestre_data)
 
 	_agendar_proximo()
 
@@ -219,19 +229,21 @@ func _process(delta: float) -> void:
 	for p in pedestres_ativos:
 		if not is_instance_valid(p["follow"]):
 			continue
+		_evitar_outros_pedestres(p)
 		_orientar_para_frente(p["follow"], p["holder"])
 		
-		# Processa som de passos 3D espacial do pedestre
-		p["step_timer"] += delta
-		if p["step_timer"] >= p["step_interval"]:
-			p["step_timer"] -= p["step_interval"]
-			var a3d: AudioStreamPlayer3D = p["audio_3d"]
-			if is_instance_valid(a3d) and not _snds_pedestre.is_empty():
-				var snd = _snds_pedestre[randi() % _snds_pedestre.size()]
-				a3d.stream = snd
-				a3d.pitch_scale = randf_range(0.92, 1.08)
-				a3d.volume_db = randf_range(-2.0, +1.0)
-				a3d.play()
+		if not p.get("cedendo_passagem", false):
+			# Processa som de passos 3D espacial do pedestre
+			p["step_timer"] += delta
+			if p["step_timer"] >= p["step_interval"]:
+				p["step_timer"] -= p["step_interval"]
+				var a3d: AudioStreamPlayer3D = p["audio_3d"]
+				if is_instance_valid(a3d) and not _snds_pedestre.is_empty():
+					var snd = _snds_pedestre[randi() % _snds_pedestre.size()]
+					a3d.stream = snd
+					a3d.pitch_scale = randf_range(0.92, 1.08)
+					a3d.volume_db = randf_range(-2.0, +1.0)
+					a3d.play()
 		
 		# Distance Culling: só calcula rotação de cabeça se estiver dentro do raio de alcance
 		if permitir_olhar_jogador and jogador:
@@ -253,6 +265,40 @@ func _process(delta: float) -> void:
 				holder.position.x = lerp(holder.position.x, lado * -desvio, delta * 3.0)
 			else:
 				holder.position.x = lerp(holder.position.x, 0.0, delta * 3.0)
+
+func _evitar_outros_pedestres(p: Dictionary) -> void:
+	if not is_instance_valid(PedestreManager):
+		return
+	var holder: Node3D = p.get("holder")
+	if not is_instance_valid(holder):
+		return
+
+	var minha_pos: Vector3 = holder.global_position
+	var meu_spawn_id: int = p.get("spawn_id", 0)
+	var ja_cedendo: bool = p.get("cedendo_passagem", false)
+	var raio: float = RAIO_LIBERACAO_PEDESTRE if ja_cedendo else RAIO_SEGURANCA_PEDESTRE
+	var deve_ceder: bool = false
+
+	for outro in PedestreManager.pedestres_ativos_global:
+		if outro == p:
+			continue
+		var outro_holder: Node3D = outro.get("holder")
+		if not is_instance_valid(outro_holder):
+			continue
+		if minha_pos.distance_to(outro_holder.global_position) < raio and meu_spawn_id > outro.get("spawn_id", 0):
+			deve_ceder = true
+			break
+
+	var tw: Tween = p.get("tween")
+	if not is_instance_valid(tw):
+		return
+
+	if deve_ceder and not ja_cedendo:
+		p["cedendo_passagem"] = true
+		tw.pause()
+	elif not deve_ceder and ja_cedendo:
+		p["cedendo_passagem"] = false
+		tw.play()
 
 func _orientar_para_frente(follow: PathFollow3D, holder: Node3D) -> void:
 	if curve == null:

@@ -8,6 +8,8 @@ extends Node
 var modelos_pedestres: Array[PackedScene] = []
 var em_uso: Dictionary = {}
 var ultimo_usado_global: int = -1
+var pedestres_ativos_global: Array[Dictionary] = []
+var _proximo_spawn_id: int = 0
 
 func _ready() -> void:
 	randomize()
@@ -86,5 +88,17 @@ func pick_pedestre() -> Dictionary:
 
 func liberar_pedestre(index: int) -> void:
 	em_uso[index] = false
+
+func gerar_spawn_id() -> int:
+	_proximo_spawn_id += 1
+	return _proximo_spawn_id
+
+func registrar_pedestre_ativo(dados: Dictionary) -> void:
+	if not pedestres_ativos_global.has(dados):
+		pedestres_ativos_global.append(dados)
+
+func desregistrar_pedestre_ativo(dados: Dictionary) -> void:
+	pedestres_ativos_global.erase(dados)
+
 func obter_pedestre_disponivel() -> Dictionary:
 	return pick_pedestre()

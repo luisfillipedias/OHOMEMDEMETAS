@@ -1254,6 +1254,7 @@ func _start_car_interior_ambience() -> void:
 	_audio_car_idle = AudioStreamPlayer.new()
 	_audio_car_idle.name = "PrologueCarIdle"
 	_audio_car_idle.volume_db = -11.0
+	_audio_car_idle.bus = "CarInterior"
 	var idle_path := "res://assets/models/car/psx/Sound effects/Car_Engine_Loop.ogg"
 	if ResourceLoader.exists(idle_path):
 		var idle_st = load(idle_path) as AudioStream
@@ -1306,10 +1307,10 @@ func _play_leaving_car_sfx() -> void:
 func _set_world_audio_for_car_interior(inside: bool) -> void:
 	_inside_car_audio = inside
 	# Mundo lá fora: grave abafado, agudos cortados, como se passasse pela lataria.
-	_ensure_audio_bus("WorldOutside", 780.0 if inside else 12000.0)
+	_ensure_audio_bus("WorldOutside", 420.0 if inside else 12000.0)
 	var outside_idx := AudioServer.get_bus_index("WorldOutside")
 	if outside_idx >= 0:
-		AudioServer.set_bus_volume_db(outside_idx, -10.0 if inside else 0.0)
+		AudioServer.set_bus_volume_db(outside_idx, -15.0 if inside else 0.0)
 	var world_bus := "WorldOutside" if inside else "Master"
 	
 	var storm = get_node_or_null("AudioAmbience") as AudioStreamPlayer

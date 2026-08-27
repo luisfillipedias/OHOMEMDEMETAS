@@ -16,6 +16,7 @@ var _rest_pos: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
 	layer = 22
+	add_to_group("item_pickup_popup")
 	if is_instance_valid(container):
 		container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		container.hide()
@@ -23,6 +24,9 @@ func _ready() -> void:
 		_rest_pos = container.position
 
 func mostrar(dados: Dictionary) -> void:
+	if _inventario_esta_aberto():
+		esconder()
+		return
 	_mostrando = true
 	if not is_instance_valid(container):
 		await get_tree().process_frame
@@ -82,6 +86,21 @@ func esconder() -> void:
 	if not _mostrando and is_instance_valid(container):
 		container.hide()
 		container.position = _rest_pos
+
+func esconder_imediato() -> void:
+	_mostrando = false
+	if is_instance_valid(_current_tween):
+		_current_tween.kill()
+	if is_instance_valid(container):
+		container.hide()
+		container.modulate.a = 0.0
+		container.position = _rest_pos
+
+func _inventario_esta_aberto() -> bool:
+	for inventario in get_tree().get_nodes_in_group("inventario_ui"):
+		if is_instance_valid(inventario) and inventario.has_method("esta_aberto") and inventario.esta_aberto():
+			return true
+	return false
 
 func _process(delta: float) -> void:
 	if _mostrando and is_instance_valid(item_pivot):

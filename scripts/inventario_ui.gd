@@ -63,6 +63,7 @@ func abrir() -> void:
 	if _aberto:
 		return
 	_aberto = true
+	_esconder_popups_item()
 	_som_abrir.play()
 	_itens = Inventario.get_itens()
 	_indice = clamp(_indice, 0, max(0, _itens.size() - 1))
@@ -84,6 +85,14 @@ func abrir() -> void:
 	
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_atualizar_display()
+
+func esta_aberto() -> bool:
+	return _aberto
+
+func _esconder_popups_item() -> void:
+	for popup in get_tree().get_nodes_in_group("item_pickup_popup"):
+		if is_instance_valid(popup) and popup.has_method("esconder_imediato"):
+			popup.esconder_imediato()
 
 func fechar() -> void:
 	if not _aberto:
