@@ -99,7 +99,7 @@ func _spawn_pedestre() -> void:
 	var corpo := AnimatableBody3D.new()
 	corpo.sync_to_physics = true
 	corpo.collision_layer = 1  # layer 1 = a mesma que o player detecta por padrão (mask=1)
-	corpo.collision_mask = 0
+	corpo.collision_mask = 1
 	holder.add_child(corpo)
 
 	var colisor := CollisionShape3D.new()
