@@ -127,6 +127,7 @@
 [ext_resource type="Texture2D" uid="uid://dixq07f1xg7x1" path="res://assets/models/car/psx/Suspicious Car 01/Texture Black.png" id="129_miyr7"]
 [ext_resource type="Texture2D" uid="uid://dkcjoiquy5n8h" path="res://assets/models/car/psx/Suspicious Car 01/Texture Persian Blue.png" id="130_rbdle"]
 [ext_resource type="Script" uid="uid://cn37bkflvcab2" path="res://scripts/invisible_wall.gd" id="131_74htr"]
+[ext_resource type="PackedScene" uid="uid://cq7wfrkhcxvvj" path="res://assets/models/campus1/chao_collider.glb" id="chao_collider_res"]
 [ext_resource type="Script" uid="uid://cwrxji6hun1y5" path="res://scripts/carro_rota.gd" id="Ext_Carro_Rota"]
 [ext_resource type="Script" uid="uid://bdh8gdlq0v3f7" path="res://scripts/controlador_semaforo.gd" id="Ext_Ctrl_Semaforo"]
 [ext_resource type="Script" uid="uid://d5kf7xra0m2" path="res://scripts/ternudo_sitting.gd" id="Ext_Ternudo_Sitting"]
@@ -3511,6 +3512,8 @@ shape = SubResource("ConvexPolygonShape3D_bfiu6")
 
 [node name="AuxScene" parent="." unique_id=130274221 instance=ExtResource("17_yjb2w")]
 transform = Transform3D(99.937004, 3.5048668, 0.5577008, -2.7748592, 67.37099, 73.84748, 2.2125268, -73.81642, 67.42579, -15.11, 0.6, -18.846)
+
+[node name="ChaoCollider" parent="AuxScene" unique_id=2016602440 instance=ExtResource("chao_collider_res")]
 
 [node name="AuxScene2" parent="." unique_id=58500237 instance=ExtResource("18_d4qwm")]
 transform = Transform3D(-2.4010508, 0.6201075, 69.95606, 1.4510623, 69.982635, -0.5705392, -69.94376, 1.4305816, -2.4133098, -72.24959, 15.799947, -23.044416)
@@ -9561,6 +9564,7 @@ debug_mode = true
 [editable path="hall/Node3D3"]
 [editable path="galpao"]
 [editable path="AuxScene"]
+[editable path="AuxScene/ChaoCollider"]
 [editable path="bosque"]
 [editable path="AuxScene4"]
 [editable path="metalfence_both_sides_no_topbar2"]
