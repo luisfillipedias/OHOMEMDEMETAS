@@ -148,26 +148,27 @@ func _tentar_spawnar() -> void:
 
 	if is_instance_valid(eng):
 		# ===== CONFIGURAÇÃO DE SOM ESPACIAL 3D DO MOTOR =====
-		# Default do Godot 4 = panning_strength=0 (sem efeito estéreo).
-		# Forçamos 1.0 para que o motor pareça vir de verdade de onde o carro está.
 		eng.panning_strength = 1.0
 		eng.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
 		if eng.unit_size < 10.0: eng.unit_size = 28.0
 		if eng.max_distance < 80.0: eng.max_distance = 160.0
 		eng.doppler_tracking = AudioStreamPlayer3D.DOPPLER_TRACKING_IDLE_STEP
+		# ===== VOLUME AMBIENTAL =====
+		# Reduzimos o motor para não dominar o mix com vários veículos ao mesmo tempo.
+		eng.volume_db = min(eng.volume_db, -10.0 + randf_range(-2.5, 0.8))
 		eng.pitch_scale = randf_range(0.88, 1.12)
 		if not eng.playing: eng.play()
 
 	if is_instance_valid(horn):
 		# ===== CONFIGURAÇÃO DE SOM ESPACIAL 3D DA BUZINA =====
-		# O problema que você sentiu: sem panning_strength a buzina soava IGUAL
-		# de qualquer lado (parecia 2D mesmo sendo um AudioStreamPlayer3D).
 		horn.panning_strength = 1.0
 		horn.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
 		horn.doppler_tracking = AudioStreamPlayer3D.DOPPLER_TRACKING_IDLE_STEP
-		# Unit_size menor = som some mais rápido conforme se afasta (buzina não precisa de 45m)
 		horn.unit_size = 18.0
 		horn.max_distance = 180.0
+		# ===== VOLUME BUZINA =====
+		# Mantém a buzina audível, mas muito menos agressiva no trânsito.
+		horn.volume_db = min(horn.volume_db, -7.0 + randf_range(-1.0, 0.6))
 	
 	# ── Variação Orgânica dos Faróis por Veículo ──────────────────────
 	var hl_energy = randf_range(2.4, 4.2)
