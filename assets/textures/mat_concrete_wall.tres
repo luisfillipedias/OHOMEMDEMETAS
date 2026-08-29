@@ -4,7 +4,7 @@
 
 [resource]
 resource_name = "Mat_ConcreteWall"
-albedo_color = Color(0.78352344, 0.78352344, 0.78352326, 1)
+albedo_color = Color(0.36245593, 0.4848379, 0.22273803, 1)
 albedo_texture = ExtResource("1_tex")
 roughness = 0.88
 uv1_scale = Vector3(20, 20, 6.666)

@@ -52,6 +52,7 @@ volume_db = 1.5
 unit_size = 28.0
 max_distance = 160.0
 attenuation_model = 1
+panning_strength = 1.0
 doppler_tracking = 1
 max_polyphony = 1
 
@@ -60,9 +61,10 @@ bus = "WorldOutside"
 stream = ExtResource("4_horn")
 autoplay = false
 volume_db = 5.0
-unit_size = 45.0
-max_distance = 220.0
+unit_size = 18.0
+max_distance = 180.0
 attenuation_model = 1
+panning_strength = 1.0
 doppler_tracking = 1
 max_polyphony = 1
 
