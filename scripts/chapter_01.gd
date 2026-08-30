@@ -381,7 +381,7 @@ func _setup_wind_audio_system() -> void:
 	
 	audio_wind = AudioStreamPlayer.new()
 	audio_wind.name = "AudioWindSeamless"
-	audio_wind.volume_db = 0.0 # Volume pleno no bus, controlado pelo master
+	audio_wind.volume_db = -14.0 # Volume atmosférico agradável (reduzido para não estourar os ouvidos)
 	audio_wind.bus = "Wind"
 	audio_wind.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(audio_wind)
@@ -1066,7 +1066,7 @@ func _update_wind_systems(delta: float) -> void:
 		peak_db = max(p_left, p_right)
 	
 	# Mapeamento calibrado com a faixa real do arquivo de som (-24.0 dB calmo .. -12.5 dB rajada máxima)
-	var raw_energy: float = clamp((peak_db - (-24.0)) / 11.5, 0.0, 1.0)
+	var raw_energy: float = clamp((peak_db - (-38.0)) / 12.0, 0.0, 1.0)
 	
 	# Filtro de Inércia de Massa de Ar: Ataque orgânico (3.2) e retorno lento (1.6)
 	if raw_energy > _wind_audio_energy:
@@ -1368,7 +1368,7 @@ func _set_world_audio_for_car_interior(inside: bool) -> void:
 	if _wind_bus_idx >= 0 and _wind_bus_idx < AudioServer.bus_count:
 		AudioServer.set_bus_send(_wind_bus_idx, "WorldOutside" if inside else "Master")
 	if is_instance_valid(audio_wind):
-		audio_wind.volume_db = -18.0 if inside else 0.0
+		audio_wind.volume_db = -26.0 if inside else -14.0
 		if not audio_wind.playing:
 			audio_wind.play()
 	if not _is_ambience_crossfading and not _ambience_playlist.is_empty():
