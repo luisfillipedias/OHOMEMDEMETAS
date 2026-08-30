@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://blc6gtg3q271h"
+path="res://.godot/imported/tommy dreamer.obj-fb82e5851ba5cbb17097d6719b3f6c3c.mesh"
+
+[deps]
+
+files=["res://.godot/imported/tommy dreamer.obj-fb82e5851ba5cbb17097d6719b3f6c3c.mesh"]
+
+source_file="res://assets/models/_caracters/cenario/tommy-dreamer-psx/source/tommy dreamer/tommy dreamer.obj"
+dest_files=["res://.godot/imported/tommy dreamer.obj-fb82e5851ba5cbb17097d6719b3f6c3c.mesh", "res://.godot/imported/tommy dreamer.obj-fb82e5851ba5cbb17097d6719b3f6c3c.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

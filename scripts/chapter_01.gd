@@ -84,6 +84,7 @@ func _ready() -> void:
 		GameManager.set_flag("chapter_progress", 1)
 		GameManager.current_chapter = 1
 		GameManager.save_game()
+		GameManager.apply_brightness(world_env)  # Aplica brilho salvo pelo jogador
 	
 	if ResourceLoader.exists("res://assets/fonts/text_font.ttf"):
 		font_retro = load("res://assets/fonts/text_font.ttf") as Font
@@ -521,11 +522,11 @@ func _setup_pause_menu() -> void:
 		vcr_box.name = "VCRBox"
 		vcr_box.color = Color(0.10, 0.16, 0.58, 0.98)
 		vcr_box.set_anchors_preset(Control.PRESET_CENTER)
-		vcr_box.custom_minimum_size = Vector2(530, 480)
+		vcr_box.custom_minimum_size = Vector2(530, 560)
 		vcr_box.offset_left = -265
-		vcr_box.offset_top = -240
+		vcr_box.offset_top = -280
 		vcr_box.offset_right = 265
-		vcr_box.offset_bottom = 240
+		vcr_box.offset_bottom = 280
 		pause_menu_control.add_child(vcr_box)
 		
 		# Borda branca VCR
@@ -641,6 +642,31 @@ func _setup_pause_menu() -> void:
 		)
 		slider_sens.drag_ended.connect(func(_val): play_sfx_select())
 		vbox.add_child(slider_sens)
+
+		# Slider Brilho
+		var lbl_brilho = Label.new()
+		lbl_brilho.name = "BrightnessLabel"
+		lbl_brilho.text = "BRILHO (%d%%)" % int(round((GameManager.brightness - 0.5) / 1.5 * 100.0))
+		if font_retro:
+			lbl_brilho.add_theme_font_override("font", font_retro)
+		lbl_brilho.add_theme_font_size_override("font_size", 15)
+		lbl_brilho.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9, 1))
+		vbox.add_child(lbl_brilho)
+
+		var slider_brilho = HSlider.new()
+		slider_brilho.min_value = 0.5
+		slider_brilho.max_value = 2.0
+		slider_brilho.step = 0.05
+		slider_brilho.value = GameManager.brightness
+		slider_brilho.mouse_entered.connect(play_sfx_cursor)
+		slider_brilho.value_changed.connect(func(v: float):
+			GameManager.brightness = v
+			GameManager.apply_brightness(world_env)
+			GameManager.save_settings()
+			lbl_brilho.text = "BRILHO (%d%%)" % int(round((v - 0.5) / 1.5 * 100.0))
+		)
+		slider_brilho.drag_ended.connect(func(_val): play_sfx_select())
+		vbox.add_child(slider_brilho)
 
 		# Opção Tela Cheia
 		var check_fs = CheckBox.new()

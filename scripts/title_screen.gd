@@ -19,6 +19,8 @@ extends Control
 @onready var sensitivity_slider: HSlider = $SettingsPanel/Margin/VBox/SensitivitySlider
 @onready var vhs_turn_on_overlay: ColorRect = $VHSTurnOnOverlay
 @onready var fade_overlay: ColorRect = $FadeOverlay
+@onready var brightness_label: Label = $SettingsPanel/Margin/VBox/BrightnessLabel
+@onready var brightness_slider: HSlider = $SettingsPanel/Margin/VBox/BrightnessSlider
 
 # Audio Stream Players
 @onready var audio_game_start: AudioStreamPlayer = $AudioGameStart
@@ -58,6 +60,15 @@ func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	settings_panel.hide()
 	base_bg_pos = background.position
+
+	# Brilho: inicializa com valor salvo no GameManager
+	if brightness_slider:
+		brightness_slider.min_value = 0.5
+		brightness_slider.max_value = 2.0
+		brightness_slider.step = 0.05
+		brightness_slider.value = GameManager.brightness
+		brightness_slider.value_changed.connect(_on_brightness_changed)
+		_update_brightness_label(GameManager.brightness)
 	
 	_setup_ui_sounds()
 
@@ -314,6 +325,7 @@ func _on_close_settings_pressed() -> void:
 	# Som de voltar em settings (Select - 2) e fechar (Cursor - 2)
 	play_ui_back()
 	settings_panel.hide()
+	GameManager.save_settings()  # Persiste brilho e demais configs
 
 func _on_sair_pressed() -> void:
 	play_ui_select()
@@ -342,3 +354,13 @@ func _on_sensitivity_changed(val: float) -> void:
 
 func _update_sensitivity_label(val: float) -> void:
 	sensitivity_label.text = "SENSIBILIDADE DO MOUSE (%d%%)" % GameState.get_mouse_sensitivity_percent()
+
+func _on_brightness_changed(val: float) -> void:
+	GameManager.brightness = val
+	_update_brightness_label(val)
+
+func _update_brightness_label(val: float) -> void:
+	if not brightness_label:
+		return
+	var pct := int(round((val - 0.5) / 1.5 * 100.0))
+	brightness_label.text = "BRILHO (%d%%)" % pct
