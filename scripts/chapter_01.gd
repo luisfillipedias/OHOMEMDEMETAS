@@ -106,6 +106,7 @@ func _ready() -> void:
 	
 	# Aplica shader de vento nas árvores
 	_aplicar_vento_automatico_em_todas_arvores()
+	_inicializar_olhar_npcs_cefet()
 	
 	# Inicia sistema de rajadas dinâmicas ocasionais de vento
 	_start_dynamic_wind_system()
@@ -1635,3 +1636,33 @@ func _play_vhs_intro_sequence() -> void:
 	# 5. Após o PLAY e o TIMECARD sumirem juntos, inicia digitação do objetivo
 	#    (quebras manuais compactas — sem autowrap espaçando as linhas)
 	_set_objective("VÁ ATÉ O PRÉDIO\nADMINISTRATIVO E FAÇA\nSUA MATRÍCULA.", true)
+
+# ============================================================
+# SISTEMA DE OLHAR REALISTA PARA NPCS DO CEFET
+# ============================================================
+
+func _inicializar_olhar_npcs_cefet() -> void:
+	var npc_script = load("res://scripts/npc_look_at.gd") as Script
+	if not npc_script:
+		return
+
+	var skeletons = find_children("*", "Skeleton3D", true, false)
+	for skel in skeletons:
+		var parent_node = skel.get_parent()
+		if not is_instance_valid(parent_node) or not (parent_node is Node3D):
+			continue
+
+		var p_name = parent_node.name.to_lower()
+		var gp_name = parent_node.get_parent().name.to_lower() if parent_node.get_parent() else ""
+
+		# Ignora o jogador e rotas de pedestres dinâmicos
+		if "player" in p_name or "player" in gp_name or "rotapedestre" in gp_name or "pedestre" in gp_name:
+			continue
+
+		# Se o nó não tiver script, aplica o script de olhar dinamicamente
+		if parent_node.get_script() == null:
+			parent_node.set_script(npc_script)
+			parent_node.process_priority = 100
+			if parent_node.has_method("_ready"):
+				parent_node._ready()
+			parent_node.set_process(true)
